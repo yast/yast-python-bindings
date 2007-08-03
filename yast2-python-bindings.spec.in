@@ -31,7 +31,7 @@ rm $RPM_BUILD_ROOT/@plugindir@/libpy2lang_python.la
 
 
 # libYCP goes elsewhere
-%dir @libdir@/python
-@libdir@/python/site-packages
+%dir %{_libdir}/python
+%{_libdir}/python/site-packages
 %dir @moduledir@
 %doc @docdir@
