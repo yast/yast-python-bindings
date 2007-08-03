@@ -12,8 +12,7 @@
 
   File:	      Y2PythonComponent.cc
 
-  Author:     Stefan Hundhammer <sh@suse.de>
-	      Martin Vidner <mvidner@suse.cz>
+
 
 /-*/
 
