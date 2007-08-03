@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	gcc-c++ yast2-core-devel yast2-devtools python-devel
+BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel
 
 
 
