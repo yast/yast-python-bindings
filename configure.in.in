@@ -1,0 +1,42 @@
+## general configure.in.in
+
+## initialize
+@YAST2-INIT-COMMON@
+@YAST2-INIT-PROGRAM@
+
+
+## some common checks
+@YAST2-CHECKS-COMMON@
+@YAST2-CHECKS-PROGRAM@
+
+AC_PROGRAM_PATH(PYTHON, python)
+if test -z "$PYTHON" ; then
+    AC_MSG_ERROR(python is missing; please install python 2.5.)
+fi
+AC_SUBST(PYTHON)
+
+## -pthread -fno-strict-aliasing -DNDEBUG -O2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -g -fPIC
+## Find out what compiler/linker flags an embedded Python interpreter needs
+PYTHON_CFLAGS=-lpython2.5
+PYTHON_LDFLAGS=-lpython2.5
+
+AC_SUBST(PYTHON_CFLAGS)
+AC_SUBST(PYTHON_LDFLAGS)
+
+CFLAGS="${CFLAGS} ${PYTHON_CFLAGS}"
+CXXFLAGS="${CXXFLAGS} ${PYTHON_CFLAGS}"
+
+## Where to install modules
+PYTHON_VENDORARCH=${libdir}/python
+AC_SUBST(PYTHON_VENDORARCH)
+
+## make a literal of yast2dir so that it can be used in python instead
+## of shell
+eval yast2dir4python='"'$yast2dir'"'
+AC_SUBST(yast2dir4python)
+
+PKG_CHECK_MODULES([ZYPP], [libzypp])
+
+## and generate the output
+##AC_OUTPUT(src/YaPI.pm)
+@YAST2-OUTPUT@

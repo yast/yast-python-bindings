@@ -1,0 +1,62 @@
+Calling YCP from Python
+
+
+YCP module "sum.ycp":
+
+{
+
+
+module "sum";
+
+global integer suma(integer a, integer b) {
+
+    return a + b;
+}
+
+//y2milestone ("suma: %1", suma(1,1));
+
+global list<any> print_list(string a, integer b) {
+    list <any> any_list = [];
+    any_list = add(any_list, a);
+    any_list = add(any_list, b);
+
+    return any_list;
+
+}
+
+global map<string, any> print_map(string key, any value) {
+    map<string, any> result = $[];
+    result[key] = value;
+    return result;
+
+}
+
+
+calling from python...
+
+general it is called via ycp.run("name_of_module","name_of_function",arg1, arg2...)
+
+>>> import ycp
+>>>
+>>> sum = ycp.run('sum','suma',1,1)
+>>> print sum
+2
+>>>
+
+>>> list = ycp.run('sum','print_list','string_example',32.5)
+>>> print list
+['string_example', 32.5]
+>>>
+>>>
+
+>>> map = ycp.run('sum','print_map','string_key',685)
+>>> print map
+{'string_key': 685}
+>>>
+>>>
+>>> print list
+['string_example', 32.5]
+>>> map = ycp.run('sum','print_map','string_key',list)
+>>> print map
+{'string_key': ['string_example', 32.5]}
+>>>

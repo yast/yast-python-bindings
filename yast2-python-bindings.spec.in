@@ -1,0 +1,37 @@
+@HEADER-COMMENT@
+
+@HEADER@
+BuildRequires:	gcc-c++ yast2-core-devel yast2-devtools python-devel
+
+
+
+# YCPValue::valuetype_str()
+Requires:	yast2-core >= 2.13.28
+Requires:	python
+
+
+Summary:	-
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+rm $RPM_BUILD_ROOT/@plugindir@/libpy2lang_python.la
+
+@CLEAN@
+
+%files
+%defattr (-, root, root)
+@plugindir@/libpy2lang_python.so.*
+@plugindir@/libpy2lang_python.so
+
+
+# libYCP goes elsewhere
+%dir @libdir@/python
+@libdir@/python/site-packages
+%dir @moduledir@
+%doc @docdir@
