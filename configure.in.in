@@ -35,7 +35,6 @@ AC_SUBST(PYTHON_VENDORARCH)
 eval yast2dir4python='"'$yast2dir'"'
 AC_SUBST(yast2dir4python)
 
-PKG_CHECK_MODULES([ZYPP], [libzypp])
 
 ## and generate the output
 ##AC_OUTPUT(src/YaPI.pm)
