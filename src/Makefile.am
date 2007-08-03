@@ -39,7 +39,7 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-lscr -lyui			\
 		-lycp -ly2			\
 		-Xlinker --no-whole-archive	\
-		${ZYPP_LIBS} -ly2util		\
+		-ly2util			\
 		-version-info 2:0
 
 
@@ -51,7 +51,7 @@ liby2lang_python_la_LDFLAGS = -version-info 2:0
 # the yast libraries are apparently necessary when we're loaded by python.
 libpy2lang_python_la_LIBADD = $(PYTHON_LDFLAGS)	\
 		-L$(libdir) -L$(plugindir)	\
-		-lycp -ly2 ${ZYPP_LIBS} -ly2util
+		-lycp -ly2 -ly2util
 
 
 liby2lang_python_la_LIBADD  = $(PYTHON_LDFLAGS)
