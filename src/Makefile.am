@@ -22,7 +22,7 @@ libYCP_la_SOURCES =				\
 	YCP.cc
 
 
-install-exec-hook:
+install-data-hook:
 	$(LN_S) -f libYCP.so $(DESTDIR)$(pythonsodir)/ycp.so
 
 
