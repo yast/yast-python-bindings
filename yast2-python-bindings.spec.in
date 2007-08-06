@@ -21,6 +21,7 @@ Summary:	-
 
 @INSTALL@
 rm $RPM_BUILD_ROOT/@plugindir@/libpy2lang_python.la
+rm $RPM_BUILD_ROOT/%{_libdir}/python/site-packages/libYCP.la
 
 @CLEAN@
 
@@ -33,5 +34,4 @@ rm $RPM_BUILD_ROOT/@plugindir@/libpy2lang_python.la
 # libYCP goes elsewhere
 %dir %{_libdir}/python
 %{_libdir}/python/site-packages
-%dir @moduledir@
 %doc @docdir@

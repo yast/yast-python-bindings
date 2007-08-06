@@ -189,10 +189,11 @@ bool YPython::PythonTypeToYCPSimpleType(PyObject* pPythonValue, YCPValue &out) {
   
   // boolean value handling
   if (PyBool_Check(pPythonValue)) {
-     int compare = PyObject_Compare(pPythonValue, Py_True);
+     PyObject * true_value = PyBool_FromLong(1);
+     int compare = PyObject_Compare(pPythonValue, true_value);
      if (compare == 0) {       
         out = YCPBoolean (true);
-     } else if (compare < 0) {
+     } else if (compare < 1) {
         out = YCPBoolean (false);
      } else { 
         return false;
