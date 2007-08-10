@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 10 18:12:33 CEST 2007 - mvidner@suse.cz
+
+- Finished integrating Feature #120292, UI as a namespace callable
+  from yast2-*-bindings.
+- 2.15.2
+
+-------------------------------------------------------------------
 Mon Aug  6 14:19:33 CEST 2007 - juhliarik@suse.cz
 
 - initial version 
