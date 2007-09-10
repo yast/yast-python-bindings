@@ -222,6 +222,11 @@ bool YPython::PythonTypeToYCPSimpleType(PyObject* pPythonValue, YCPValue &out) {
      return true;
   }
 
+  if (pPythonValue == Py_None) {
+     out = YCPNull();
+     return true;
+  }
+
   return false;
 }
 
@@ -230,7 +235,11 @@ bool YPython::PythonTypeToYCPSimpleType(PyObject* pPythonValue, YCPValue &out) {
     * transfered are: boolean, integer, string, float,
     **/
 PyObject* YPython::YCPTypeToPythonSimpleType(YCPValue in) {
-  if (in->isBoolean()) {
+  
+  if (in.isNull()) {
+     return Py_None;
+ 
+  } else if (in->isBoolean()) {
      long val = 0;
      bool true_false = in->asBoolean()->value();      
      true_false ? val = 1 : val =0;      
@@ -245,6 +254,12 @@ PyObject* YPython::YCPTypeToPythonSimpleType(YCPValue in) {
 
   } else if (in->isString()) {
      return PyString_FromString((in->asString()->value()).c_str());
+
+  } else if (in->isVoid()) {
+     return Py_None;
+
+  } else if (in->isVoid()) {
+     return Py_None;
 
   } else
      return NULL;
