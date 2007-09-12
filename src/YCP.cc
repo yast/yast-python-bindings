@@ -9,7 +9,7 @@
 #include <y2/Y2Component.h>
 #include <y2/Y2ComponentCreator.h>
 #include <ycp/y2log.h>
-//#include <ycp/YBlock.h>
+#include <ycp/YBlock.h>
 #include <ycp/YExpression.h>
 #include <ycp/YStatement.h>
 #include <ycp/Import.h>
@@ -17,10 +17,12 @@
 #include <wfm/Y2WFMComponent.h>
 #include <ycp/YCPMap.h>
 #include <ycp/YCPList.h>
+#include <ycp/YCPPath.h>
 #include <ycp/YCPString.h>
 #include <ycp/SymbolTable.h>
 
 #include "YPython.h"
+#include "PythonLogger.h"
 
 
 YCPList ycp_ListFunctions;
@@ -31,27 +33,26 @@ PyObject * Import_YCPNameSpace (PyObject *args);
 
 PyObject * Init_UI (PyObject *args);
 
+PyObject * SCR_Run (const char *scr_command, PyObject *args);
+
+void init_wfm ();
+
 
 static bool HandleSymbolTable (const SymbolEntry & se) {
   if (se.isFunction ()) {
 
      ycp_ListFunctions->add(YCPString(se.name()));
-
+     /*
      cout << se.name() << endl;
      constFunctionTypePtr type = (constFunctionTypePtr)se.type();
      if (type->parameters())
         cout << type->parameters()->toString() << endl;
-
+     */
 
   }
   return true;
 }
 
-/*
-void MyClass::Foo () {
-  my_y2namespace->table()->forEach (&DoIt);
-}
-*/
 
 
 /**
@@ -89,10 +90,35 @@ static PyObject * ycp_init_ui(PyObject *self, PyObject *args) {
   return Init_UI (args);
 }
 
+static PyObject * ycp_scr_read(PyObject *self, PyObject *args) {
+
+  return  SCR_Run ("SCR::Read", args);
+}
+
+static PyObject * ycp_scr_write(PyObject *self, PyObject *args) {
+
+  return  SCR_Run ("SCR::Write", args);
+}
+
+static PyObject * ycp_scr_execute(PyObject *self, PyObject *args) {
+
+  return  SCR_Run ("SCR::Execute", args);
+}
+
+static PyObject * ycp_scr_dir(PyObject *self, PyObject *args) {
+
+  return  SCR_Run ("SCR::Dir", args);
+}
+
+
 static PyMethodDef YCPMethods[] = {
   {"run",  ycp_handle_function, METH_VARARGS, "Calling YCP from Python"},
   {"import_module",  ycp_import_namespace, METH_VARARGS, "Import namespace from YCP module"},
   {"init_ui",  ycp_init_ui, METH_VARARGS, "Initialization of UI for YCP"},
+  {"SCR_Read",  ycp_scr_read, METH_VARARGS, "SCR Read function"},
+  {"SCR_Write",  ycp_scr_write, METH_VARARGS, "SCR Write function"},
+  {"SCR_Execute",  ycp_scr_execute, METH_VARARGS, "SCR Execute function"},
+  {"SCR_Dir",  ycp_scr_dir, METH_VARARGS, "SCR Dir function"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -106,10 +132,14 @@ PyMODINIT_FUNC initycp(void) {
 
   (void) Py_InitModule("ycp", YCPMethods);
 
+  init_wfm ();
 
   PyRun_SimpleString(func_code);
 
 }
+
+
+
 
 
 
@@ -144,6 +174,20 @@ bool RegFunctions(char *NameSpace, YCPList list_functions) {
 
   return true;
 
+}
+
+Y2Component *owned_wfmc = 0;
+
+void init_wfm () {
+
+  //printf("Calling init_wfm ()\n");
+  if (Y2WFMComponent::instance () == 0) {
+     owned_wfmc = Y2ComponentBroker::createClient ("wfm");
+     if (owned_wfmc == 0) {
+	y2error ("Cannot create WFM component");
+        //printf("Cannot create WFM component\n");
+     }
+  }
 }
 
 Y2Component *owned_uic = 0;
@@ -248,6 +292,160 @@ PyObject * Import_YCPNameSpace (PyObject *args) {
 
 }
 
+
+PyObject * SCR_Run (const char *scr_command, PyObject *args) {
+
+  // access directly the statically declared builtins
+  extern StaticDeclaration static_declarations;
+  int number_args = PyTuple_Size(args);
+  YCPValue ycpArg = YCPNull ();
+  YCPValue ycpRetValue = YCPNull ();
+  YCPValue ycpPath = YCPNull ();
+  PyObject * pPythonValue;
+  PyObject * pReturnValue;
+    
+  YPython *ypython = YPython::yPython ();
+  char *temp; 
+  temp = (char *) malloc(20);
+  //printf("Test 1. %s\n",scr_command);
+
+  temp = strcpy(temp, scr_command);
+
+  //printf("Test 1.01. %s\n",temp);
+
+  declaration_t *bi_dt = static_declarations.findDeclaration(temp);
+
+  //printf("Test 1.1.\n");
+  
+  if (bi_dt == NULL) {
+     y2error ("No such builtin '%s'", scr_command);
+     return PyExc_RuntimeError;
+  }
+
+  YEBuiltin *bi_call = new YEBuiltin (bi_dt);
+  if (number_args < 1) {
+     y2error ("Missing argument of function.");
+     //printf("Missing argument of function.\n");
+     return  PyExc_SyntaxError;
+  }
+
+  //printf("Test 2.\n");
+  for (int i=0; i< number_args; i++) {
+      pPythonValue = PyTuple_GetItem(args, i);
+      if (pPythonValue) {
+         if (!(ypython->PythonTypeToYCPSimpleType(pPythonValue,ycpArg))) {
+            ycpArg = ypython->fromPythonListToYCPList (pPythonValue);
+            if (ycpArg.isNull())
+               ycpArg = ypython->fromPythonDictToYCPMap (pPythonValue);
+         }
+         //convert the first argument to path
+         if (i==0) {
+            if (ycpArg->isString()) {
+               //ycpArg = YCPPath(ycpArg->asString()->value());
+
+	       ycpPath = YCPPath(ycpArg->asString()->value());
+            } else {
+               y2error ("String argument is necessary.");
+               //printf("String argument is necessary.\n");
+               return  PyExc_TypeError;
+            }
+
+	    if (ycpArg.isNull()) {
+		y2error ("Problem converting 1st argument to path.");
+                //printf("Problem converting 1st argument to path.\n");
+                return PyExc_RuntimeError;
+
+	    }
+         }
+
+         //printf("Test 3.\n");
+	 if (ycpArg.isNull ()) {
+	    // an error has already been reported, now refine it.
+	    // Can't know parameter name?
+	    y2error ("... when passing parameter %d to builtin %s",
+		     i, scr_command);
+	    return  PyExc_RuntimeError;
+	 }
+
+
+         // Such YConsts without a specific type produce invalid
+	 // bytecode. (Which is OK here)
+	 // The actual parameter's YCode becomes owned by the function call?
+        
+	 YConst *param_c = new YConst (YCode::ycConstant, (i==0)? ycpPath:ycpArg);
+
+	 // for attaching the parameter, must get the real type so that it matches
+	 constTypePtr act_param_tp = Type::vt2type ((i==0) ? ycpPath->valuetype():ycpArg->valuetype());
+
+	 // Attach the parameter
+	 // Returns NULL if OK, Type::Error if excessive argument
+	 // Other errors (bad code, bad type) shouldn't happen
+
+         //printf("Test 4.\n");
+	 constTypePtr err_tp = bi_call->attachParameter (param_c, act_param_tp);
+	 if (err_tp != NULL) {
+	    if (err_tp->isError ()) {
+		// where we were called from.
+		y2error ("Excessive parameter to builtin %s",
+			 scr_command);
+	    } else {
+		y2internal ("attachParameter returned %s",
+			    err_tp->toString ().c_str ());
+	    }
+	    return PyExc_RuntimeError;
+	}
+
+
+      } else {
+         y2error ("Missing argument of function.");
+         //printf("Missing argument of function.\n");
+         return  PyExc_SyntaxError;
+
+      }
+  }
+  //printf("Test 5.\n");
+  
+  // now must check if we got fewer parameters than needed
+  // or there was another error while resolving the overload
+  constTypePtr err_tp = bi_call->finalize (PythonLogger::instance ());
+  if (err_tp != NULL) {
+     // apparently the error was already reported?
+     y2error ("Error type %s when finalizing builtin %s",
+	      err_tp->toString ().c_str (), scr_command);
+	return PyExc_RuntimeError;
+  }
+ 
+  // go call it now!
+  y2debug ("Python is calling builtin %s", scr_command);
+
+  ycpRetValue = YCPNull();
+  ycpRetValue = bi_call->evaluate (false /* no const subexpr elim */);
+  /*
+  if (ycpRetValue->isList())
+     printf("jj ycpRetValue->isList() %s\n", ycpRetValue->toString().c_str());
+  */
+
+  delete bi_call;
+  free(temp);
+
+
+  pReturnValue = ypython->YCPTypeToPythonSimpleType(ycpRetValue);
+  if (!pReturnValue)
+     pReturnValue = ypython->fromYCPListToPythonList(ycpRetValue);
+  if (!pReturnValue)
+     pReturnValue = ypython->fromYCPMapToPythonDict(ycpRetValue);
+
+  if (pReturnValue)
+     return pReturnValue;
+  else 
+     return Py_None;
+
+}
+
+
+
+
+
 PyObject * Call_YCPFunction (PyObject *args) {
 
 
@@ -318,8 +516,10 @@ PyObject * Call_YCPFunction (PyObject *args) {
      }
      SymbolEntryPtr sym_entry = sym_te->sentry();
      constFunctionTypePtr fun_type = (constFunctionTypePtr)sym_entry->type();
+     /*
      if (fun_type->parameterCount() >0 )
         cout << fun_type->parameters()->toString() << endl;
+     */
      Y2Function *func_call = ns->createFunctionCall (func_name, NULL);
      if (func_call == NULL) {
 	y2error ("No such function %s::%s", ns_name, func_name);
@@ -365,6 +565,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
         //printf("Problem with finishing arguments for adding arguments of function %s\n", func_name);
         return  PyExc_RuntimeError;
      }
+
      ycpRetValue = func_call->evaluateCall ();
      delete func_call;
      if (ycpRetValue.isNull ()) {
@@ -389,6 +590,20 @@ PyObject * Call_YCPFunction (PyObject *args) {
 
 }
 
+void delete_all () {
+
+  if (owned_uic != 0) {
+     delete owned_uic;
+     owned_uic = 0;
+  }
+
+  if (owned_wfmc != 0) {
+     delete owned_wfmc;
+     owned_wfmc = 0;
+  }
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -401,5 +616,6 @@ main(int argc, char *argv[])
     /* Add a static module */
     initycp();
 
+    delete_all ();
     Py_Finalize();
 }

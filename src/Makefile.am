@@ -19,7 +19,8 @@ pythonso_LTLIBRARIES = libYCP.la
 # binary part of the python module
 libYCP_la_SOURCES =				\
 	$(liby2lang_python_la_SOURCES)		\
-	YCP.cc
+	YCP.cc					\
+	PythonLogger.cc PythonLogger.h
 
 
 install-data-hook:

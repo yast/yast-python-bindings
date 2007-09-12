@@ -281,7 +281,7 @@ YCPList YPython::fromPythonListToYCPList (PyObject* pPythonList) {
             if (!ycp_value.isNull ()) {
 	       ycp_List->add(ycp_value);
             } else {
-               return YCPNull ();         
+               return YCPNull ();
             }
          } else { //end of if (PythonTypeToYCPSimpleType(item, ycp_value))
             return YCPNull ();
