@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Sep 9 18:00:33 CEST 2007 - juhliarik@suse.cz
+- Adding support for calling SCR
+- Adding support for ycp types symbol, term, path
+- Adding support for calling UI from YaST
+- Added patch for bug #308213 and bug# 300909
+- V 2.15.3
+
+-------------------------------------------------------------------
 Fri Aug 10 18:12:33 CEST 2007 - mvidner@suse.cz
 
 - Finished integrating Feature #120292, UI as a namespace callable
