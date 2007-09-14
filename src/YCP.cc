@@ -18,6 +18,7 @@
 #include <ycp/YCPMap.h>
 #include <ycp/YCPList.h>
 #include <ycp/YCPPath.h>
+#include <ycp/YCPTerm.h>
 #include <ycp/YCPString.h>
 #include <ycp/SymbolTable.h>
 
@@ -126,9 +127,40 @@ PyMODINIT_FUNC initycp(void) {
 
   char func_code[] = 
     "def _factory(module, name):\n\
-	def FunctionCall(*args):\n\
-	   return ycp.run(module, name, *args)\n\
-	return FunctionCall";
+       def FunctionCall(*args):\n\
+	 return ycp.run(module, name, *args)\n\
+       return FunctionCall";
+
+  char class_type_code[] = 
+    "class YCPType:\n\
+       def __init__(self, value=''):\n\
+         self.type = \"any\"\n\
+         self.value = value\n\
+       def identity(self):\n\
+         return self.type";
+
+  char class_symbol_type_code[] = 
+     "class Symbol(YCPType):\n\
+       def __init__(self, value):\n\
+         self.type = \"symbol\"\n\
+         self.value = value";
+
+  char class_path_type_code[] = 
+     "class Path(YCPType):\n\
+       def __init__(self, value):\n\
+         self.type = \"path\"\n\
+         self.value = value";
+
+
+  char class_term_type_code[] = 
+     "class Term(YCPType):\n\
+       def __init__(self, name, *args):\n\
+         self.type = \"term\"\n\
+         self.name = name\n\
+         self.value = args";
+
+
+
 
   (void) Py_InitModule("ycp", YCPMethods);
 
@@ -136,6 +168,13 @@ PyMODINIT_FUNC initycp(void) {
 
   PyRun_SimpleString(func_code);
 
+  PyRun_SimpleString(class_type_code);
+
+  PyRun_SimpleString(class_symbol_type_code);
+
+  PyRun_SimpleString(class_path_type_code);
+
+  PyRun_SimpleString(class_term_type_code);
 }
 
 
@@ -307,15 +346,10 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   YPython *ypython = YPython::yPython ();
   char *temp; 
   temp = (char *) malloc(20);
-  //printf("Test 1. %s\n",scr_command);
-
   temp = strcpy(temp, scr_command);
-
-  //printf("Test 1.01. %s\n",temp);
 
   declaration_t *bi_dt = static_declarations.findDeclaration(temp);
 
-  //printf("Test 1.1.\n");
   
   if (bi_dt == NULL) {
      y2error ("No such builtin '%s'", scr_command);
@@ -329,7 +363,7 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
      return  PyExc_SyntaxError;
   }
 
-  //printf("Test 2.\n");
+
   for (int i=0; i< number_args; i++) {
       pPythonValue = PyTuple_GetItem(args, i);
       if (pPythonValue) {
@@ -358,7 +392,7 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 	    }
          }
 
-         //printf("Test 3.\n");
+
 	 if (ycpArg.isNull ()) {
 	    // an error has already been reported, now refine it.
 	    // Can't know parameter name?
@@ -381,7 +415,6 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 	 // Returns NULL if OK, Type::Error if excessive argument
 	 // Other errors (bad code, bad type) shouldn't happen
 
-         //printf("Test 4.\n");
 	 constTypePtr err_tp = bi_call->attachParameter (param_c, act_param_tp);
 	 if (err_tp != NULL) {
 	    if (err_tp->isError ()) {
@@ -403,7 +436,6 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 
       }
   }
-  //printf("Test 5.\n");
   
   // now must check if we got fewer parameters than needed
   // or there was another error while resolving the overload
@@ -537,9 +569,13 @@ PyObject * Call_YCPFunction (PyObject *args) {
          pPythonValue = PyTuple_GetItem(args, i);
          if (pPythonValue) {
             if (!(ypython->PythonTypeToYCPSimpleType(pPythonValue,ycpArg))) {
-               ycpArg = ypython->fromPythonListToYCPList (pPythonValue);
+               ycpArg = ypython->fromPythonListToYCPList(pPythonValue);
                if (ycpArg.isNull())
-                  ycpArg = ypython->fromPythonDictToYCPMap (pPythonValue);
+                  ycpArg = ypython->fromPythonDictToYCPMap(pPythonValue);
+               if (ycpArg.isNull())
+                  ycpArg = ypython->fromPythonTupleToYCPList(pPythonValue);
+               if (ycpArg.isNull())
+                  ycpArg = ypython->fromPythonTermToYCPTerm(pPythonValue);
             }
 	    if (fun_type->parameterType(i-2)->matchvalue(ycpArg) != 0) {
                y2error ("Wrong type of argumment %d",i-2);
@@ -578,8 +614,14 @@ PyObject * Call_YCPFunction (PyObject *args) {
      pReturnValue = ypython->YCPTypeToPythonSimpleType(ycpRetValue);
      if (!pReturnValue)
          pReturnValue = ypython->fromYCPListToPythonList(ycpRetValue);
+    if (!pReturnValue)
+         pReturnValue = ypython->fromYCPListToPythonTuple(ycpRetValue);
      if (!pReturnValue)
          pReturnValue = ypython->fromYCPMapToPythonDict(ycpRetValue);
+     if (!pReturnValue)
+         pReturnValue = ypython->fromYCPTermToPythonTerm(ycpRetValue);
+
+
      return pReturnValue;
      
   } else {

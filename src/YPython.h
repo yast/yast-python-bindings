@@ -96,6 +96,30 @@ public:
      **/
     PyObject* fromYCPMapToPythonDict (YCPValue ycp_Map);
 
+    /**
+     * Convert a Python Tuple to YCPList
+     **/
+    YCPList fromPythonTupleToYCPList (PyObject* pPythonTuple);
+
+    /**
+     * Convert a YCPList to a Python tuple.
+     **/
+    PyObject* fromYCPListToPythonTuple (YCPValue ycp_List);
+
+    /**
+     * Convert a Python Tuple to YCPList
+     **/
+    YCPTerm fromPythonTermToYCPTerm (PyObject* pPythonTerm);
+
+    /**
+     * Convert a YCPList to a Python tuple.
+     **/
+    PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
+
+
+    PyObject  *pPathClass;
+    PyObject  *pSymbolClass;
+    PyObject  *pTermClass;
 
 
 protected:
@@ -111,8 +135,7 @@ protected:
      **/
     ~YPython();
 
-
-   
+    
 
 
 };
