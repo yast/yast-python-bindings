@@ -178,9 +178,34 @@ PyMODINIT_FUNC initycp(void) {
 }
 
 
+bool RegFunctions(char *NameSpace, YCPList list_functions) {
+    string nameSpace(NameSpace);
+    string function;
+    string python_code;
+    string postfix("Static"); // here can be random generated string
 
+    python_code = "class " + nameSpace + postfix + ":";
+    for (int i=0; i<list_functions.size();i++) {
+        function = list_functions->value(i)->asString()->value();
 
+        python_code += "\n\tdef " + function + "(self, *args):";
+        python_code += "\n\t\treturn ycp.run(\"" + nameSpace + "\", \"" + function + "\", *args)";
+    }
 
+    // registration into ycp module with nameSpace as name
+    python_code += "\nycp.__dict__['" + nameSpace + "'] = " + nameSpace + postfix + "()";
+
+    // debug:
+    //std::cout << "==============================" << std::endl;
+    //std::cout << python_code << std::endl;
+    //std::cout << "==============================" << std::endl;
+
+    PyRun_SimpleString(python_code.c_str());
+
+    return true;
+}
+
+/*
 
 bool RegFunctions(char *NameSpace, YCPList list_functions) {
 
@@ -214,6 +239,7 @@ bool RegFunctions(char *NameSpace, YCPList list_functions) {
   return true;
 
 }
+*/
 
 Y2Component *owned_wfmc = 0;
 

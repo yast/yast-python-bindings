@@ -1,12 +1,15 @@
 Calling YCP from Python
 
+1. Basic instructions
+=====================
 
-YCP module "sum.ycp":
+There is simple YCP module (example)
+------------------------------------
 
 {
 
 
-module "sum";
+module "test";
 
 global integer suma(integer a, integer b) {
 
@@ -32,31 +35,86 @@ global map<string, any> print_map(string key, any value) {
 }
 
 
-calling from python...
+}
 
-general it is called via ycp.run("name_of_module","name_of_function",arg1, arg2...)
+Calling this module from python
+-------------------------------
 
+Python 2.5.1 (r251:54863, Aug 17 2007, 22:45:43)
+[GCC 4.2.1 (SUSE Linux)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
 >>> import ycp
 >>>
->>> sum = ycp.run('sum','suma',1,1)
->>> print sum
-2
+>>> ycp.import_module("test")
+True
 >>>
+>>> ycp.test.suma(2,3)
+5
+>>>    
 
->>> list = ycp.run('sum','print_list','string_example',32.5)
->>> print list
-['string_example', 32.5]
->>>
->>>
 
->>> map = ycp.run('sum','print_map','string_key',685)
->>> print map
-{'string_key': 685}
+2. How to call UI from YaST in Python
+=====================================
+- there is important function: ycp.init_ui("qt")
+that initialize UI from YaST
+
+Python 2.5.1 (r251:54863, Aug 17 2007, 22:45:43)
+[GCC 4.2.1 (SUSE Linux)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
 >>>
+>>> import ycp
 >>>
->>> print list
-['string_example', 32.5]
->>> map = ycp.run('sum','print_map','string_key',list)
->>> print map
-{'string_key': ['string_example', 32.5]}
+>>> ycp.init_ui("qt")
+True
 >>>
+>>> ycp.import_module("Popup")
+True
+>>>
+>>> ycp.Popup.Message("Example text")
+>>> 
+
+
+3. How to call SCR from python
+==============================
+- there are 4 functions for working with SCR
+SCR_Dir, SCR_Read, SCR_Write and SCR_Execute
+- first argument of function is ycp path as string
+e.g. ".target.bash_output"
+
+Python 2.5.1 (r251:54863, Aug 17 2007, 22:45:43)
+[GCC 4.2.1 (SUSE Linux)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+>>> import ycp
+>>>
+>>> ycp.SCR_Execute(".target.bash_output","pwd")
+{'exit': 0, 'stderr': '', 'stdout': '/home/user\n'}
+>>>  
+
+
+4. Symbol, Path and Term in python
+==================================
+- after importing ycp python has 3 classes
+for building ycp type such as symbol, path or term
+
+
+>>>
+>>> path = Path(".my.path")
+>>>  
+
+
+>>>
+>>> symbol = Symbol("Enabled")
+>>>  
+
+>>>
+>>> term = Term("VBox",Term("Label","&Example Label"), Term("PushButton", "&So What"))
+>>>   
+
+5. Calling python module from YCP
+=================================
+- it works such as standart ycp module
+just write "import name_module_without_postfix_py"
+and you are able to call only function from python's module
+via "name_module_without_postfix_py::name_function(arg1, arg2..)"
