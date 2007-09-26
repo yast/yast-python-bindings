@@ -52,10 +52,9 @@ YPython * YPython::_yPython = 0;
 YPython::YPython() {
 
   PyObject* pMain;
-  PyObject* pYCP;
   PyObject* pMainDict;
   pMain = PyImport_AddModule("__main__");
-  pYCP = PyImport_AddModule("ycp");
+  PyRun_SimpleString("from ycp import *");
   pMainDict = PyModule_GetDict(pMain);
   pPathClass = PyDict_GetItemString(pMainDict, "Path");
   pSymbolClass = PyDict_GetItemString(pMainDict, "Symbol");

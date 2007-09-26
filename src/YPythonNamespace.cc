@@ -9,6 +9,7 @@
 
 #define y2log_component "Y2PythonNamespace"
 #include <ycp/y2log.h>
+#include <ycp/pathsearch.h>
 
 #include <ycp/YCPElement.h>
 #include <ycp/Type.h>
@@ -149,7 +150,7 @@ YPythonNamespace::YPythonNamespace (string name)
   PyObject* item;         //item from list of globals symbols from __main__
   PyObject* num_args;     //number of function argumets in python
   PyObject * fun_names;   //list of globals symbols from __main__
-   
+  string module;
   FILE*     file;
 
   int num_fun_names = 0;
@@ -161,16 +162,21 @@ YPythonNamespace::YPythonNamespace (string name)
   //add __main__ module
   pMain = PyImport_AddModule("__main__");
   PyRun_SimpleString("import __main__");
+  //PyRun_SimpleString("import ycp");
   //import inspect module - necessary for number of function arguments
   PyRun_SimpleString("import inspect");
   //obtain main dictionary of globals variables
   pMainDict = PyModule_GetDict(pMain);
 
-
   //Open file and his running in main module
-  file = fopen(strcat((char *) c_name, ".py"), "r");
+
+  module = YCPPathSearch::find (YCPPathSearch::Module, name + ".py");
+  
+  
+  file = fopen(module.c_str(), "r");
   if (file) {
-     PyRun_SimpleFile(file, strcat((char *) c_name, ".py"));
+     y2milestone("module name %s", module.c_str());
+     PyRun_SimpleFile(file, module.c_str());
   }
   //symbols from __main__
   PyRun_SimpleString("fun_names = dir(__main__)");
@@ -222,7 +228,7 @@ YPythonNamespace::YPythonNamespace (string name)
   } // end of for (int i = 0; i < num_fun_names; i++) 
 
   delete []command;
-  Py_CLEAR(fun_names);
+  //Py_CLEAR(fun_names);
 
 
   

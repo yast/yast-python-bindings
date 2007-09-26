@@ -1,6 +1,5 @@
 /**
  * 
- *
  * This is the path from Python to YCP. It defines XSUBs.
  */
 
@@ -25,8 +24,12 @@
 #include "YPython.h"
 #include "PythonLogger.h"
 
+/**
+ * Store pointer to ycp module itself.
+ */
+static PyObject *Self;
 
-YCPList ycp_ListFunctions;
+YCPList * ycp_ListFunctions;
 
 PyObject * Call_YCPFunction (PyObject *args);
 
@@ -36,10 +39,13 @@ PyObject * Init_UI (PyObject *args);
 
 PyObject * SCR_Run (const char *scr_command, PyObject *args);
 
+void Py_y2logger(PyObject *args);
+
 void init_wfm ();
 
 
 static bool HandleSymbolTable (const SymbolEntry & se) {
+
   if (se.isFunction ()) {
 
      ycp_ListFunctions->add(YCPString(se.name()));
@@ -111,6 +117,20 @@ static PyObject * ycp_scr_dir(PyObject *self, PyObject *args) {
   return  SCR_Run ("SCR::Dir", args);
 }
 
+static PyObject * ycp_y2logger (PyObject *self, PyObject *args) {
+
+  Py_y2logger(args);
+  return Py_None;
+}
+
+/**
+ * This is needed for importing new module from ycp.
+ */
+static PyMethodDef new_module_methods[] = {
+    {"__run", ycp_handle_function, METH_VARARGS, "Calling YCP from Python"},
+    {NULL, NULL, 0, NULL}
+};
+
 
 static PyMethodDef YCPMethods[] = {
   {"run",  ycp_handle_function, METH_VARARGS, "Calling YCP from Python"},
@@ -120,16 +140,13 @@ static PyMethodDef YCPMethods[] = {
   {"SCR_Write",  ycp_scr_write, METH_VARARGS, "SCR Write function"},
   {"SCR_Execute",  ycp_scr_execute, METH_VARARGS, "SCR Execute function"},
   {"SCR_Dir",  ycp_scr_dir, METH_VARARGS, "SCR Dir function"},
+  {"y2logger", ycp_y2logger, METH_VARARGS, "Logging error, debug messages and milestones in python"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 PyMODINIT_FUNC initycp(void) {
 
-  char func_code[] = 
-    "def _factory(module, name):\n\
-       def FunctionCall(*args):\n\
-	 return ycp.run(module, name, *args)\n\
-       return FunctionCall";
+  PyObject *traceback;
 
   char class_type_code[] = 
     "class YCPType:\n\
@@ -159,87 +176,141 @@ PyMODINIT_FUNC initycp(void) {
          self.name = name\n\
          self.value = args";
 
+  char func_y2internal[] =
+      "def y2internal(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(5, file, line, func, message)";
+
+  char func_y2security[] =
+      "def y2security(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(4, file, line, func, message)";
+
+  char func_y2error[] =
+      "def y2error(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(3, file, line, func, message)";
+
+  char func_y2warning[] =
+      "def y2warning(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(2, file, line, func, message)";
+
+  char func_y2milestone[] =
+      "def y2milestone(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(1, file, line, func, message)";
+
+  char func_y2debug[] =
+      "def y2debug(message):\n\
+        file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
+        y2logger(0, file, line, func, message)";
 
 
+  PyRun_SimpleString("import sys, traceback");
+  Self = Py_InitModule("ycp", YCPMethods);
 
-  (void) Py_InitModule("ycp", YCPMethods);
+  traceback = PyImport_AddModule("traceback");
 
+  PyModule_AddObject(Self,"traceback",traceback);
   init_wfm ();
 
-  PyRun_SimpleString(func_code);
+  PyObject *dict = PyModule_GetDict(Self);
+  PyObject *code;
 
-  PyRun_SimpleString(class_type_code);
-
-  PyRun_SimpleString(class_symbol_type_code);
-
-  PyRun_SimpleString(class_path_type_code);
-
-  PyRun_SimpleString(class_term_type_code);
-}
-
-
-bool RegFunctions(char *NameSpace, YCPList list_functions) {
-    string nameSpace(NameSpace);
-    string function;
-    string python_code;
-    string postfix("Static"); // here can be random generated string
-
-    python_code = "class " + nameSpace + postfix + ":";
-    for (int i=0; i<list_functions.size();i++) {
-        function = list_functions->value(i)->asString()->value();
-
-        python_code += "\n\tdef " + function + "(self, *args):";
-        python_code += "\n\t\treturn ycp.run(\"" + nameSpace + "\", \"" + function + "\", *args)";
-    }
-
-    // registration into ycp module with nameSpace as name
-    python_code += "\nycp.__dict__['" + nameSpace + "'] = " + nameSpace + postfix + "()";
-
-    // debug:
-    //std::cout << "==============================" << std::endl;
-    //std::cout << python_code << std::endl;
-    //std::cout << "==============================" << std::endl;
-
-    PyRun_SimpleString(python_code.c_str());
-
-    return true;
-}
-
-/*
-
-bool RegFunctions(char *NameSpace, YCPList list_functions) {
-
-  string reg_line_dict = "ycp.__dict__['";
-  string reg_line_name;
-  string reg_line_factory = " = _factory(\"";
-  reg_line_factory += NameSpace;
-  reg_line_factory += "\",\"";
-  reg_line_name.insert(0,NameSpace);
-  reg_line_name += "_";
-  string function;
-  string command;
-
-
-  for (int i=0; i<list_functions.size();i++) {
-    function = list_functions->value(i)->asString()->value();
-
-    command = reg_line_dict;
-    command += reg_line_name;
-    command += function;
-    command += "']";
-    command +=reg_line_factory;
-    command += function;
-    command += "\")";
-
-    PyRun_SimpleString(command.c_str());
-    //printf("command for ycp %s\n", command.c_str());
   
-  }
 
-  return true;
+
+  code = PyRun_String(class_type_code, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+
+  code = PyRun_String(class_symbol_type_code, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(class_path_type_code, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(class_term_type_code, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2internal, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2security, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2error, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2warning, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2milestone, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(func_y2debug, Py_single_input, dict, dict);
+  Py_XDECREF(code);
 
 }
-*/
+
+
+
+/**
+ * Returns true if NameSpace is registered (is key) in dictionary dict.
+ * Otherwise returns false;
+ */
+bool isRegistered(PyObject *dict, const char *NameSpace)
+{
+    bool ret = false;
+    PyObject *name_space = PyString_FromString(NameSpace);
+
+    if (PyDict_Contains(dict, name_space) == 1)
+        ret = true;
+
+
+    Py_XDECREF(name_space);
+
+    return ret;
+}
+
+bool RegFunctions(char *NameSpace, YCPList list_functions) {
+
+    // Dictionary of ycp module
+    PyObject *ycp_dict = PyModule_GetDict(Self);
+    if (ycp_dict == NULL) return false;
+
+    // If already registered return true
+    if (isRegistered(ycp_dict, NameSpace)) return true;
+
+
+    // Init new module with name NameSpace and method __run (see new_module_methods)
+    PyObject *new_module = Py_InitModule(NameSpace, new_module_methods);
+    if (new_module == NULL) return false;
+
+    // Add new initialized module into ycp dictionary (can be accessed via ycp.NameSpace)
+    PyDict_SetItemString(ycp_dict, NameSpace, new_module);
+
+    // Dictionary of new_module - there will be registered all functions
+    PyObject *new_module_dict = PyModule_GetDict(new_module);
+    if (new_module_dict == NULL) return false;
+
+    PyObject *code;
+    string func_def;
+    string function;
+    for (int i=0; i<list_functions.size();i++) {
+        function = list_functions->value(i)->asString()->value(); 
+        func_def = "def " + function + "(*args):";
+        func_def += "\n\treturn __run(\"" + string(NameSpace) + "\", \"" + function + "\", *args)";
+
+        // Register function into dictionary of new module. Returns new reference - must be decremented
+        code = PyRun_String(func_def.c_str(), Py_single_input, new_module_dict, new_module_dict);
+        Py_XDECREF(code);
+    }
+    return true;
+
+}
+
 
 Y2Component *owned_wfmc = 0;
 
@@ -334,14 +405,14 @@ PyObject * Import_YCPNameSpace (PyObject *args) {
            ns->initialize ();
         }
 
+        ycp_ListFunctions = new YCPList();
 
-        //printf("List of function:\n");
-        ns->table()->forEach (&HandleSymbolTable);
-        //printf("End list\n");
+        ns->table()->forEach (&HandleSymbolTable);	
 
+        RegFunctions(ns_name, *ycp_ListFunctions);
 
-        RegFunctions(ns_name, ycp_ListFunctions);
         delete [] ns_name;
+        delete ycp_ListFunctions;
 
         pResult = PyBool_FromLong(1);
      }
@@ -637,6 +708,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      }
      delete []ns_name;
      delete []func_name;
+
      pReturnValue = ypython->YCPTypeToPythonSimpleType(ycpRetValue);
      if (!pReturnValue)
          pReturnValue = ypython->fromYCPListToPythonList(ycpRetValue);
@@ -657,6 +729,66 @@ PyObject * Call_YCPFunction (PyObject *args) {
   }    
 
 }
+
+void Py_y2logger(PyObject *args) {
+
+  int number_args = PyTuple_Size(args);
+  PyObject * pPythonValue;
+  loglevel_t level = LOG_DEBUG;
+  string file;
+  int line = 0;
+  string function;
+  string message;
+  if (number_args == 5) {
+     //obtain name of namespace (first argument)
+     pPythonValue = PyTuple_GetItem(args, 0);
+     if (pPythonValue) {
+        if (PyInt_Check(pPythonValue)) {
+           level = (loglevel_t)PyInt_AsLong(pPythonValue); 
+        } else {
+	   y2error("Wrong type of argument"); 
+	}
+     }
+     pPythonValue = PyTuple_GetItem(args, 1);
+     if (pPythonValue) {
+        if (PyString_Check(pPythonValue)) {
+           file = PyString_AsString(pPythonValue); 
+        } else {
+	   y2error("Wrong type of argument"); 
+	}
+     }
+
+     pPythonValue = PyTuple_GetItem(args, 2);
+     if (pPythonValue) {
+        if (PyInt_Check(pPythonValue)) {
+           line = (int)PyInt_AsLong(pPythonValue); 
+        } else {
+	   y2error("Wrong type of argument"); 
+	}
+     }
+     pPythonValue = PyTuple_GetItem(args, 3);
+     if (pPythonValue) {
+        if (PyString_Check(pPythonValue)) {
+           function = PyString_AsString(pPythonValue); 
+        } else {
+	   y2error("Wrong type of argument"); 
+	}
+     }
+     pPythonValue = PyTuple_GetItem(args, 4);
+     if (pPythonValue) {
+        if (PyString_Check(pPythonValue)) {
+           message = PyString_AsString(pPythonValue); 
+        } else {
+	   y2error("Wrong type of argument"); 
+	}
+     }
+
+     y2_logger_function(level, Y2LOG, file.c_str(), line, function.c_str(),"%s", message.c_str());
+  } else {
+     y2error("Wrong number of arguments");
+  }
+}
+
 
 void delete_all () {
 
