@@ -13,8 +13,14 @@ pythonsodir = $(MY_PYTHON_VENDORARCH)/site-packages
 
 # plugin, libtool forces 'lib' prefix
 plugin_LTLIBRARIES = libpy2lang_python.la
-noinst_LTLIBRARIES = liby2lang_python.la
+noinst_LTLIBRARIES = libYCPTypes.la liby2lang_python.la
 pythonso_LTLIBRARIES = libYCP.la
+
+libYCPTypes_la_SOURCES = YCPTypes.cc YCPTypes.h \
+                         YCPTypes/YCPTypesInternal.cc YCPTypes/YCPTypesInternal.h \
+                         YCPTypes/Path.cc \
+                         YCPTypes/Symbol.cc \
+                         YCPTypes/Term.cc
 
 # binary part of the python module
 libYCP_la_SOURCES =				\
@@ -43,6 +49,8 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-ly2util			\
 		-version-info 2:0
 
+libYCP_la_LIBADD = libYCPTypes.la
+
 
 libpy2lang_python_la_LDFLAGS = -version-info 2:0
 
@@ -50,9 +58,11 @@ liby2lang_python_la_LDFLAGS = -version-info 2:0
 
 
 # the yast libraries are apparently necessary when we're loaded by python.
-libpy2lang_python_la_LIBADD = $(PYTHON_LDFLAGS)	\
+libpy2lang_python_la_LDFLAGS = $(PYTHON_LDFLAGS)	\
 		-L$(libdir) -L$(plugindir)	\
 		-lycp -ly2 -ly2util
+
+libpy2lang_python_la_LIBADD = libYCPTypes.la
 
 
 liby2lang_python_la_LIBADD  = $(PYTHON_LDFLAGS)

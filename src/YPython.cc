@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------\
-|								       |
-|		       __   __	  ____ _____ ____		       |
-|		       \ \ / /_ _/ ___|_   _|___ \		       |
+|							       |
+|	       __   __	  ____ _____ ____		       |
+|	       \ \ / /_ _/ ___|_   _|___ \		       |
 |			\ V / _` \___ \ | |   __) |		       |
 |			 | | (_| |___) || |  / __/		       |
 |			 |_|\__,_|____/ |_| |_____|		       |
@@ -47,29 +47,19 @@
 #include <ycp/YCPVoid.h>
 #include <ycp/YCPCode.h>
 #include <ycp/YCPExternal.h>
+
+#include "YCPTypes.h"
+#include <iostream>
+#define DBG(str) \
+    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
+    std::cerr.flush()
+
 YPython * YPython::_yPython = 0;
 
-YPython::YPython() {
-
-  PyObject* pMain;
-  PyObject* pMainDict;
-  pMain = PyImport_AddModule("__main__");
-  PyRun_SimpleString("from ycp import *");
-  pMainDict = PyModule_GetDict(pMain);
-  pPathClass = PyDict_GetItemString(pMainDict, "Path");
-  pSymbolClass = PyDict_GetItemString(pMainDict, "Symbol");
-  pTermClass = PyDict_GetItemString(pMainDict, "Term");
-  
-}
+YPython::YPython(){}
 
 
-YPython::~YPython() {  
-
-  Py_CLEAR(pPathClass);
-  Py_CLEAR(pSymbolClass);
-  Py_CLEAR(pTermClass);
-
-}
+YPython::~YPython(){}
 
 
 YPython *
@@ -113,7 +103,7 @@ YPython::loadModule( YCPList argList )
  * evaluate of function from python
  * @param string name of module
  * @param string name of function
- * @param bool is it method?
+ * @param bool is it method? TODO !!
  * @param YCPList argumnets from YCP to python function(0 - dummy)
  * @return YCPValue return value from python's function
  */
@@ -121,441 +111,311 @@ YCPValue
 YPython::callInner (string module, string function, bool method,
 		  YCPList argList)
 {
-    
+    PyObject* pMain;
+    PyObject* pMainDict;
+    PyObject* pFunc;
+    PyObject* pArgs;
+    PyObject* pReturn;
+    YCPValue result = YCPNull ();
 
 
-  PyObject* pMain;
-  PyObject* pMainDict;
-  PyObject* pFunc;
-  PyObject* pArgs;
-  PyObject* pReturn;
- 
-  YCPValue result = YCPNull ();
-  
+    pMain = PyImport_AddModule("__main__");
+    //PyRun_SimpleString("import __main__");
+    pMainDict = PyModule_GetDict(pMain);
+    pFunc = PyDict_GetItemString(pMainDict, function.c_str());
+    pArgs = PyTuple_New(argList->size()-1);
 
-  pMain = PyImport_AddModule("__main__");
-  //PyRun_SimpleString("import __main__");
-  pMainDict = PyModule_GetDict(pMain);
-  
-  
-  
-  pFunc = PyDict_GetItemString(pMainDict, function.c_str());
-  
-  
-  pArgs = PyTuple_New(argList->size()-1);
+    //Parsing argumments
+    PyObject *pArg;
+    y2milestone ("name of function %s and number of arguments %d", function.c_str(), argList->size()-1);
+    for ( int i=1; i < argList->size(); i++ ) {
+        pArg = YCPTypeToPythonType(argList->value(i));
+        PyTuple_SetItem(pArgs,i-1, pArg);
+    }
 
-  PyObject *pArg;
-  //Parsing argumments
+    pReturn = PyObject_CallObject(pFunc, pArgs);
 
-  y2milestone ("name of function %s and nuber of arguments %d", function.c_str(), argList->size()-1);
-  
-  for ( int i=1; i < argList->size(); i++ ) {
-      //FIXME  add checking for all types from YCP and conversion to python types...
+    Py_CLEAR(pArgs);
 
-      pArg = YCPTypeToPythonSimpleType(argList->value(i));
-      
-      if (!pArg)
-         pArg = fromYCPListToPythonList(argList->value(i));
+    if (pReturn){
+        result = PythonTypeToYCPType(pReturn); // create YCP value
+    }else
+        y2error("pReturn == 0");
+    Py_CLEAR(pReturn);
 
-      if (!pArg)
-         pArg = fromYCPListToPythonTuple(argList->value(i));
+    if (result.isNull ()) {
+        y2error ("Result is NULL when returning from %s", function.c_str());
+        result = YCPVoid ();
+    }
 
-      if (!pArg)
-         pArg = fromYCPMapToPythonDict(argList->value(i));
-      if (!pArg)
-         pArg = fromYCPTermToPythonTerm(argList->value(i));
-
-      PyTuple_SetItem(pArgs,i-1, pArg);
-
-  } 
-  
-
-  pReturn = PyObject_CallObject(pFunc, pArgs);
-  
-  Py_CLEAR(pArgs);
-
-
-
-  if (pReturn) {
-     //result = YCPInteger(PyInt_AsLong(pReturn)); //new YCPValue();
-
-     if (!PythonTypeToYCPSimpleType(pReturn, result))
-        result =  fromPythonTupleToYCPList(pReturn);
-
-     if (result.isNull())
-        result = fromPythonListToYCPList (pReturn);
-
-     if (result.isNull())
-        result = fromPythonDictToYCPMap (pReturn);
-
-     if (result.isNull())
-        result = fromPythonTermToYCPTerm(pReturn);
-
-
-  }   
-  Py_CLEAR(pReturn);
-
-  if (result.isNull ()) {
-     y2error ("Result is NULL when returning from %s", function.c_str());
-     result = YCPVoid ();
-  }
-
-  return result;
+    return result;
 }
 
 
-   /**
-    * Transfer from python simple type to ycp simple type
-    * transfered are: boolean, integer, string, float,
-    **/
-bool YPython::PythonTypeToYCPSimpleType(PyObject* pPythonValue, YCPValue &out) {
-  PyObject * value;
-  // boolean value handling
-  if (PyBool_Check(pPythonValue)) {
-     PyObject * true_value = PyBool_FromLong(1);
-     int compare = PyObject_Compare(pPythonValue, true_value);
-     if (compare == 0) {       
-        out = YCPBoolean (true);
-     } else if (compare < 1) {
-        out = YCPBoolean (false);
-     } else { 
-        return false;
-     }
-     return true;
-  }
-  
-  //integer value handling
-  if (PyInt_Check(pPythonValue)) {
+YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
+{
+    // null (in python None)
+    if (pythonValue == Py_None)
+        return YCPNull();
 
-     out = YCPInteger(PyInt_AsLong(pPythonValue));
-     return true;
-  }
+    //boolean
+    if (PyBool_Check(pythonValue)){
+        int cmp_result = PyObject_Compare(pythonValue, Py_True);
+        if (PyErr_Occurred() != NULL){
+            return YCPNull();
+        }
+        if (cmp_result == 0){
+            return YCPBoolean(true);
+        }else{
+            return YCPBoolean(false);
+        }
+    }
 
-  //float value handling
-  if (PyFloat_Check(pPythonValue)) {
+    // integer
+    if (PyInt_Check(pythonValue))
+        return YCPInteger(PyInt_AsLong(pythonValue));
 
-     out = YCPFloat(PyFloat_AsDouble(pPythonValue));
-     return true;
-  }
+    //float
+    if (PyFloat_Check(pythonValue))
+        return YCPFloat(PyFloat_AsDouble(pythonValue));
 
-  //string value handling
-  if (PyString_Check(pPythonValue)) {
+    //string
+    if (PyString_Check(pythonValue))
+        return YCPString(PyString_AsString(pythonValue));
 
-     out = YCPString(PyString_AsString(pPythonValue));
-     return true;
-  }
+    //list
+    if (PyList_Check(pythonValue))
+        return fromPythonListToYCPList(pythonValue);
 
-  if (pPythonValue == Py_None) {
-     out = YCPNull();
-     return true;
-  }
+    //tuple -> list
+    if (PyTuple_Check(pythonValue))
+        return fromPythonTupleToYCPList(pythonValue);
 
-  if (PyInstance_Check(pPythonValue)) {
-     if (PyObject_HasAttrString(pPythonValue, "type"))  {
-        PyObject * py_attr = PyObject_GetAttrString(pPythonValue,"type");
-        if (PyString_Check(py_attr)) {
-	   string type = PyString_AsString(py_attr);
-           if (type.compare("symbol") == 0) {
-	      value = PyObject_GetAttrString(pPythonValue,"value");
-	      out = YCPSymbol(PyString_AsString(value));
-              return true;
-           }
-           if (type.compare("path") == 0) {
-	      value = PyObject_GetAttrString(pPythonValue,"value");
-	      out = YCPPath(PyString_AsString(value));
-              return true;
-           }
-        } //end of if (PyString_Check(py_attr))
-     } //end of if (PyObject_HasAttrString(pPythonValue, "type"))
-  }
-  return false;
+    //dict -> map
+    if (PyDict_Check(pythonValue))
+        return fromPythonDictToYCPMap(pythonValue);
+
+    // term, symbol, path
+    switch (getYCPType(pythonValue)){
+        case SYMBOL:
+            return YCPSymbol(Symbol_getValue((Symbol *)pythonValue));
+        case PATH:
+            return YCPPath(Path_getValue((Path *)pythonValue));
+        case TERM:
+            return fromPythonTermToYCPTerm(pythonValue);
+        case NOT_YCP_TYPE:
+            return YCPNull();
+    }
+
+    return YCPNull();
 }
 
-   /**
-    * Transfer from ycp simple type to python simple type
-    * transfered are: boolean, integer, string, float,
-    **/
-PyObject* YPython::YCPTypeToPythonSimpleType(YCPValue in) {
-  
-  if (in.isNull()) {
-     return Py_None;
- 
-  } else if (in->isBoolean()) {
-     long val = 0;
-     bool true_false = in->asBoolean()->value();      
-     true_false ? val = 1 : val =0;      
-     return PyBool_FromLong(val);
 
-  } else if (in->isInteger()) {
-     return PyInt_FromLong(in->asInteger()->value());
-
-  } else if (in->isFloat()) {
-     double val = in->asFloat()->value();
-     return PyFloat_FromDouble(val);
-
-  } else if (in->isString()) {
-     return PyString_FromString((in->asString()->value()).c_str());
-
-  } else if (in->isVoid()) {
-     return Py_None;
-
-  } else if (in->isPath()) {
-     if (pPathClass) {
-        PyObject *value =  PyString_FromString(in->asPath()->toString().c_str());
-        PyObject *pyArgs = PyTuple_New(1);
-        PyTuple_SetItem(pyArgs, 0, value);
-        return PyInstance_New(pPathClass, pyArgs, NULL);
-
-     } else {
+PyObject *YPython::YCPTypeToPythonType(YCPValue value)
+{
+    // null -> None
+    if (value.isNull())
         return Py_None;
-     }
-  } else if (in->isSymbol()) {
-     if (pSymbolClass) {
-        //add hack delete first char (`) from output 
-        PyObject *value =  PyString_FromString(in->asSymbol()->toString().erase(0,1).c_str());
-        PyObject *pyArgs = PyTuple_New(1);
-        PyTuple_SetItem(pyArgs, 0, value);
-        return PyInstance_New(pSymbolClass, pyArgs, NULL);
-
-     } else {
+    //void -> None
+    if (value->isVoid())
         return Py_None;
-     }
-  } else
-     return NULL;
+
+    // boolean
+    if (value->isBoolean()){
+        if (value->asBoolean()->value())
+            return PyBool_FromLong(1);
+        return PyBool_FromLong(0);
+    }
+
+    //integer
+    if (value->isInteger())
+        return PyInt_FromLong(value->asInteger()->value());
+
+    //float
+    if (value->isFloat())
+        return PyFloat_FromDouble(value->asFloat()->value());
+
+    //string
+    if (value->isString())
+        return PyString_FromString(value->asString()->value().c_str());
+
+    //list -> tuple
+    if (value->isList())
+        return fromYCPListToPythonTuple(value->asList());
+
+    //map -> dict
+    if (value->isMap())
+        return fromYCPMapToPythonDict(value->asMap());
+
+    //path
+    if (value->isPath())
+        return Path_NewString(value->asPath()->toString().c_str());
+
+    //symbol
+    if (value->isSymbol())
+        return Symbol_NewString(value->asSymbol()->toString().erase(0,1).c_str());
+
+    //term
+    if (value->isTerm())
+        return fromYCPTermToPythonTerm(value->asTerm());
+
+    return Py_None;
 }
+
+
+
+
+
+/********** PRIVATE: **********/
 
 /**
   * Convert a Python list to a YCPList.
 **/
-
 YCPList YPython::fromPythonListToYCPList (PyObject* pPythonList) {
-  YCPList ycp_List;
-  PyObject * pItem;
-  YCPValue ycp_value;
-  //checking for list (is it really list?)
-  if (PyList_Check(pPythonList) > 0) {
-     int list_size = PyList_Size(pPythonList);
-     for (int i = 0; i < list_size; i++) {
-         pItem = PyList_GetItem(pPythonList, i);
-         if (PythonTypeToYCPSimpleType(pItem, ycp_value)) {
+    YCPList ycp_List;
+    PyObject * pItem;
+    YCPValue ycp_value;
+
+    //checking for list (is it really list?)
+    if (PyList_Check(pPythonList) > 0) {
+        int list_size = PyList_Size(pPythonList);
+        for (int i = 0; i < list_size; i++) {
+            pItem = PyList_GetItem(pPythonList, i);
+            ycp_value = PythonTypeToYCPType(pItem);
+
             if (!ycp_value.isNull ()) {
-	       ycp_List->add(ycp_value);
+                ycp_List->add(ycp_value);
             } else {
-               return YCPNull ();
+                return YCPNull ();
             }
-         } else { //end of if (PythonTypeToYCPSimpleType(item, ycp_value))
-            ycp_value = fromPythonListToYCPList(pItem);
-            if (ycp_value.isNull ())
-               ycp_value = fromPythonDictToYCPMap (pItem);
-            if (ycp_value.isNull ())
-               ycp_value = fromPythonTupleToYCPList(pItem);
-            if (ycp_value.isNull ())
-               ycp_value = fromPythonTermToYCPTerm(pItem);
+        }
+    }else{
+        y2milestone ("Value is not Python List");
+        return YCPNull ();
+    }
 
-            if (!ycp_value.isNull ())
-	       ycp_List->add(ycp_value);
-            else
-               return YCPNull ();
-         } // end of else for if (PythonTypeToYCPSimpleType(item, ycp_value))
-     } //end of for (int i = 0; i < list_size; i++)
-  } else { //end if (PyList_Check(pPythonList) > 0)
-     y2milestone ("Value is not Python List");
-     return YCPNull ();
-  } //end else of if (PyList_Check(pPythonList) > 0) 
-
-  return ycp_List;
+    return ycp_List;
 }
 
 /**
   * Convert a Python Tuple to a YCPList.
  **/
 YCPList YPython::fromPythonTupleToYCPList (PyObject* pPythonTuple) {
-  YCPList ycp_List;
-  PyObject * pItem;
-  YCPValue ycp_value;
-  //checking for list (is it really list?)
-  if (PyTuple_Check(pPythonTuple) > 0) {
-     int list_size = PyTuple_Size(pPythonTuple);
-     for (int i = 0; i < list_size; i++) {
-         pItem = PyTuple_GetItem(pPythonTuple, i);
-         if (PythonTypeToYCPSimpleType(pItem, ycp_value)) {
+    YCPList ycp_List;
+    PyObject * pItem;
+    YCPValue ycp_value;
+
+    //checking for list (is it really list?)
+    if (PyTuple_Check(pPythonTuple) > 0) {
+        int list_size = PyTuple_Size(pPythonTuple);
+        for (int i = 0; i < list_size; i++) {
+            pItem = PyTuple_GetItem(pPythonTuple, i);
+            ycp_value = PythonTypeToYCPType(pItem);
+
             if (!ycp_value.isNull ()) {
-	       ycp_List->add(ycp_value);
+                ycp_List->add(ycp_value);
             } else {
-               return YCPNull ();
-            }
-         } else { //end of if (PythonTypeToYCPSimpleType(item, ycp_value))
-             ycp_value = fromPythonListToYCPList(pItem);
-
-             if (ycp_value.isNull ())
-                ycp_value = fromPythonTupleToYCPList(pItem);
-
-             if (ycp_value.isNull ())
-                ycp_value = fromPythonDictToYCPMap(pItem);
-
-             if (ycp_value.isNull ())
-                ycp_value = fromPythonTermToYCPTerm(pItem);
-
-             if (!ycp_value.isNull ())
-		ycp_List->add(ycp_value);
-             else
                 return YCPNull ();
-         } // end of else for if (PythonTypeToYCPSimpleType(item, ycp_value))
-     } //end of for (int i = 0; i < list_size; i++)
-  } else { //end if (PyTuple_Check(pPythonList) > 0)
-     y2milestone ("Value is not Python Tuple");
-     return YCPNull ();
-  } //end else of if (PyTuple_Check(pPythonList) > 0) 
+            }
+        }
+    }else{
+        y2milestone ("Value is not Python Tuple");
+        return YCPNull ();
+    }
 
-  return ycp_List;
+    return ycp_List;
 }
 
 /**
   * Convert a YCPList to a Python list.
  **/
 PyObject* YPython::fromYCPListToPythonList (YCPValue ycp_List) {
+    PyObject* pPythonList;
+    PyObject* pItem;
+    int ret = 0;
 
-  PyObject* pPythonList;
-  PyObject* pItem;
-  int ret = 0;
-  if (ycp_List->isList()) {
-     if (ycp_List->asList()->size()>0)
+    if (ycp_List->isList()) {
         pPythonList = PyList_New(ycp_List->asList()->size());
-     else {
-        y2error("YCP list is empty."); 
+
+        y2milestone ("Size of list %d",ycp_List->asList()->size());
+        for ( int i = 0; i < ycp_List->asList()->size(); i++ ) {
+            pItem = YCPTypeToPythonType(ycp_List->asList()->value(i));
+            ret = PyList_SetItem(pPythonList, i, pItem);
+
+            if (ret <0)
+                y2error("PyList_SetItem doesn't add item into python list.");
+        }
+        Py_INCREF(pPythonList); //TODO: Review this - is it really needed? PyList_New returns New Reference.
+        return pPythonList;
+
+    } else {
+        y2milestone ("Value is not YCPList");
         return Py_None;
-     }
-     y2milestone ("Size of list %d",ycp_List->asList()->size());
-     for ( int i = 0; i < ycp_List->asList()->size(); i++ ) {
-         pItem = YCPTypeToPythonSimpleType(ycp_List->asList()->value(i));
-
-         if (!pItem)
-            pItem = fromYCPListToPythonList(ycp_List->asList()->value(i));
-
-         if (!pItem)
-            pItem = fromYCPListToPythonTuple(ycp_List->asList()->value(i));
-
-         if (!pItem)
-	    pItem = fromYCPMapToPythonDict(ycp_List->asList()->value(i));
-
-         if (!pItem)
-	    pItem = fromYCPTermToPythonTerm(ycp_List->asList()->value(i));
-
-         ret = PyList_SetItem(pPythonList, i, pItem);
-
-         if (ret <0)
-            y2error("PyList_SetItem doesn't add item into python list.");  
-
-     }
-     Py_INCREF(pPythonList);
-     return pPythonList;
-
-  } else {
-    y2milestone ("Value is not YCPList");
-    return NULL;
-  }
+    }
 }
 
 /**
   * Convert a YCPList to a Python tuple.
  **/
 PyObject* YPython::fromYCPListToPythonTuple (YCPValue ycp_List) {
+    PyObject* pPythonTuple;
+    PyObject* pItem;
+    int ret = 0;
 
-  PyObject* pPythonTuple;
-  PyObject* pItem;
-  int ret = 0;
-  if (ycp_List->isList()) {
-     if (ycp_List->asList()->size()>0)
+    if (ycp_List->isList()) {
         pPythonTuple = PyTuple_New(ycp_List->asList()->size());
-     else {
-        y2error("YCP list is empty."); 
-        return Py_None;
-     }
-     y2milestone ("Size of list %d",ycp_List->asList()->size());
-     for ( int i = 0; i < ycp_List->asList()->size(); i++ ) {
-         pItem = YCPTypeToPythonSimpleType(ycp_List->asList()->value(i));
 
-         if (!pItem)
-            pItem = fromYCPListToPythonList(ycp_List->asList()->value(i));
+        y2milestone ("Size of list %d",ycp_List->asList()->size());
+        for ( int i = 0; i < ycp_List->asList()->size(); i++ ) {
+            pItem = YCPTypeToPythonType(ycp_List->asList()->value(i));
+            ret = PyTuple_SetItem(pPythonTuple, i, pItem);
 
-         if (!pItem)
-            pItem = fromYCPListToPythonTuple(ycp_List->asList()->value(i));
+            if (ret <0)
+                y2error("PyList_SetItem doesn't add item into python list.");  
+        }
+        Py_INCREF(pPythonTuple); //TODO: Review this.
+        return pPythonTuple;
 
-         if (!pItem)
-	    pItem = fromYCPMapToPythonDict(ycp_List->asList()->value(i));
-
-         if (!pItem)
-	    pItem = fromYCPTermToPythonTerm(ycp_List->asList()->value(i));
-
-         ret = PyTuple_SetItem(pPythonTuple, i, pItem);
-
-         if (ret <0)
-            y2error("PyList_SetItem doesn't add item into python list.");  
-
-     }
-     Py_INCREF(pPythonTuple);
-     return pPythonTuple;
-
-  } else {
-    y2milestone ("Value is not YCPList");
-    return NULL;
-  }
+    } else {
+        y2milestone ("Value is not YCPList");
+        return NULL;
+    }
 }
 
 
 /**
   * Convert a YCPMap to a Python Dictionary.
+  * If something goes wrong, iteration is trying proceed...
  **/
 PyObject* YPython::fromYCPMapToPythonDict (YCPValue ycp_Map) {
+    PyObject* pPythonDict;
+    PyObject* pKey;
+    PyObject* pValue;
+    int ret = -1;
 
-  PyObject* pPythonDict;
-  PyObject* pKey;
-  PyObject* pValue;
-  int ret = -1;
-  if (ycp_Map->isMap()) {
-     if (ycp_Map->asMap()->size()>0) {
+    if (ycp_Map->isMap()) {
         pPythonDict = PyDict_New();
+
         for (YCPMapIterator it = ycp_Map->asMap()->begin(); it != ycp_Map->asMap()->end(); ++it ) {
-            pKey = YCPTypeToPythonSimpleType(it.key());
-            if (!pKey) {
-               y2error("Transfer key YCPMap to PyObject falsed.");
-               return NULL;
+            pKey = YCPTypeToPythonType(it.key());
+            pValue = YCPTypeToPythonType(it.value());
+
+            if (pValue && pKey){
+                ret = PyDict_SetItem(pPythonDict, pKey, pValue);
+
+                if (ret < 0)
+                    y2error("Adding value and key from YCPMap to Python Dictionary falsed.");
+            }else{
+                y2error("Transformation key and/or value to python type failed.");
             }
-            pValue =  YCPTypeToPythonSimpleType(it.value());
-	    if (!pValue)
-               pValue = fromYCPListToPythonList(it.value());
-	    if (!pValue)
-               pValue = fromYCPListToPythonTuple(it.value());
-            if (!pValue)
-               pValue = fromYCPMapToPythonDict(it.value());
-            if (!pValue)
-               pValue = fromYCPTermToPythonTerm(it.value());
+        }
+    }else{
+        y2milestone ("Value is not YCPMap");
+        return Py_None;
+    }
 
-
-            if (pValue) {
-               ret = PyDict_SetItem(pPythonDict, pKey, pValue);
-               if (ret < 0) {
-                  y2error("Adding value and key from YCPMap to Python Dictionary falsed.");
-                  return NULL;
-               }
-            } else {
-               y2error("Transfer value from YCPMap to PyObject falsed.");
-               return NULL;
-               
-            }             
-        } // end of for (YCPMapIterator it = ycp_Map->begin(); it != ycp_Map->end(); ++it )
-
-     } else { // end if (ycp_Map->asMap()->size()>0)
-        y2error("YCP map is empty."); 
-        return NULL;
-     } // end else of if (ycp_Map->asMap()->size()>0)
-
-  } else { // end if (ycp_Map->isMap())
-     y2milestone ("Value is not YCPMap");
-     return NULL;
-  } // end else of if (ycp_Map->isMap())
-  Py_INCREF(pPythonDict);
-  return pPythonDict;
+    Py_INCREF(pPythonDict);// TODO: Review this
+    return pPythonDict;
 }
 
 
@@ -563,140 +423,75 @@ PyObject* YPython::fromYCPMapToPythonDict (YCPValue ycp_Map) {
   * Convert a Python Dictionary to a YCPMap.
  **/
 YCPMap YPython::fromPythonDictToYCPMap (PyObject* pPythonDict) {
+    YCPValue ycp_key;
+    YCPValue ycp_value;
+    YCPMap ycp_Map;
 
-  PyObject* pListKeys;
-  PyObject* pListValues;
-  YCPValue ycp_key;
-  YCPValue ycp_value;
-  YCPMap ycp_Map;
-  if (PyDict_Check(pPythonDict)>0) {
-     if (PyDict_Size(pPythonDict)>0) {
-        pListKeys = PyDict_Keys(pPythonDict);
-        pListValues = PyDict_Values(pPythonDict);
-        for (int i=0; i < PyList_Size(pListKeys); i++) {
-            if (PythonTypeToYCPSimpleType(PyList_GetItem(pListKeys, i),ycp_key)) {
-	       if (PythonTypeToYCPSimpleType(PyList_GetItem(pListValues, i),ycp_value)) {
-                  ycp_Map->add (ycp_key, ycp_value);
-               } else {
-                  ycp_value = fromPythonListToYCPList(PyList_GetItem(pListValues, i));
-                  if (ycp_value.isNull ())
-                     ycp_value = fromPythonTupleToYCPList(PyList_GetItem(pListValues, i));
-                  if (ycp_value.isNull ())
-                     ycp_value = fromPythonDictToYCPMap (PyList_GetItem(pListValues, i));
-                  if (ycp_value.isNull ())
-                     ycp_value = fromPythonTermToYCPTerm(PyList_GetItem(pListValues, i));
+    if (PyDict_Check(pPythonDict)>0) {
+        if (PyDict_Size(pPythonDict) == 0)
+            return ycp_Map;
 
-		  ycp_Map->add (ycp_key, ycp_value);
-               }
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
 
-            } else {
-               y2error("Cannot convert key from python dictionary");
-               return YCPNull ();
-            }               
-        } 
-        
-     } else {
-        y2milestone ("Python dictionary is empty");
-        return YCPNull ();
-     }
-  } else {
-     y2milestone ("Value is not python dictionary");
-     return YCPNull ();
-  }
-  return ycp_Map;
+        while (PyDict_Next(pPythonDict, &pos, &key, &value)) {
+            ycp_key = PythonTypeToYCPType(key);
+            ycp_value = PythonTypeToYCPType(value);
+
+            ycp_Map->add(ycp_key, ycp_value);
+        }
+    }else{
+        y2milestone ("Value is not python dictionary");
+        return YCPNull();
+    }
+
+    return ycp_Map;
 }
+
 
 /**
   * Convert a Python Term to a YCPTerm.
+  * Argument should be Term!
  **/
+YCPTerm YPython::fromPythonTermToYCPTerm (PyObject* pythonTerm) {
+    PyObject *value;
+    string name;
+    YCPValue ycp_value;
 
-YCPTerm YPython::fromPythonTermToYCPTerm (PyObject* pPythonTerm) {
-  PyObject *value;
-  PyObject *pyName;
-  string name;
-  YCPValue ycp_value;
+    if (!isTerm(pythonTerm)){
+        y2error("Argument is not Term!");
+        return YCPNull();
+    }
 
-  if (PyInstance_Check(pPythonTerm)) {
-     if (PyObject_HasAttrString(pPythonTerm, "type"))  {
-        PyObject * py_attr = PyObject_GetAttrString(pPythonTerm,"type");
-        if (PyString_Check(py_attr)) {
-	   string type = PyString_AsString(py_attr);
-           if (type.compare("term") == 0) {
-              pyName = PyObject_GetAttrString(pPythonTerm,"name");
-              if (PyString_Check(pyName)) {
-		 name = PyString_AsString(pyName);
-		 value = PyObject_GetAttrString(pPythonTerm,"value");
-                 if (PyTuple_Check(value))
+    name = Term_getName((Term *)pythonTerm);
+    value = Term_getValue((Term *)pythonTerm);
+    ycp_value = fromPythonTupleToYCPList(value);
 
-                 ycp_value = fromPythonTupleToYCPList(value);
-                 
-                 if (!ycp_value.isNull ()) {
-                    //printf("term is: %s\n",YCPTerm(name,ycp_value->asList())->toString().c_str());
-                    return YCPTerm(name,ycp_value->asList());
-                    
-                 } else {
-                    y2error("Value was not converted to YCPTerm");
-                    return YCPNull ();
-                 }
-              } else {
-                 y2error ("The name of Term is not string");
-                 return YCPNull ();
-              }
-           } else {
-              y2milestone ("Value is not python Term");
-              return YCPNull ();
-           }
-        } else {
-           y2error ("Value is not any python class for ycp types");
-           return YCPNull ();
-        }
-     }
-  } else {
-     return YCPNull ();
-  }	
-  return YCPNull ();
+    if (!ycp_value.isNull())
+        return YCPTerm(name, ycp_value->asList());
+
+    return YCPNull();
 }
 
 
 /**
   * Convert a YCPTerm to a Python Term.
+  * Given argument should be term!
  **/
 PyObject* YPython::fromYCPTermToPythonTerm (YCPValue ycp_Term) {
+    PyObject *value;
 
-  PyObject* pPythonTerm;
-  PyObject* pName;
-  PyObject* pValue;
+    if (!ycp_Term->isTerm()){
+        y2error("Argument is not term!");
+        return Py_None;
+    }
 
-  if (ycp_Term->isTerm()) {
-     if (ycp_Term->asTerm()->args()->size()>0) {
-        pName = PyString_FromString(ycp_Term->asTerm()->name().c_str());
-        YCPValue list = ycp_Term->asTerm()->args();
-        pValue = fromYCPListToPythonTuple(list);
-        if (pValue) {
-	   if (pTermClass) {
-              PyObject *pyArgs = PyTuple_New(2);
-              PyTuple_SetItem(pyArgs, 0, pName);
-              PyTuple_SetItem(pyArgs, 1, pValue);
-              pPythonTerm = PyInstance_New(pTermClass, pyArgs, NULL);
-           } else {
-              y2error("There is missing Term class in python");
-              return Py_None;
-           }
-        } else {
-           y2error("Converting to python tuple failed");
-           return Py_None;
-        }
- 
-     } else { // end if (ycp_Map->asMap()->size()>0)
-        y2error("YCP term is empty."); 
-        return NULL;
-     } // end else of if (ycp_Map->asMap()->size()>0)
+    value = fromYCPListToPythonTuple(ycp_Term->asTerm()->args());
+    if (value == Py_None){
+        y2error("fromYCPListToPythonTuple FIALED");
+        return Py_None;
+    }
 
-  } else { // end if (ycp_Map->isMap())
-     y2milestone ("Value is not YCPTerm");
-     return NULL;
-  } // end else of if (ycp_Map->isMap())
-  Py_INCREF(pPythonTerm);
-  return pPythonTerm;
+    return Term_NewString(ycp_Term->asTerm()->name().c_str(), value);
 }
 

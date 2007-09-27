@@ -29,4 +29,13 @@ int YCPTypeString_init(YCPTypeString *self, PyObject *args, PyObject *kwds);
  */
 long YCPTypeString_hash(YCPTypeString *self);
 
+/**
+ * Return new object that has type type.
+ */
+PyObject *YCPTypeString_New(PyObject *str, PyTypeObject *type);
+
+
+
+PyObject *Term_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+int Term_init(Term *self, PyObject *args, PyObject *kwds);
 #endif

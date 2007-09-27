@@ -24,6 +24,13 @@ extern PyTypeObject SymbolType;
 bool isSymbol(PyObject *);
 std::string Symbol_getValue(Symbol *);
 
+/**
+ * Return new object created from str.
+ * Return New Reference!
+ */
+PyObject *Symbol_New(PyObject *str);
+PyObject *Symbol_NewString(const char *);
+
 
 /**
  * Path
@@ -33,6 +40,9 @@ extern PyTypeObject PathType;
 
 bool isPath(PyObject *);
 std::string Path_getValue(Path *);
+
+PyObject *Path_New(PyObject *str);
+PyObject *Path_NewString(const char *);
 
 
 /**
@@ -56,6 +66,9 @@ std::string Term_getName(Term *);
  */
 PyObject *Term_getValue(Term *);
 
+PyObject *Term_New(PyObject *name, PyObject *list_value);
+PyObject *Term_NewString(const char *name, PyObject *list_value);
+
 
 /**
  * Initialize alll YCP types
@@ -75,6 +88,6 @@ bool isYCPType(PyObject *);
  *      }
  */
 enum YCPType { NOT_YCP_TYPE, PATH, SYMBOL, TERM };
-YCPType getType(PyObject *);
+YCPType getYCPType(PyObject *);
 
 #endif

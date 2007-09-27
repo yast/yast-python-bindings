@@ -14,7 +14,7 @@ static void Term_dealloc(Term *self)
  * This function is called before Term_init.
  * In this function is set only default values.
  */
-static PyObject *Term_new(PyTypeObject *type, PyObject *args,
+PyObject *Term_new(PyTypeObject *type, PyObject *args,
                                          PyObject *kwds)
 {
     Term *self;
@@ -83,7 +83,7 @@ int Term_init(Term *self, PyObject *args, PyObject *kwds)
 /**
  * Returns hash of Term object.
  */
-long Term_hash(Term *self)
+static long Term_hash(Term *self)
 {
     if (self->hash != -1){
         self->hash = PyObject_Hash(self->name) + PyObject_Hash(self->value);

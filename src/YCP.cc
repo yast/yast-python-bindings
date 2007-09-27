@@ -24,6 +24,8 @@
 #include "YPython.h"
 #include "PythonLogger.h"
 
+#include "YCPTypes.h"
+
 /**
  * Store pointer to ycp module itself.
  */
@@ -148,34 +150,6 @@ PyMODINIT_FUNC initycp(void) {
 
   PyObject *traceback;
 
-  char class_type_code[] = 
-    "class YCPType:\n\
-       def __init__(self, value=''):\n\
-         self.type = \"any\"\n\
-         self.value = value\n\
-       def identity(self):\n\
-         return self.type";
-
-  char class_symbol_type_code[] = 
-     "class Symbol(YCPType):\n\
-       def __init__(self, value):\n\
-         self.type = \"symbol\"\n\
-         self.value = value";
-
-  char class_path_type_code[] = 
-     "class Path(YCPType):\n\
-       def __init__(self, value):\n\
-         self.type = \"path\"\n\
-         self.value = value";
-
-
-  char class_term_type_code[] = 
-     "class Term(YCPType):\n\
-       def __init__(self, name, *args):\n\
-         self.type = \"term\"\n\
-         self.name = name\n\
-         self.value = args";
-
   char func_y2internal[] =
       "def y2internal(message):\n\
         file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
@@ -210,6 +184,8 @@ PyMODINIT_FUNC initycp(void) {
   PyRun_SimpleString("import sys, traceback");
   Self = Py_InitModule("ycp", YCPMethods);
 
+  initYCPTypes(Self);
+
   traceback = PyImport_AddModule("traceback");
 
   PyModule_AddObject(Self,"traceback",traceback);
@@ -218,21 +194,6 @@ PyMODINIT_FUNC initycp(void) {
   PyObject *dict = PyModule_GetDict(Self);
   PyObject *code;
 
-  
-
-
-  code = PyRun_String(class_type_code, Py_single_input, dict, dict);
-  Py_XDECREF(code);
-
-
-  code = PyRun_String(class_symbol_type_code, Py_single_input, dict, dict);
-  Py_XDECREF(code);
-
-  code = PyRun_String(class_path_type_code, Py_single_input, dict, dict);
-  Py_XDECREF(code);
-
-  code = PyRun_String(class_term_type_code, Py_single_input, dict, dict);
-  Py_XDECREF(code);
 
   code = PyRun_String(func_y2internal, Py_single_input, dict, dict);
   Py_XDECREF(code);
@@ -464,11 +425,8 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   for (int i=0; i< number_args; i++) {
       pPythonValue = PyTuple_GetItem(args, i);
       if (pPythonValue) {
-         if (!(ypython->PythonTypeToYCPSimpleType(pPythonValue,ycpArg))) {
-            ycpArg = ypython->fromPythonListToYCPList (pPythonValue);
-            if (ycpArg.isNull())
-               ycpArg = ypython->fromPythonDictToYCPMap (pPythonValue);
-         }
+          ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+
          //convert the first argument to path
          if (i==0) {
             if (ycpArg->isString()) {
@@ -558,11 +516,7 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   free(temp);
 
 
-  pReturnValue = ypython->YCPTypeToPythonSimpleType(ycpRetValue);
-  if (!pReturnValue)
-     pReturnValue = ypython->fromYCPListToPythonList(ycpRetValue);
-  if (!pReturnValue)
-     pReturnValue = ypython->fromYCPMapToPythonDict(ycpRetValue);
+  pReturnValue = ypython->YCPTypeToPythonType(ycpRetValue);
 
   if (pReturnValue)
      return pReturnValue;
@@ -665,15 +619,8 @@ PyObject * Call_YCPFunction (PyObject *args) {
      for (int i=2; i< number_args; i++) {
          pPythonValue = PyTuple_GetItem(args, i);
          if (pPythonValue) {
-            if (!(ypython->PythonTypeToYCPSimpleType(pPythonValue,ycpArg))) {
-               ycpArg = ypython->fromPythonListToYCPList(pPythonValue);
-               if (ycpArg.isNull())
-                  ycpArg = ypython->fromPythonDictToYCPMap(pPythonValue);
-               if (ycpArg.isNull())
-                  ycpArg = ypython->fromPythonTupleToYCPList(pPythonValue);
-               if (ycpArg.isNull())
-                  ycpArg = ypython->fromPythonTermToYCPTerm(pPythonValue);
-            }
+             ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+
 	    if (fun_type->parameterType(i-2)->matchvalue(ycpArg) != 0) {
                y2error ("Wrong type of argumment %d",i-2);
                return PyExc_TypeError;
@@ -709,16 +656,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      delete []ns_name;
      delete []func_name;
 
-     pReturnValue = ypython->YCPTypeToPythonSimpleType(ycpRetValue);
-     if (!pReturnValue)
-         pReturnValue = ypython->fromYCPListToPythonList(ycpRetValue);
-    if (!pReturnValue)
-         pReturnValue = ypython->fromYCPListToPythonTuple(ycpRetValue);
-     if (!pReturnValue)
-         pReturnValue = ypython->fromYCPMapToPythonDict(ycpRetValue);
-     if (!pReturnValue)
-         pReturnValue = ypython->fromYCPTermToPythonTerm(ycpRetValue);
-
+     pReturnValue = ypython->YCPTypeToPythonType(ycpRetValue);
 
      return pReturnValue;
      

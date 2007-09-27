@@ -63,18 +63,20 @@ public:
     static YPython * _yPython;
 
 
-   /**
-    * Transfer from python simple type to ycp simple type
-    * transfered are: boolean, integer, string, float,
-    **/
-    bool PythonTypeToYCPSimpleType(PyObject* pPythonValue, YCPValue &out);
+    /**
+     * Transform Python type to YCP type and return new YCPValue built
+     * from python object.
+     */
+    YCPValue PythonTypeToYCPType(PyObject*);
 
-   /**
-    * Transfer from ycp simple type to python simple type
-    * transfered are: boolean, integer, string, float,
-    **/
-    PyObject* YCPTypeToPythonSimpleType(YCPValue in);
+    /**
+     * Transform YCP type to Python type and return reference to new
+     * Python object.
+     */
+    PyObject *YCPTypeToPythonType(YCPValue);
 
+
+private:
     /**
      * Convert a Python list to a YCPList.
      **/
@@ -115,12 +117,6 @@ public:
      * Convert a YCPList to a Python tuple.
      **/
     PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
-
-
-    PyObject  *pPathClass;
-    PyObject  *pSymbolClass;
-    PyObject  *pTermClass;
-
 
 protected:
 

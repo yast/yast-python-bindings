@@ -2,37 +2,6 @@
 using std::string;
 
 /**
- * Returns new Path object created from string str.
- * Returns New Reference!
- */
-static PyObject *Path_StringNew(const char *str)
-{
-    PyObject *ret;
-    PyObject *args;
-
-    // create args variable
-    args = Py_BuildValue("(s)", str);
-
-    // create new Path object
-    ret = YCPTypeString_new(&PathType, Py_None, Py_None);
-    if (ret == NULL){
-        Py_XDECREF(args);
-        return Py_None;
-    }
-
-    // initialize Path object
-    if (YCPTypeString_init((YCPTypeString *)ret, args, Py_None) == -1){
-        Py_XDECREF(args);
-        return Py_None;
-    }
-
-    Py_XDECREF(args);
-    return ret;
-}
-
-
-
-/**
  * Compare two Path objects.
  * If obj1 or obj2 are not Paths returns -1 (it means not equal)
  */
@@ -75,7 +44,7 @@ static PyObject *Path_append(Path *self, PyObject *arg)
     new_value += ".";
     new_value += str;
 
-    return Path_StringNew(new_value.c_str());
+    return Path_NewString(new_value.c_str());
 }
 
 /**
@@ -96,7 +65,7 @@ static PyObject *Path_prepend(Path *self, PyObject *arg)
     new_value += ".";
     new_value += PyString_AsString(self->value);
 
-    return Path_StringNew(new_value.c_str());
+    return Path_NewString(new_value.c_str());
 }
 
 static PyMethodDef Path_methods[] = {

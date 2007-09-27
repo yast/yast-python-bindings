@@ -50,3 +50,38 @@ long YCPTypeString_hash(YCPTypeString *self)
     }
     return self->hash;
 }
+
+PyObject *YCPTypeString_New(PyObject *value, PyTypeObject *type)
+{
+    PyObject *ret;
+    PyObject *args;
+
+    if (!PyString_Check(value)){
+        return Py_None;
+    }
+
+    // create args variable
+    args = PyTuple_New(1);
+    Py_INCREF(value);
+    if (PyTuple_SetItem(args, 0, value) != 0){
+        Py_XDECREF(args);
+        Py_DECREF(value);
+    }
+
+    // create new Path object
+    ret = YCPTypeString_new(type, Py_None, Py_None);
+    if (ret == NULL){
+        Py_XDECREF(args);
+        return Py_None;
+    }
+
+    // initialize Path object
+    if (YCPTypeString_init((YCPTypeString *)ret, args, Py_None) == -1){
+        Py_XDECREF(args);
+        return Py_None;
+    }
+
+    Py_XDECREF(args);
+    return ret;
+}
+
