@@ -81,17 +81,6 @@ YPython::pMainDicts()
     return _pMainDicts;
 }
 
-bool  
-AddNewDict(string name, PyObject* dict)
-{ 
-    int ret = PyDict_SetItem(YPython::_pMainDicts, PyString_FromString(name.c_str()), dict);
-    if (ret == 0)
-       return true;
-    else
-       return false;
-}
-
-
 
 
 YCPValue
@@ -117,6 +106,7 @@ YPython::loadModule(string module)
 {
     string path;
     string module_name;
+    PyObject* pModuleName;
     size_t found;
     PyObject* pMain;
 
@@ -135,13 +125,20 @@ YPython::loadModule(string module)
        YPython::_pMainDicts = PyDict_New();
     }
 
-    //YPython::_pMain = PyImport_ImportModule(module_name.c_str());
 
-    //new style
 
-    pMain = PyImport_ImportModule(module_name.c_str());
-    PyDict_SetItem(YPython::_pMainDicts, PyString_FromString(module_name.c_str()), PyModule_GetDict(pMain));
-    //YPython::yPython()->AddNewDict(module_name, PyModule_GetDict(pMain));
+    pModuleName = PyString_FromString(module_name.c_str());
+
+    if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
+       pMain = PyImport_ImportModule(module_name.c_str());
+       int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
+       if (ret != 0)
+          return YCPError("The module was not imported");
+    } else {
+
+       return YCPError("The module is imported");
+    }
+
 
     return YCPVoid();
  
