@@ -56,6 +56,8 @@
 
 YPython * YPython::_yPython = 0;
 
+PyObject * YPython::_pMain = NULL;
+
 YPython::YPython(){}
 
 
@@ -71,6 +73,13 @@ YPython::yPython()
     return _yPython;
 }
 
+
+PyObject* 
+YPython::pMain()
+{
+
+    return _pMain;
+}
 
 
 YCPValue
@@ -92,9 +101,28 @@ YPython::destroy()
  * Loads a module.
  */
 YCPValue
-YPython::loadModule( YCPList argList )
+YPython::loadModule(string module)
 {
-    Py_Initialize();
+    string path;
+    string module_name;
+    size_t found;
+
+    //found last "/" in path
+    found = module.find_last_of("/");
+    //extract directory from path module
+    path = module.substr(0,found+1);
+    //extract module name from path
+    module_name = module.substr(found+1);
+    //delete last 3 chars from module name ".py"
+    module_name.erase(module_name.size()-3); //delete ".py"
+    //initialize python and set the path where are python modules
+    if (!Py_IsInitialized()) {
+       setenv("PYTHONPATH", path.c_str(), 1);
+       Py_Initialize();
+
+    }
+
+    YPython::_pMain = PyImport_ImportModule(module_name.c_str());
 
     return YCPVoid();
 }
@@ -119,9 +147,8 @@ YPython::callInner (string module, string function, bool method,
     YCPValue result = YCPNull ();
 
 
-    pMain = PyImport_AddModule("__main__");
-    //PyRun_SimpleString("import __main__");
-    pMainDict = PyModule_GetDict(pMain);
+    //pMain = PyImport_AddModule("__main__");
+    pMainDict = PyModule_GetDict(YPython::_pMain);
     pFunc = PyDict_GetItemString(pMainDict, function.c_str());
     pArgs = PyTuple_New(argList->size()-1);
 
@@ -137,9 +164,9 @@ YPython::callInner (string module, string function, bool method,
 
     Py_CLEAR(pArgs);
 
-    if (pReturn){
+    if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
-    }else
+    else
         y2error("pReturn == 0");
     Py_CLEAR(pReturn);
 
