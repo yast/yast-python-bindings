@@ -47,7 +47,7 @@ public:
 	    m_call->add (YCPVoid ());
 	}
 
-    //! if true, the perl function is passed the module name
+    //! if true, the python function is passed the module name
     virtual bool isMethod () = 0;
 
     //! called by YEFunction::evaluate
@@ -141,49 +141,25 @@ YPythonNamespace::YPythonNamespace (string name)
       m_all_methods (true)
 {
 
-  const char * c_name = m_name.c_str ();
-
   //Objects for Python API
-  PyObject* pMain;        //main module
-  PyObject* pMainDict;    //global dictionary of variables from __main__
+  PyObject* pMainDict;    //global dictionary of imported module
   PyObject* pFunc;        //pionter for function from python
-  PyObject* item;         //item from list of globals symbols from __main__
-  PyObject* num_args;     //number of function argumets in python
-  PyObject * fun_names;   //list of globals symbols from __main__
-  string module;
-  FILE*     file;
+  PyObject* item;         //item from dictionary
+  PyObject * fun_names;   //list of keys from dictionary (YPython::yPython()->pMain())
+  PyObject * fun_code;    //code of function
 
-  int num_fun_names = 0;
-  int count = 0;  
-  long num = 0;
-  // args = inspect.getargs(name_function.func_code)
-  char * command = new char[201]; //command for obtain arguments of function
 
-  //add __main__ module
-  pMain = PyImport_AddModule("__main__");
-  PyRun_SimpleString("import __main__");
-  //PyRun_SimpleString("import ycp");
-  //import inspect module - necessary for number of function arguments
-  PyRun_SimpleString("import inspect");
+  int num_fun_names = 0; //number of keys from dictionary
+  int count = 0;         // position. arbitrary numbering
+  long num = 0;          //number of function arguments
+
   //obtain main dictionary of globals variables
-  pMainDict = PyModule_GetDict(pMain);
+  pMainDict = PyModule_GetDict(YPython::yPython()->pMain());
+  //keys from dictionary
+  fun_names = PyDict_Keys(pMainDict);
 
-  //Open file and his running in main module
-
-  module = YCPPathSearch::find (YCPPathSearch::Module, name + ".py");
-  
-  
-  file = fopen(module.c_str(), "r");
-  if (file) {
-     y2milestone("module name %s", module.c_str());
-     PyRun_SimpleFile(file, module.c_str());
-  }
-  //symbols from __main__
-  PyRun_SimpleString("fun_names = dir(__main__)");
-  fun_names = PyDict_GetItemString(pMainDict, "fun_names");
   //number of symbols
   num_fun_names = PyList_Size(fun_names);
-  
   //check each symbol and try to find function names
   for (int i = 0; i < num_fun_names; i++) {
     //y2milestone ("YPythonNamespace iteration %d from all %d", i, num_fun_names);
@@ -196,17 +172,9 @@ YPythonNamespace::YPythonNamespace (string name)
 
     if (PyFunction_Check(pFunc)) {
        FunctionTypePtr  sym_tp = new FunctionType (Type::Any);
-       
-       //build command for obtaining number of function
-       strcpy(command, "");
-       strcpy(command, "args = inspect.getargs(");
-       command = strcat(command, PyString_AsString(item));
-       command = strcat(command, ".func_code)");
-       //run the command: args = inspect.getargs(name_function.func_code)
-       PyRun_SimpleString(command);
-       PyRun_SimpleString("num_args = len(args[0])");
-       num_args = PyDict_GetItemString(pMainDict, "num_args");
-       num = PyInt_AsLong(num_args);
+
+       fun_code = PyFunction_GetCode(pFunc);
+       num = ((PyCodeObject *) fun_code)->co_argcount;
        //y2milestone ("Number of parameters: %d", num);
        //add types and number of arguments into SymbolEntry table
        for (long j = 0; j < num; j++) {
@@ -226,12 +194,6 @@ YPythonNamespace::YPythonNamespace (string name)
        enterSymbol (fun_se, 0);
     }
   } // end of for (int i = 0; i < num_fun_names; i++) 
-
-  delete []command;
-  //Py_CLEAR(fun_names);
-
-
-  
   y2milestone ("YPythonNamespace finish");
   
 }
