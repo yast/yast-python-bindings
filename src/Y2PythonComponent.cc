@@ -61,13 +61,7 @@ Y2Namespace *Y2PythonComponent::import (const char* name)
 	return NULL;
     }
     
-    module.erase (module.size () - 3 /* strlen (".py") */);
-    YCPList args;
-    args->add (YCPString(/*module*/ name));
-
-    // load it
-    //XXX -> not rewrited
-    YPython::loadModule (args);
+    YPython::loadModule (module);
 
     // introspect, create data structures for the interpreter
     Y2Namespace *ns = new YPythonNamespace (name);
