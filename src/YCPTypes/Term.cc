@@ -85,7 +85,7 @@ int Term_init(Term *self, PyObject *args, PyObject *kwds)
  */
 static long Term_hash(Term *self)
 {
-    if (self->hash != -1){
+    if (self->hash == -1){
         self->hash = PyObject_Hash(self->name) + PyObject_Hash(self->value);
     }
     return self->hash;

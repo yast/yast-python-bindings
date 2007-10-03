@@ -45,7 +45,7 @@ int YCPTypeString_init(YCPTypeString *self, PyObject *args, PyObject *kwds)
 
 long YCPTypeString_hash(YCPTypeString *self)
 {
-    if (self->hash != -1){
+    if (self->hash == -1){
         self->hash = PyObject_Hash(self->value);
     }
     return self->hash;
