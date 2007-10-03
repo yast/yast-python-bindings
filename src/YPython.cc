@@ -56,7 +56,7 @@
 
 YPython * YPython::_yPython = 0;
 
-PyObject * YPython::_pMain = NULL;
+PyObject * YPython::_pMainDicts = NULL;
 
 YPython::YPython(){}
 
@@ -75,11 +75,23 @@ YPython::yPython()
 
 
 PyObject* 
-YPython::pMain()
+YPython::pMainDicts()
 {
 
-    return _pMain;
+    return _pMainDicts;
 }
+
+bool  
+AddNewDict(string name, PyObject* dict)
+{ 
+    int ret = PyDict_SetItem(YPython::_pMainDicts, PyString_FromString(name.c_str()), dict);
+    if (ret == 0)
+       return true;
+    else
+       return false;
+}
+
+
 
 
 YCPValue
@@ -106,6 +118,7 @@ YPython::loadModule(string module)
     string path;
     string module_name;
     size_t found;
+    PyObject* pMain;
 
     //found last "/" in path
     found = module.find_last_of("/");
@@ -119,12 +132,19 @@ YPython::loadModule(string module)
     if (!Py_IsInitialized()) {
        setenv("PYTHONPATH", path.c_str(), 1);
        Py_Initialize();
-
+       YPython::_pMainDicts = PyDict_New();
     }
 
-    YPython::_pMain = PyImport_ImportModule(module_name.c_str());
+    //YPython::_pMain = PyImport_ImportModule(module_name.c_str());
+
+    //new style
+
+    pMain = PyImport_ImportModule(module_name.c_str());
+    PyDict_SetItem(YPython::_pMainDicts, PyString_FromString(module_name.c_str()), PyModule_GetDict(pMain));
+    //YPython::yPython()->AddNewDict(module_name, PyModule_GetDict(pMain));
 
     return YCPVoid();
+ 
 }
 
 /**
@@ -139,16 +159,13 @@ YCPValue
 YPython::callInner (string module, string function, bool method,
 		  YCPList argList)
 {
-    PyObject* pMain;
     PyObject* pMainDict;
     PyObject* pFunc;
     PyObject* pArgs;
     PyObject* pReturn;
     YCPValue result = YCPNull ();
 
-
-    //pMain = PyImport_AddModule("__main__");
-    pMainDict = PyModule_GetDict(YPython::_pMain);
+    pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
     pFunc = PyDict_GetItemString(pMainDict, function.c_str());
     pArgs = PyTuple_New(argList->size()-1);
 

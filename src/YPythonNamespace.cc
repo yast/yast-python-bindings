@@ -154,7 +154,8 @@ YPythonNamespace::YPythonNamespace (string name)
   long num = 0;          //number of function arguments
 
   //obtain main dictionary of globals variables
-  pMainDict = PyModule_GetDict(YPython::yPython()->pMain());
+  pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),name.c_str());
+
   //keys from dictionary
   fun_names = PyDict_Keys(pMainDict);
 
