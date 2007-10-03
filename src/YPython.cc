@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------\
-|							       |
-|	       __   __	  ____ _____ ____		       |
-|	       \ \ / /_ _/ ___|_   _|___ \		       |
+|								       |
+|			__   __	  ____ _____ ____		       |
+|			\ \ / /_ _/ ___|_   _|___ \		       |
 |			\ V / _` \___ \ | |   __) |		       |
 |			 | | (_| |___) || |  / __/		       |
 |			 |_|\__,_|____/ |_| |_____|		       |
@@ -64,6 +64,10 @@ YPython::YPython(){}
 YPython::~YPython(){}
 
 
+/**
+ * return static _yPython
+ **/
+
 YPython *
 YPython::yPython()
 {
@@ -73,6 +77,9 @@ YPython::yPython()
     return _yPython;
 }
 
+/**
+ * return static _pMainDicts
+ **/
 
 PyObject* 
 YPython::pMainDicts()
@@ -81,6 +88,9 @@ YPython::pMainDicts()
     return _pMainDicts;
 }
 
+/**
+ * "static" destructor
+ **/
 
 
 YCPValue
@@ -100,7 +110,7 @@ YPython::destroy()
 
 /**
  * Loads a module.
- */
+ **/
 YCPValue
 YPython::loadModule(string module)
 {
@@ -125,10 +135,9 @@ YPython::loadModule(string module)
        YPython::_pMainDicts = PyDict_New();
     }
 
-
-
+    //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
-
+    //check if dictionary contain "dictionary" for module
     if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
        pMain = PyImport_ImportModule(module_name.c_str());
        int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
@@ -151,18 +160,20 @@ YPython::loadModule(string module)
  * @param bool is it method? TODO !!
  * @param YCPList argumnets from YCP to python function(0 - dummy)
  * @return YCPValue return value from python's function
- */
+ **/
 YCPValue
 YPython::callInner (string module, string function, bool method,
 		  YCPList argList)
 {
-    PyObject* pMainDict;
-    PyObject* pFunc;
-    PyObject* pArgs;
-    PyObject* pReturn;
+    PyObject* pMainDict;  // dictionary of module
+    PyObject* pFunc;      // function from dictionary
+    PyObject* pArgs;      // tuple object of argument for function
+    PyObject* pReturn;    // return value from python
     YCPValue result = YCPNull ();
 
+    //obtain correct dictionary for module
     pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
+    //obtain function from dictionary
     pFunc = PyDict_GetItemString(pMainDict, function.c_str());
     pArgs = PyTuple_New(argList->size()-1);
 
@@ -173,15 +184,16 @@ YPython::callInner (string module, string function, bool method,
         pArg = YCPTypeToPythonType(argList->value(i));
         PyTuple_SetItem(pArgs,i-1, pArg);
     }
-
+    //calling function from python
     pReturn = PyObject_CallObject(pFunc, pArgs);
-
+    //delete arguments
     Py_CLEAR(pArgs);
-
+    //convert python value to YCPValue
     if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
     else
         y2error("pReturn == 0");
+    //delete pReturn
     Py_CLEAR(pReturn);
 
     if (result.isNull ()) {
@@ -192,6 +204,12 @@ YPython::callInner (string module, string function, bool method,
     return result;
 }
 
+
+/**
+ * convert python value to YCPValue
+ * @param pythonValue
+ * @return YCPValue covnerted value from pythonValue
+ **/
 
 YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
 {
@@ -250,7 +268,11 @@ YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
 
     return YCPNull();
 }
-
+/**
+ * convert YCPValue to python value 
+ * @param YCPValue
+ * @return pythonValue covnerted value from YCPValue
+ **/
 
 PyObject *YPython::YCPTypeToPythonType(YCPValue value)
 {
@@ -311,7 +333,9 @@ PyObject *YPython::YCPTypeToPythonType(YCPValue value)
 
 /**
   * Convert a Python list to a YCPList.
-**/
+  * @param PyObject (python list)
+  * @return YCPList covnerted value from pythonValue
+ **/
 YCPList YPython::fromPythonListToYCPList (PyObject* pPythonList) {
     YCPList ycp_List;
     PyObject * pItem;
@@ -340,6 +364,8 @@ YCPList YPython::fromPythonListToYCPList (PyObject* pPythonList) {
 
 /**
   * Convert a Python Tuple to a YCPList.
+  * @param PyObject (python tuple)
+  * @return YCPList covnerted value from pythonValue
  **/
 YCPList YPython::fromPythonTupleToYCPList (PyObject* pPythonTuple) {
     YCPList ycp_List;
@@ -369,6 +395,8 @@ YCPList YPython::fromPythonTupleToYCPList (PyObject* pPythonTuple) {
 
 /**
   * Convert a YCPList to a Python list.
+  * @param YCPValue (list)
+  * @return PyObject (python list) covnerted value from YCPValue
  **/
 PyObject* YPython::fromYCPListToPythonList (YCPValue ycp_List) {
     PyObject* pPythonList;
@@ -397,6 +425,8 @@ PyObject* YPython::fromYCPListToPythonList (YCPValue ycp_List) {
 
 /**
   * Convert a YCPList to a Python tuple.
+  * @param YCPValue (list)
+  * @return PyObject (python tuple) covnerted value from YCPValue
  **/
 PyObject* YPython::fromYCPListToPythonTuple (YCPValue ycp_List) {
     PyObject* pPythonTuple;
@@ -427,6 +457,8 @@ PyObject* YPython::fromYCPListToPythonTuple (YCPValue ycp_List) {
 /**
   * Convert a YCPMap to a Python Dictionary.
   * If something goes wrong, iteration is trying proceed...
+  * @param YCPValue (map)
+  * @return PyObject (python dictionary) covnerted value from YCPValue
  **/
 PyObject* YPython::fromYCPMapToPythonDict (YCPValue ycp_Map) {
     PyObject* pPythonDict;
@@ -462,6 +494,8 @@ PyObject* YPython::fromYCPMapToPythonDict (YCPValue ycp_Map) {
 
 /**
   * Convert a Python Dictionary to a YCPMap.
+  * @param PyObject (python dictionary)
+  * @return YCPMap covnerted value from PyObject
  **/
 YCPMap YPython::fromPythonDictToYCPMap (PyObject* pPythonDict) {
     YCPValue ycp_key;
@@ -493,6 +527,8 @@ YCPMap YPython::fromPythonDictToYCPMap (PyObject* pPythonDict) {
 /**
   * Convert a Python Term to a YCPTerm.
   * Argument should be Term!
+  * @param PyObject (python Term)
+  * @return YCPTerm covnerted value from PyObject
  **/
 YCPTerm YPython::fromPythonTermToYCPTerm (PyObject* pythonTerm) {
     PyObject *value;
@@ -518,6 +554,8 @@ YCPTerm YPython::fromPythonTermToYCPTerm (PyObject* pythonTerm) {
 /**
   * Convert a YCPTerm to a Python Term.
   * Given argument should be term!
+  * @param YCPValue (Term)
+  * @return PyObject (python dictionary) covnerted value from YCPValue
  **/
 PyObject* YPython::fromYCPTermToPythonTerm (YCPValue ycp_Term) {
     PyObject *value;
