@@ -30,11 +30,11 @@ class YPython
 public:
 
     /**
-     * Load a Perl module - equivalent to "use" in Python.
+     * Load a Python module - equivalent to "use" in Python.
      *
      * Returns a YCPError on failure, YCPVoid on success.
      **/
-    static YCPValue loadModule( YCPList argList );
+    static YCPValue loadModule(string module);
 
     /**
      * Access the static (singleton) YPython object. Create it if it isn't
@@ -44,10 +44,12 @@ public:
      **/
     static YPython * yPython();
 
+    PyObject* pMain();
 
+    static PyObject* _pMain;
 
     /**
-     * Destroy the static (singleton) YPython object and unload the embedded Perl
+     * Destroy the static (singleton) YPython object and unload the embedded Python
      * interpreter.
      *
      * Returns YCPVoid().
