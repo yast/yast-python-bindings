@@ -110,8 +110,23 @@ static int Term_cmp(PyObject *obj1, PyObject *obj2)
 }
 
 
+static PyObject *Term_len(PyObject *self, PyObject *)
+{
+    int size;
+
+    if (!isTerm(self))
+        return Py_None;
+
+    size = PyTuple_Size(((Term *)self)->value);
+    return Py_BuildValue("i", size);
+}
+
 
 static PyMethodDef Term_methods[] = {
+    {"len", (PyCFunction)Term_len, METH_NOARGS, "Return number of Terms\' parameters."},
+    {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
+    {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
+    {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},
     {NULL}  /* Sentinel */
 };
 

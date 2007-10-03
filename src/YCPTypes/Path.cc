@@ -24,6 +24,14 @@ static int Path_cmp(PyObject *obj1, PyObject *obj2)
     return ret;
 }
 
+static PyObject *Path_str(PyObject *self)
+{
+    if (isPath(self)){
+        Py_INCREF(((Path *)self)->value);
+        return ((Path *)self)->value;
+    }
+    return Py_None;
+}
 
 /**
  * Returns New Reference!
@@ -71,6 +79,9 @@ static PyObject *Path_prepend(Path *self, PyObject *arg)
 static PyMethodDef Path_methods[] = {
     {"append", (PyCFunction)Path_append, METH_O, "Return new Path object with appended path given in argument."},
     {"prepend", (PyCFunction)Path_prepend, METH_O, "Return new Path object with perpended path given in argument."},
+    {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
+    {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
+    {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},
     {NULL}  /* Sentinel */
 };
 
@@ -100,7 +111,7 @@ PyTypeObject PathType = {
     0,                         /*tp_as_mapping*/
     (hashfunc)YCPTypeString_hash,/*tp_hash */
     0,                         /*tp_call*/
-    0,                         /*tp_str*/
+    (reprfunc)Path_str,        /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/

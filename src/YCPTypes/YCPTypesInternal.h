@@ -38,4 +38,9 @@ PyObject *YCPTypeString_New(PyObject *str, PyTypeObject *type);
 
 PyObject *Term_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Term_init(Term *self, PyObject *args, PyObject *kwds);
+
+
+PyObject *YCPType_isSymbol(PyObject *self, PyObject *);
+PyObject *YCPType_isPath(PyObject *self, PyObject *);
+PyObject *YCPType_isTerm(PyObject *self, PyObject *);
 #endif

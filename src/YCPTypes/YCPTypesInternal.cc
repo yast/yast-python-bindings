@@ -85,3 +85,29 @@ PyObject *YCPTypeString_New(PyObject *value, PyTypeObject *type)
     return ret;
 }
 
+PyObject *YCPType_isSymbol(PyObject *self, PyObject *)
+{
+    if (isSymbol(self)){
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
+    }
+}
+
+PyObject *YCPType_isPath(PyObject *self, PyObject *)
+{
+    if (isPath(self)){
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
+    }
+}
+
+PyObject *YCPType_isTerm(PyObject *self, PyObject *)
+{
+    if (isTerm(self)){
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
+    }
+}

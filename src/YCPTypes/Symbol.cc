@@ -24,7 +24,21 @@ static int Symbol_cmp(PyObject *obj1, PyObject *obj2)
 }
 
 
+static PyObject *Symbol_str(PyObject *self)
+{
+    if (isSymbol(self)){
+        Py_INCREF(((Symbol *)self)->value);
+        return ((Symbol *)self)->value;
+    }
+
+    return Py_None;
+}
+
+
 static PyMethodDef Symbol_methods[] = {
+    {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
+    {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
+    {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},
     {NULL}  /* Sentinel */
 };
 
@@ -54,7 +68,7 @@ PyTypeObject SymbolType = {
     0,                         /*tp_as_mapping*/
     (hashfunc)YCPTypeString_hash,     /*tp_hash */
     0,                         /*tp_call*/
-    0,                         /*tp_str*/
+    (reprfunc)Symbol_str,      /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
