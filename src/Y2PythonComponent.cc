@@ -60,7 +60,8 @@ Y2Namespace *Y2PythonComponent::import (const char* name)
 	y2internal ("Couldn't find %s after Y2CCPython pointed to us", name);
 	return NULL;
     }
-    
+
+    //import module and add his dictionary to YPython::_pMainDicts
     YPython::loadModule (module);
 
     // introspect, create data structures for the interpreter
