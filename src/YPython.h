@@ -44,9 +44,19 @@ public:
      **/
     static YPython * yPython();
 
-    PyObject* pMain();
+   /**
+     * Access the static _pMainDicts
+     * 
+     **/
 
-    static PyObject* _pMain;
+    PyObject* pMainDicts();
+
+   /**
+     * static _pMainDicts includes dictionaries of all imported python modules
+     * 
+     **/
+
+    static PyObject* _pMainDicts;
 
     /**
      * Destroy the static (singleton) YPython object and unload the embedded Python
@@ -78,7 +88,11 @@ public:
     PyObject *YCPTypeToPythonType(YCPValue);
 
 
+
 private:
+    
+
+
     /**
      * Convert a Python list to a YCPList.
      **/
