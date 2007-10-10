@@ -60,7 +60,9 @@ class YCPDeclare:
         "symbol",
         "path",
         "float",
-        "void"
+        "void",
+        "map",
+        "list"
     )
 
     def __init__(self, return_type, *params_types):

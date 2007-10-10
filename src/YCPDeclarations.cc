@@ -146,6 +146,10 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
         return Type::Symbol;
     if (type == "term")
         return Type::Term;
+    if (type == "map")
+        return Type::Map;
+    if (type == "list")
+        return Type::List;
 
     // default:
     return Type::Any;
