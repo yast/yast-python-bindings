@@ -5,15 +5,16 @@
 AM_CXXFLAGS = -DY2LOG=\"Python\" -DMODULEDIR=\"$(moduledir)\"
 
 MY_PYTHON_VENDORARCH = $(subst /usr,$(prefix),$(PYTHON_VENDORARCH))
-pythonpydir = $(MY_PYTHON_VENDORARCH)/YaST
+#pythonpydir = $(MY_PYTHON_VENDORARCH)/YaST
+pythonpydir = $(MY_PYTHON_VENDORARCH)/site-packages
 pythonsodir = $(MY_PYTHON_VENDORARCH)/site-packages
 
 
-#pythonpm_DATA = YCP.pm
+pythonpy_DATA = YCPDeclarations.py
 
 # plugin, libtool forces 'lib' prefix
 plugin_LTLIBRARIES = libpy2lang_python.la
-noinst_LTLIBRARIES = libYCPTypes.la liby2lang_python.la
+noinst_LTLIBRARIES = libYCPTypes.la liby2lang_python.la libYCPDeclarations.la
 pythonso_LTLIBRARIES = libYCP.la
 
 libYCPTypes_la_SOURCES = YCPTypes.cc YCPTypes.h \
@@ -21,6 +22,8 @@ libYCPTypes_la_SOURCES = YCPTypes.cc YCPTypes.h \
                          YCPTypes/Path.cc \
                          YCPTypes/Symbol.cc \
                          YCPTypes/Term.cc
+
+libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
 
 # binary part of the python module
 libYCP_la_SOURCES =				\
@@ -49,7 +52,7 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-ly2util			\
 		-version-info 2:0
 
-libYCP_la_LIBADD = libYCPTypes.la
+libYCP_la_LIBADD = libYCPTypes.la #libYCPDeclarations.la
 
 
 libpy2lang_python_la_LDFLAGS = -version-info 2:0
@@ -62,7 +65,7 @@ libpy2lang_python_la_LDFLAGS = $(PYTHON_LDFLAGS)	\
 		-L$(libdir) -L$(plugindir)	\
 		-lycp -ly2 -ly2util
 
-libpy2lang_python_la_LIBADD = libYCPTypes.la
+libpy2lang_python_la_LIBADD = libYCPTypes.la libYCPDeclarations.la
 
 
 liby2lang_python_la_LIBADD  = $(PYTHON_LDFLAGS)
@@ -105,3 +108,5 @@ INCLUDES = -I$(srcdir)/include -I$(includedir) ${ZYPP_CFLAGS} -I/usr/include/pyt
 # nodist_module_DATA = YaPI.pm
 
 #EXTRA_DIST = $(pythonpy_DATA) $(module_DATA)
+EXTRA_DIST = $(pythonpy_DATA)
+
