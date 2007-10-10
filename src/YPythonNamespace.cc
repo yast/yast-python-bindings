@@ -18,6 +18,11 @@
 #include <YPython.h>
 #include <stdio.h>
 
+#include "YCPDeclarations.h"
+#define DBG(str) \
+    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
+    std::cerr.flush()
+
 
 
 /**
@@ -148,6 +153,12 @@ YPythonNamespace::YPythonNamespace (string name)
   PyObject * fun_names;   //list of keys from dictionary (YPython::yPython()->pMain())
   PyObject * fun_code;    //code of function
 
+  //Declarations (using YPCDelcarations python module)
+  YCPDeclarations *decl = YCPDeclarations::instance();
+  FunctionTypePtr sym_tp;
+  std::vector<constTypePtr> list_of_types;
+  int tmp;
+
 
   int num_fun_names = 0; //number of keys from dictionary
   int count = 0;         // position. arbitrary numbering
@@ -155,6 +166,10 @@ YPythonNamespace::YPythonNamespace (string name)
 
   //obtain main dictionary of globals variables
   pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),name.c_str());
+  if (pMainDict == NULL){
+      y2error("Can't load module %s", name.c_str());
+      return;
+  }
 
   //keys from dictionary
   fun_names = PyDict_Keys(pMainDict);
@@ -172,14 +187,26 @@ YPythonNamespace::YPythonNamespace (string name)
     //check if symbol is callable    
 
     if (PyFunction_Check(pFunc)) {
-       FunctionTypePtr  sym_tp = new FunctionType (Type::Any);
-
        fun_code = PyFunction_GetCode(pFunc);
        num = ((PyCodeObject *) fun_code)->co_argcount;
-       //y2milestone ("Number of parameters: %d", num);
-       //add types and number of arguments into SymbolEntry table
-       for (long j = 0; j < num; j++) {
-           sym_tp->concat(Type::Any);    
+
+       if (decl->exists((PyFunctionObject *)pFunc)
+           && decl->numParams((PyFunctionObject *)pFunc) == num){
+
+           sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)pFunc));
+
+           list_of_types = decl->params((PyFunctionObject *)pFunc);
+           tmp = list_of_types.size();
+           for (int i=0; i < tmp; i++){
+               sym_tp->concat(list_of_types[i]);
+           }
+       }else{
+           sym_tp = new FunctionType(Type::Any);
+           //y2milestone ("Number of parameters: %d", num);
+           //add types and number of arguments into SymbolEntry table
+           for (long j = 0; j < num; j++) {
+               sym_tp->concat(Type::Any);    
+           }
        }
        //y2milestone ("Callable function %s", PyString_AsString(item));
        // symbol entry for the function

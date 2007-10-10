@@ -111,6 +111,9 @@ const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyF
 
 PyObject *YCPDeclarations::_getItemFromFunctionMap(PyObject *key)
 {
+    if (_py_self == NULL)
+        return NULL;
+
     PyObject *dict = PyModule_GetDict(_py_self);
     PyObject *func_map = PyDict_GetItemString(dict, "_function_map");
 
@@ -158,6 +161,9 @@ YCPDeclarations::YCPDeclarations()
 {
     DBG("YCPDeclarations - constructor");
     _py_self = PyImport_ImportModule("YCPDeclarations");
+    if (_py_self == NULL){
+        DBG("YCPDeclarations::YCPDeclarations() - Failed to import YCPDeclarations module!");
+    }
 }
 
 YCPDeclarations::~YCPDeclarations()

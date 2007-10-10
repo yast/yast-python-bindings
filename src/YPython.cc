@@ -140,6 +140,16 @@ YPython::loadModule(string module)
     //check if dictionary contain "dictionary" for module
     if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
        pMain = PyImport_ImportModule(module_name.c_str());
+       if (pMain == NULL){
+           y2error("Can't import module %s", module_name.c_str());
+
+           if (PyErr_Occurred() != NULL){
+               PyErr_Print();
+           }
+
+           return YCPError("The module was not imported");
+       }
+
        int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
        if (ret != 0)
           return YCPError("The module was not imported");
