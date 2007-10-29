@@ -69,9 +69,32 @@ PyObject *Term_getValue(Term *);
 PyObject *Term_New(PyObject *name, PyObject *list_value);
 PyObject *Term_NewString(const char *name, PyObject *list_value);
 
+/**
+ * Code
+ * Code is composed from value (pointer to function call)
+ */
+typedef struct{
+    PyObject_HEAD
+    PyObject *value; // pointer to function
+    long hash;
+} Code;
+extern PyTypeObject CodeType;
+
+bool isCode(PyObject *);
+
 
 /**
- * Initialize alll YCP types
+ * Returns list or None.
+ * Borrowed reference!
+ */
+PyObject *Code_getValue(Code *);
+
+PyObject *Code_New(PyObject *value);
+
+
+
+/**
+ * Initialize all YCP types
  */
 bool initYCPTypes(PyObject *module);
 
@@ -87,7 +110,7 @@ bool isYCPType(PyObject *);
  *            ...
  *      }
  */
-enum YCPType { NOT_YCP_TYPE, PATH, SYMBOL, TERM };
+enum YCPType { NOT_YCP_TYPE, PATH, SYMBOL, TERM, CODE };
 YCPType getYCPType(PyObject *);
 
 #endif

@@ -10,13 +10,16 @@ bool initYCPTypes(PyObject *module)
         return false;
     if (PyType_Ready(&TermType) < 0)
         return false;
-
+    if (PyType_Ready(&CodeType) < 0)
+        return false;
     Py_INCREF(&SymbolType);
     PyModule_AddObject(module, "Symbol", (PyObject *)&SymbolType);
     Py_INCREF(&PathType);
     PyModule_AddObject(module, "Path", (PyObject *)&PathType);
     Py_INCREF(&TermType);
     PyModule_AddObject(module, "Term", (PyObject *)&TermType);
+    Py_INCREF(&CodeType);
+    PyModule_AddObject(module, "Code", (PyObject *)&CodeType);
 
     return true;
 }
@@ -36,6 +39,9 @@ YCPType getYCPType(PyObject *obj)
         return PATH;
     if (isTerm(obj))
         return TERM;
+    if (isCode(obj))
+        return CODE;
+
     return NOT_YCP_TYPE;
 }
 
@@ -184,5 +190,63 @@ PyObject *Term_NewString(const char *name, PyObject *value)
 
     return ret;
 }
+/***** Term END *****/
+
+/***** Code *****/
+bool isCode(PyObject *obj)
+{
+    if (PyObject_IsInstance(obj, (PyObject *)&CodeType))
+        return true;
+    return false;
+}
+
+PyObject *Code_getValue(Code *obj)
+{
+    if (isCode((PyObject *)obj)){
+        return obj->value;
+    }
+    return Py_None;
+}
+
+
+PyObject *Code_New(PyObject *value)
+{
+    PyObject *ret;
+    PyObject *args;
+    int size, i;
+    PyObject *tmp;
+
+    if (!PyFunction_Check(value)){
+        return Py_None;
+    }
+
+    // create args variable
+
+    args = PyTuple_New(1);
+
+    if (PyTuple_SetItem(args, 0, value) != 0){
+        Py_XDECREF(args);
+        Py_DECREF(value);
+        return Py_None;
+    }
+
+    // create new object
+    ret = Code_new(&CodeType, Py_None, Py_None);
+    if (ret == NULL){
+        Py_XDECREF(args);
+        return Py_None;
+    }
+
+    // initialize object
+    if (Code_init((Code *)ret, args, Py_None) == -1){
+        Py_XDECREF(args);
+        return Py_None;
+    }
+
+    Py_XDECREF(args);
+    return ret;
+}
+
+
 /***** Term END *****/
 

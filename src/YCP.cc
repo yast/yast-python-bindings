@@ -14,6 +14,7 @@
 #include <ycp/Import.h>
 #include <yui/YUIComponent.h>
 #include <wfm/Y2WFMComponent.h>
+#include <ycp/Parser.h>
 #include <ycp/YCPMap.h>
 #include <ycp/YCPList.h>
 #include <ycp/YCPPath.h>
@@ -23,6 +24,7 @@
 
 #include "YPython.h"
 #include "PythonLogger.h"
+
 
 #include "YCPTypes.h"
 
@@ -40,6 +42,8 @@ PyObject * Import_YCPNameSpace (PyObject *args);
 PyObject * Init_UI (PyObject *args);
 
 PyObject * SCR_Run (const char *scr_command, PyObject *args);
+
+PyObject * Py_ycp_code(PyObject *args);
 
 void Py_y2logger(PyObject *args);
 
@@ -125,6 +129,13 @@ static PyObject * ycp_y2logger (PyObject *self, PyObject *args) {
   return Py_None;
 }
 
+static PyObject * ycp_code (PyObject *self, PyObject *args) {
+
+  Py_ycp_code(args);
+  return Py_None;
+}
+
+
 /**
  * This is needed for importing new module from ycp.
  */
@@ -143,6 +154,7 @@ static PyMethodDef YCPMethods[] = {
   {"SCR_Execute",  ycp_scr_execute, METH_VARARGS, "SCR Execute function"},
   {"SCR_Dir",  ycp_scr_dir, METH_VARARGS, "SCR Dir function"},
   {"y2logger", ycp_y2logger, METH_VARARGS, "Logging error, debug messages and milestones in python"},
+  {"ycp_code", ycp_code, METH_VARARGS, "Convert Python function call to YCP Code"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -194,7 +206,6 @@ PyMODINIT_FUNC initycp(void) {
   PyObject *dict = PyModule_GetDict(Self);
   PyObject *code;
 
-
   code = PyRun_String(func_y2internal, Py_single_input, dict, dict);
   Py_XDECREF(code);
 
@@ -229,7 +240,7 @@ bool isRegistered(PyObject *dict, const char *NameSpace)
     if (PyDict_Contains(dict, name_space) == 1)
         ret = true;
 
-
+    
     Py_XDECREF(name_space);
 
     return ret;
@@ -336,6 +347,41 @@ PyObject * Init_UI (PyObject *args) {
   }
   return PyBool_FromLong(1);
 }
+
+
+PyObject * Py_ycp_code(PyObject *args) {
+
+  Parser *parser;
+  PyObject *temp;
+  string command;
+  YCodePtr c = 0;
+
+  temp = PyTuple_GetItem(args, 0);
+
+  if (PyString_Check(temp))
+     command = PyString_AsString(temp);
+  else
+     command = "";
+  cout << command << endl;
+  parser = new Parser(command.c_str());
+
+  //parser->setInput(command.c_str());
+  //parser->setBuffered();
+  c = parser->parse();
+
+  if (c)
+      c->evaluate();
+  else
+      cout << "eee c nejde!" << endl;
+
+  cout << c->toString() << endl;
+
+  delete(parser);
+
+  return Py_None;
+
+}
+
 
 PyObject * Import_YCPNameSpace (PyObject *args) {
 
@@ -621,11 +667,12 @@ PyObject * Call_YCPFunction (PyObject *args) {
          if (pPythonValue) {
              ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
 
+            /*XXX
 	    if (fun_type->parameterType(i-2)->matchvalue(ycpArg) != 0) {
                y2error ("Wrong type of argumment %d",i-2);
                return PyExc_TypeError;
 
-	    }
+	    }*/
             bool ok = func_call->appendParameter (ycpArg);
 	    if (!ok) {
                y2error ("Problem with adding arguments of function %s", func_name);
@@ -657,7 +704,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      delete []func_name;
 
      pReturnValue = ypython->YCPTypeToPythonType(ycpRetValue);
-
+     Py_INCREF(pReturnValue);
      return pReturnValue;
      
   } else {

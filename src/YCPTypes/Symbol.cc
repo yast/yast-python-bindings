@@ -37,6 +37,7 @@ static PyObject *Symbol_str(PyObject *self)
 
 static PyMethodDef Symbol_methods[] = {
     {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
+    {"isCode", (PyCFunction)YCPType_isCode, METH_NOARGS, "Return true if object is Code."},
     {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
     {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},
     {NULL}  /* Sentinel */

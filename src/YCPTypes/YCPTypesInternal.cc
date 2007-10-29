@@ -111,3 +111,12 @@ PyObject *YCPType_isTerm(PyObject *self, PyObject *)
         Py_RETURN_FALSE;
     }
 }
+
+PyObject *YCPType_isCode(PyObject *self, PyObject *)
+{
+    if (isCode(self)){
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
+    }
+}

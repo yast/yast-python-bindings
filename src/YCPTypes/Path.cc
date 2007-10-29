@@ -79,6 +79,7 @@ static PyObject *Path_prepend(Path *self, PyObject *arg)
 static PyMethodDef Path_methods[] = {
     {"append", (PyCFunction)Path_append, METH_O, "Return new Path object with appended path given in argument."},
     {"prepend", (PyCFunction)Path_prepend, METH_O, "Return new Path object with perpended path given in argument."},
+    {"isCode", (PyCFunction)YCPType_isCode, METH_NOARGS, "Return true if object is Code."},
     {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
     {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
     {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},

@@ -22,8 +22,34 @@
 #include <Python.h>
 
 #include <ycp/YCPList.h>
+#include <ycp/YCPValue.h>
 #include <ycp/Type.h>
+#include <ycp/YCPCode.h>
+#include <ycp/YCode.h>
 
+
+
+class YPythonCode : public YCode
+{
+
+public: 
+     YPythonCode (PyObject *pFunc);
+
+     YCode::ykind kind() const;
+
+     std::ostream & toStream (std::ostream & str) const;
+
+     std::ostream & toXml (std::ostream & str, int indent ) const;
+     /**
+     * Evaluates the code.
+     */
+    YCPValue evaluate (bool cse = false);
+
+private:
+     ykind m_kind;
+     PyObject *_pFunc; 
+
+};
 
 class YPython
 {
@@ -133,6 +159,8 @@ private:
      * Convert a YCPList to a Python tuple.
      **/
     PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
+
+    YCPValue fromPythonFunToReference (PyObject* pyFun);
 
 protected:
 

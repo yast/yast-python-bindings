@@ -124,6 +124,7 @@ static PyObject *Term_len(PyObject *self, PyObject *)
 
 static PyMethodDef Term_methods[] = {
     {"len", (PyCFunction)Term_len, METH_NOARGS, "Return number of Terms\' parameters."},
+    {"isCode", (PyCFunction)YCPType_isCode, METH_NOARGS, "Return true if object is Code."},
     {"isSymbol", (PyCFunction)YCPType_isSymbol, METH_NOARGS, "Return true if object is Symbol."},
     {"isPath", (PyCFunction)YCPType_isPath, METH_NOARGS, "Return true if object is Path."},
     {"isTerm", (PyCFunction)YCPType_isTerm, METH_NOARGS, "Return true if object is Term."},

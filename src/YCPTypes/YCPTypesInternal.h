@@ -40,6 +40,11 @@ PyObject *Term_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Term_init(Term *self, PyObject *args, PyObject *kwds);
 
 
+PyObject *Code_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+int Code_init(Code *self, PyObject *args, PyObject *kwds);
+
+
+PyObject *YCPType_isCode(PyObject *self, PyObject *);
 PyObject *YCPType_isSymbol(PyObject *self, PyObject *);
 PyObject *YCPType_isPath(PyObject *self, PyObject *);
 PyObject *YCPType_isTerm(PyObject *self, PyObject *);

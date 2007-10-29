@@ -21,6 +21,7 @@ libYCPTypes_la_SOURCES = YCPTypes.cc YCPTypes.h \
                          YCPTypes/YCPTypesInternal.cc YCPTypes/YCPTypesInternal.h \
                          YCPTypes/Path.cc \
                          YCPTypes/Symbol.cc \
+                         YCPTypes/Code.cc \
                          YCPTypes/Term.cc
 
 libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
@@ -29,7 +30,10 @@ libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
 libYCP_la_SOURCES =				\
 	$(liby2lang_python_la_SOURCES)		\
 	YCP.cc					\
-	PythonLogger.cc PythonLogger.h
+	PythonLogger.cc PythonLogger.h		\
+	YPythonNamespace.cc YPythonNamespace.h	\
+	YCPDeclarations.cc YCPDeclarations.
+
 
 
 install-data-hook:

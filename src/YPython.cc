@@ -31,7 +31,6 @@
 #include <ycp/pathsearch.h>
 
 
-
 #include <YPython.h>
 #include <ycp/YCPValue.h>
 #include <ycp/YCPBoolean.h>
@@ -49,6 +48,8 @@
 #include <ycp/YCPExternal.h>
 
 #include "YCPTypes.h"
+#include "YPythonNamespace.h"
+
 #include <iostream>
 #define DBG(str) \
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
@@ -129,16 +130,28 @@ YPython::loadModule(string module)
     //delete last 3 chars from module name ".py"
     module_name.erase(module_name.size()-3); //delete ".py"
     //initialize python and set the path where are python modules
+
+    cout << "Searching path for modules: " << Py_GetPath()<< endl;
     if (!Py_IsInitialized()) {
+       cout <<"path :" << path << endl;
        setenv("PYTHONPATH", path.c_str(), 1);
+       
        Py_Initialize();
        YPython::_pMainDicts = PyDict_New();
     }
 
+    setenv("PYTHONPATH", path.c_str(), 1);
+    cout <<"path :" << path << endl;
+    if (!YPython::_pMainDicts)
+       YPython::_pMainDicts = PyDict_New();
     //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
+       cout <<"loadModule name: " << module_name << endl;
+       //char * new_path = (char *) path.c_str();
+       //PySys_SetPath(new_path);
+       cout << "Searching path for modules after init: " << Py_GetPath()<< endl;
        pMain = PyImport_ImportModule(module_name.c_str());
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
@@ -155,7 +168,9 @@ YPython::loadModule(string module)
           return YCPError("The module was not imported");
     } else {
 
-       return YCPError("The module is imported");
+       //return YCPError("The module is imported");
+       y2error("The module is imported");
+       return YCPVoid();
     }
 
 
@@ -252,6 +267,14 @@ YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
     if (PyString_Check(pythonValue))
         return YCPString(PyString_AsString(pythonValue));
 
+    //functions ->Reference
+    if (PyFunction_Check(pythonValue))
+	return fromPythonFunToReference (pythonValue);
+
+    //function
+    if (PyFunction_Check(pythonValue))
+        return YCPByteblock((const unsigned char *)PyFunction_GetCode(pythonValue), (long) sizeof(PyFunction_GetCode(pythonValue)));
+
     //list
     if (PyList_Check(pythonValue))
         return fromPythonListToYCPList(pythonValue);
@@ -264,6 +287,8 @@ YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
     if (PyDict_Check(pythonValue))
         return fromPythonDictToYCPMap(pythonValue);
 
+    
+
     // term, symbol, path
     switch (getYCPType(pythonValue)){
         case SYMBOL:
@@ -272,6 +297,9 @@ YCPValue YPython::PythonTypeToYCPType(PyObject *pythonValue)
             return YCPPath(Path_getValue((Path *)pythonValue));
         case TERM:
             return fromPythonTermToYCPTerm(pythonValue);
+	case CODE:
+            return YCPCode(new YPythonCode(Code_getValue((Code *)pythonValue)));
+
         case NOT_YCP_TYPE:
             return YCPNull();
     }
@@ -584,3 +612,119 @@ PyObject* YPython::fromYCPTermToPythonTerm (YCPValue ycp_Term) {
     return Term_NewString(ycp_Term->asTerm()->name().c_str(), value);
 }
 
+
+/**
+  * Convert Python Function to YCPCode.
+  * 
+  * @param pointer to python function
+  * @return YCPCode - Referecne
+ **/
+
+YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
+
+    
+    FunctionTypePtr sym_tp = new FunctionType(Type::Any);
+    PyObject *fun_code = PyFunction_GetCode(pyFun);
+    char *fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
+
+    string file_path = PyString_AsString(((PyCodeObject *) fun_code)->co_filename);
+    //Y2Namespace* name_space = new Y2Namespace();
+
+    printf ("meno funckie %s\n", fun_name);
+    printf ("meno suboru %s\n", file_path.c_str());
+    
+    //found last "/" in path
+    size_t found = file_path.find_last_of("/");
+    //extract module name from path
+    string module_name = file_path.substr(found+1);
+
+    file_path = YCPPathSearch::find (YCPPathSearch::Module, module_name);
+
+    if (file_path.empty())
+       file_path = YCPPathSearch::find (YCPPathSearch::Include, module_name);
+
+    if (file_path.empty())
+       file_path = YCPPathSearch::find (YCPPathSearch::Client, module_name);
+
+    if (file_path.empty()) {
+       y2error("Finding file where is function %s failed", fun_name);
+       return YCPNull();
+    }
+
+
+
+    YPython::loadModule (file_path);
+
+
+    //found last  "/" in path
+    found = file_path.find_last_of("/");
+    //extract module name from path
+
+    module_name = file_path.substr(found+1);
+
+    //delete last 3 chars from module name ".py"
+    module_name.erase(module_name.size()-3); //delete ".py"
+
+    //found last  "/" in path
+    Y2Namespace *ns = new YPythonNamespace (module_name);
+
+
+    if (ns) {
+       TableEntry *sym_te = ns->table ()->find (fun_name);
+       if (sym_te == NULL) {
+	  y2error ("No such symbol %s::%s", module_name.c_str(), fun_name);
+	  return YCPNull();
+       }
+       SymbolEntryPtr sym_entry = sym_te->sentry();
+       cout << "entry" << sym_entry->toString()<< endl;
+       return YCPReference(sym_entry);
+
+    } else {
+       y2error("Creating namespace for function %s failed", fun_name);
+       return YCPNull();
+
+    }
+
+    return YCPNull();
+}
+
+
+
+YPythonCode::YPythonCode (PyObject *pFunc):YCode() {
+    m_kind = YCode::yeReference;
+    _pFunc = pFunc;
+}
+
+YCPValue YPythonCode::evaluate(bool cse) {
+
+    PyObject * pReturn;
+    YCPValue result = YCPVoid();
+    
+    if (Py_IsInitialized()) {
+       pReturn = PyObject_CallObject(_pFunc, NULL);
+       //convert python value to YCPValue
+       if (pReturn) {
+          result = YPython::yPython()->PythonTypeToYCPType(pReturn); // create YCP value
+       } else {
+          y2error("pReturn == 0");
+       }
+    }
+    return result;
+
+}
+
+YCode::ykind YPythonCode::kind() const {
+
+    return m_kind;
+}
+
+std::ostream & YPythonCode::toStream (std::ostream & str) const {
+
+    return str;
+}
+
+std::ostream & YPythonCode::toXml (std::ostream & str, int indent ) const {
+
+    return str;
+
+}

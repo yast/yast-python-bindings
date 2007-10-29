@@ -171,6 +171,7 @@ YPythonNamespace::YPythonNamespace (string name)
       return;
   }
 
+
   //keys from dictionary
   fun_names = PyDict_Keys(pMainDict);
 
