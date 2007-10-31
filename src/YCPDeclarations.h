@@ -48,7 +48,6 @@ class YCPDeclarations {
      */
     std::vector<cache_function_t *> _cache;
 
-
     /**
      * Private construct.
      * Call YCPDeclarations::instance() to get pointer to YCPDeclarations
@@ -56,7 +55,6 @@ class YCPDeclarations {
      */
     YCPDeclarations();
     
-
     /**
      * Return item from function map which has key key.
      * Return borrowed reference!
@@ -88,7 +86,7 @@ class YCPDeclarations {
     const cache_function_t *_getCachedFunction(PyFunctionObject *func) const;
 
   public:
-    ~YCPDeclarations();
+    ~YCPDeclarations();   
 
     /**
      * Return number of parameters in declaration or -1 if function is not registered.

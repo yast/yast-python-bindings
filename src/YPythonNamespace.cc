@@ -155,6 +155,7 @@ YPythonNamespace::YPythonNamespace (string name)
 
   //Declarations (using YPCDelcarations python module)
   YCPDeclarations *decl = YCPDeclarations::instance();
+  //YCPDeclarations *decl = new YCPDeclarations();
   
   FunctionTypePtr sym_tp;
   std::vector<constTypePtr> list_of_types;

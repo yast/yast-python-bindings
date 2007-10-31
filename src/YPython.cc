@@ -142,7 +142,7 @@ YPython::loadModule(string module)
     //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
-    if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
+    if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
        pMain = PyImport_ImportModule(module_name.c_str());
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
@@ -689,9 +689,20 @@ YCPValue YPythonCode::evaluate(bool cse) {
 
     PyObject * pReturn;
     YCPValue result = YCPVoid();
-    
+    PyObject * pFunction;
+    PyObject * pArgs = NULL;
+    int args_size;
+        
+    args_size = PyTuple_Size(_pFunc);
+
+    if (args_size >=1) {
+       pFunction = PyTuple_GetItem(_pFunc, 0);
+       if (args_size > 1) {
+          pArgs = PyTuple_GetSlice(_pFunc, 1, args_size);
+       }
+    }
     if (Py_IsInitialized()) {
-       pReturn = PyObject_CallObject(_pFunc, NULL);
+       pReturn = PyObject_CallObject(pFunction, pArgs);
        //convert python value to YCPValue
        if (pReturn) {
           result = YPython::yPython()->PythonTypeToYCPType(pReturn); // create YCP value

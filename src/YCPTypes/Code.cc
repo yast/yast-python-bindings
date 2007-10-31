@@ -21,11 +21,13 @@ PyObject *Code_new(PyTypeObject *type, PyObject *args,
 
     self = (Code *)type->tp_alloc(type, 0);
     if (self != NULL){
-        self->value = Py_None;
+
+        self->value = PyTuple_New(0);
         if (self->value == NULL){
             Py_XDECREF(self);
             return NULL;
         }
+
 
         self->hash = -1;
     }
@@ -51,35 +53,38 @@ int Code_init(Code *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    // value:
+    // check if first argument is function
+    tmp = PyTuple_GetItem(args, 0);
+    if (!PyFunction_Check(tmp)) {
+        PyErr_SetString(PyExc_TypeError, ": argument 1 must be function");
+        return -1;
+    }
+    // value    
+    value = PyTuple_GetSlice(args, 0, args_size); //args; 
+    if (value != NULL) {
+       tmp = self->value;
+       self->value = value;
+       Py_XDECREF(tmp);
+    }
+   
+
+
+
+
+    /*
     value = PyTuple_GetItem(args, 0);
     if (PyFunction_Check(value)){
         tmp = PyFunction_GetCode(self->value);
         Py_INCREF(value);
         self->value = value;
-        /*
-        printf("Code_init...\n");
-	pReturn = PyObject_CallObject(self->value, NULL);
-        if (pReturn != NULL)
-           printf("Calling value: %d",PyInt_AsLong(pReturn));
-        else
-           printf("pReturn == NULL");*/
         Py_XDECREF(tmp);
     } else {
         PyErr_SetString(PyExc_TypeError, ": argument 1 must be function");
         return -1;
     }
-    /*
-    // value:
-    if (args_size > 1){
-        value = PyTuple_GetSlice(args, 1, args_size); // return new reference
-        if (value != NULL){
-            tmp = self->value;
-            self->value = value;
-            Py_XDECREF(tmp);
-        }
-    }
+
     */
+
     return 0;
 }
 
