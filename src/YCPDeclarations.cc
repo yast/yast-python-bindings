@@ -2,10 +2,10 @@
 #include <iostream>
 using std::string;
 using std::vector;
-//#define DBG(str) \
+#define DBG(str) \
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
     std::cerr.flush()
-#define DBG(str)
+//#define DBG(str)
 
 
 /********** STATIC MEMBERS **********/
@@ -172,8 +172,9 @@ YCPDeclarations::YCPDeclarations()
 
 YCPDeclarations::~YCPDeclarations()
 {
+    
     DBG("YCPDeclarations - destructor");
-
+ 
     int cache_len = _cache.size();
     for (int i=0; i < cache_len; i++){
         delete _cache[i];
@@ -181,6 +182,8 @@ YCPDeclarations::~YCPDeclarations()
 
     if (_py_self != NULL)
         Py_DECREF(_py_self);
+       
+    //_instance = std::auto_ptr<YCPDeclarations>(NULL);
 }
 
 

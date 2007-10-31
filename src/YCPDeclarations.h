@@ -49,13 +49,13 @@ class YCPDeclarations {
     std::vector<cache_function_t *> _cache;
 
 
-
     /**
      * Private construct.
      * Call YCPDeclarations::instance() to get pointer to YCPDeclarations
      * object.
      */
     YCPDeclarations();
+    
 
     /**
      * Return item from function map which has key key.

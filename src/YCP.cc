@@ -43,8 +43,6 @@ PyObject * Init_UI (PyObject *args);
 
 PyObject * SCR_Run (const char *scr_command, PyObject *args);
 
-PyObject * Py_ycp_code(PyObject *args);
-
 void Py_y2logger(PyObject *args);
 
 void init_wfm ();
@@ -129,12 +127,14 @@ static PyObject * ycp_y2logger (PyObject *self, PyObject *args) {
   return Py_None;
 }
 
+/*
 static PyObject * ycp_code (PyObject *self, PyObject *args) {
 
   Py_ycp_code(args);
   return Py_None;
 }
 
+*/
 
 /**
  * This is needed for importing new module from ycp.
@@ -154,7 +154,6 @@ static PyMethodDef YCPMethods[] = {
   {"SCR_Execute",  ycp_scr_execute, METH_VARARGS, "SCR Execute function"},
   {"SCR_Dir",  ycp_scr_dir, METH_VARARGS, "SCR Dir function"},
   {"y2logger", ycp_y2logger, METH_VARARGS, "Logging error, debug messages and milestones in python"},
-  {"ycp_code", ycp_code, METH_VARARGS, "Convert Python function call to YCP Code"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -346,40 +345,6 @@ PyObject * Init_UI (PyObject *args) {
      y2debug ("UI component already present: %s", c->name ().c_str ());
   }
   return PyBool_FromLong(1);
-}
-
-
-PyObject * Py_ycp_code(PyObject *args) {
-
-  Parser *parser;
-  PyObject *temp;
-  string command;
-  YCodePtr c = 0;
-
-  temp = PyTuple_GetItem(args, 0);
-
-  if (PyString_Check(temp))
-     command = PyString_AsString(temp);
-  else
-     command = "";
-  cout << command << endl;
-  parser = new Parser(command.c_str());
-
-  //parser->setInput(command.c_str());
-  //parser->setBuffered();
-  c = parser->parse();
-
-  if (c)
-      c->evaluate();
-  else
-      cout << "eee c nejde!" << endl;
-
-  cout << c->toString() << endl;
-
-  delete(parser);
-
-  return Py_None;
-
 }
 
 

@@ -30,9 +30,7 @@ libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
 libYCP_la_SOURCES =				\
 	$(liby2lang_python_la_SOURCES)		\
 	YCP.cc					\
-	PythonLogger.cc PythonLogger.h		\
-	YPythonNamespace.cc YPythonNamespace.h	\
-	YCPDeclarations.cc YCPDeclarations.
+	PythonLogger.cc PythonLogger.h
 
 
 
@@ -54,6 +52,8 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-lycp -ly2			\
 		-Xlinker --no-whole-archive	\
 		-ly2util			\
+                -ly2				\
+		-lYCPDeclarations		\
 		-version-info 2:0
 
 libYCP_la_LIBADD = libYCPTypes.la #libYCPDeclarations.la

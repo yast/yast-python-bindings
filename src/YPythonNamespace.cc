@@ -155,6 +155,7 @@ YPythonNamespace::YPythonNamespace (string name)
 
   //Declarations (using YPCDelcarations python module)
   YCPDeclarations *decl = YCPDeclarations::instance();
+  
   FunctionTypePtr sym_tp;
   std::vector<constTypePtr> list_of_types;
   int tmp;
@@ -170,7 +171,6 @@ YPythonNamespace::YPythonNamespace (string name)
       y2error("Can't load module %s", name.c_str());
       return;
   }
-
 
   //keys from dictionary
   fun_names = PyDict_Keys(pMainDict);
@@ -191,7 +191,8 @@ YPythonNamespace::YPythonNamespace (string name)
        fun_code = PyFunction_GetCode(pFunc);
        num = ((PyCodeObject *) fun_code)->co_argcount;
 
-       if (decl->exists((PyFunctionObject *)pFunc)
+          
+       if (decl->exists((PyFunctionObject *)pFunc) 
            && decl->numParams((PyFunctionObject *)pFunc) == num){
 
            sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)pFunc));
@@ -222,13 +223,16 @@ YPythonNamespace::YPythonNamespace (string name)
        // enter it to the symbol table
        enterSymbol (fun_se, 0);
     }
-  } // end of for (int i = 0; i < num_fun_names; i++) 
+  } // end of for (int i = 0; i < num_fun_names; i++)
+
   y2milestone ("YPythonNamespace finish");
   
 }
 
 YPythonNamespace::~YPythonNamespace ()
 {
+
+
 }
 
 const string YPythonNamespace::filename () const

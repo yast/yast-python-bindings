@@ -16,7 +16,7 @@ PyObject *YCPTypeString_new(PyTypeObject *type, PyObject *args,
     if (self != NULL){
         self->value = PyString_FromString("");
         if (self->value == NULL){
-            Py_DECREF(self);
+            Py_XDECREF(self);
             return NULL;
         }
 
@@ -65,7 +65,7 @@ PyObject *YCPTypeString_New(PyObject *value, PyTypeObject *type)
     Py_INCREF(value);
     if (PyTuple_SetItem(args, 0, value) != 0){
         Py_XDECREF(args);
-        Py_DECREF(value);
+        Py_XDECREF(value);
     }
 
     // create new Path object

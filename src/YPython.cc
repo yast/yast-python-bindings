@@ -129,29 +129,20 @@ YPython::loadModule(string module)
     module_name = module.substr(found+1);
     //delete last 3 chars from module name ".py"
     module_name.erase(module_name.size()-3); //delete ".py"
-    //initialize python and set the path where are python modules
 
-    cout << "Searching path for modules: " << Py_GetPath()<< endl;
+    //initialize python and set the path where are python modules
     if (!Py_IsInitialized()) {
-       cout <<"path :" << path << endl;
-       setenv("PYTHONPATH", path.c_str(), 1);
-       
+       setenv("PYTHONPATH", path.c_str(), 1);       
        Py_Initialize();
        YPython::_pMainDicts = PyDict_New();
     }
 
-    setenv("PYTHONPATH", path.c_str(), 1);
-    cout <<"path :" << path << endl;
     if (!YPython::_pMainDicts)
        YPython::_pMainDicts = PyDict_New();
     //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if ( PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       cout <<"loadModule name: " << module_name << endl;
-       //char * new_path = (char *) path.c_str();
-       //PySys_SetPath(new_path);
-       cout << "Searching path for modules after init: " << Py_GetPath()<< endl;
        pMain = PyImport_ImportModule(module_name.c_str());
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
@@ -628,10 +619,9 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
     char *fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
 
     string file_path = PyString_AsString(((PyCodeObject *) fun_code)->co_filename);
-    //Y2Namespace* name_space = new Y2Namespace();
 
-    printf ("meno funckie %s\n", fun_name);
-    printf ("meno suboru %s\n", file_path.c_str());
+    //printf ("meno funckie %s\n", fun_name);
+    //printf ("meno suboru %s\n", file_path.c_str());
     
     //found last "/" in path
     size_t found = file_path.find_last_of("/");
@@ -650,16 +640,17 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
        y2error("Finding file where is function %s failed", fun_name);
        return YCPNull();
     }
+    
+    //found last  "/" in path
+    found = file_path.find_last_of("/");
 
+    string path = file_path.substr(0,found+1);
 
+    setenv("PYTHONPATH", path.c_str(), 1);
 
     YPython::loadModule (file_path);
 
-
-    //found last  "/" in path
-    found = file_path.find_last_of("/");
     //extract module name from path
-
     module_name = file_path.substr(found+1);
 
     //delete last 3 chars from module name ".py"
@@ -668,7 +659,6 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
     //found last  "/" in path
     Y2Namespace *ns = new YPythonNamespace (module_name);
 
-
     if (ns) {
        TableEntry *sym_te = ns->table ()->find (fun_name);
        if (sym_te == NULL) {
@@ -676,7 +666,7 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
 	  return YCPNull();
        }
        SymbolEntryPtr sym_entry = sym_te->sentry();
-       cout << "entry" << sym_entry->toString()<< endl;
+       //cout << "entry" << sym_entry->toString()<< endl;
        return YCPReference(sym_entry);
 
     } else {

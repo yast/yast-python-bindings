@@ -23,12 +23,12 @@ PyObject *Term_new(PyTypeObject *type, PyObject *args,
     if (self != NULL){
         self->name = PyString_FromString("");
         if (self->name == NULL){
-            Py_DECREF(self);
+            Py_XDECREF(self);
             return NULL;
         }
         self->value = PyTuple_New(0);
         if (self->value == NULL){
-            Py_DECREF(self);
+            Py_XDECREF(self);
             return NULL;
         }
 

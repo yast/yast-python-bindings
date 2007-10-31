@@ -23,7 +23,7 @@ PyObject *Code_new(PyTypeObject *type, PyObject *args,
     if (self != NULL){
         self->value = Py_None;
         if (self->value == NULL){
-            Py_DECREF(self);
+            Py_XDECREF(self);
             return NULL;
         }
 
