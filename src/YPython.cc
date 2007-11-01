@@ -621,6 +621,36 @@ static Y2Namespace * getNs (const char * ns_name, const char * func_name) {
   return ns;
 }
 
+
+/**
+ * Find function in Global Dictionary
+ * confirm if function is from imported module or not
+ * return 1 if module is in dictionary and function too
+ * retrun 0 if module is in dictionary and function not
+ * return -1 if missing both (module and dinctionary)
+**/
+
+int YPython::findModuleFuncInDict(string module, string function) {
+
+    PyObject* pMainDict = NULL;  // dictionary of module
+    PyObject* pFunc = NULL;      // function from dictionary
+
+    //obtain correct dictionary for module
+    pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
+
+    //obtain function from dictionary
+    if (pMainDict)        
+       pFunc = PyDict_GetItemString(pMainDict, function.c_str());
+    else
+       return -1;
+    
+    if (pFunc)
+       return 1;
+    else
+       return 0;
+}
+
+
 /**
   * Convert Python Function to YCPCode.
   * 
@@ -643,11 +673,12 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
     //delete last 3 chars from module name ".py"
     module_name.erase(module_name.size()-3);
 
+    int find = findModuleFuncInDict(module_name, fun_name);
 
+    if (find) {
     Y2Namespace *ns = getNs (module_name.c_str(),fun_name.c_str());
 
     if (ns) {
-       cout <<"ns bolo najdene!!! "<< endl;
        TableEntry *sym_te = ns->table ()->find (fun_name.c_str());
        if (sym_te == NULL) {
 	  y2error ("No such symbol %s::%s", module_name.c_str(), fun_name.c_str());
@@ -661,6 +692,7 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
        y2error("Creating namespace for function %s failed", fun_name.c_str());
        return YCPNull();
 
+    }
     }
 
     return YCPNull();

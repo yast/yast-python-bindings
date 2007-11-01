@@ -154,7 +154,7 @@ YPythonNamespace::YPythonNamespace (string name)
   PyObject * fun_code;    //code of function
 
   //Declarations (using YPCDelcarations python module)
-  //YCPDeclarations *decl = YCPDeclarations::instance();
+  YCPDeclarations *decl = YCPDeclarations::instance();
   //YCPDeclarations *decl = new YCPDeclarations();
   
   FunctionTypePtr sym_tp;
@@ -192,7 +192,7 @@ YPythonNamespace::YPythonNamespace (string name)
        fun_code = PyFunction_GetCode(pFunc);
        num = ((PyCodeObject *) fun_code)->co_argcount;
 
-       /*   
+         
        if (decl->exists((PyFunctionObject *)pFunc) 
            && decl->numParams((PyFunctionObject *)pFunc) == num){
 
@@ -203,14 +203,14 @@ YPythonNamespace::YPythonNamespace (string name)
            for (int i=0; i < tmp; i++){
                sym_tp->concat(list_of_types[i]);
            }
-       }else{*/
+       }else{
            sym_tp = new FunctionType(Type::Any);
            //y2milestone ("Number of parameters: %d", num);
            //add types and number of arguments into SymbolEntry table
            for (long j = 0; j < num; j++) {
                sym_tp->concat(Type::Any);    
            }
-       //}
+       }
        //y2milestone ("Callable function %s", PyString_AsString(item));
        // symbol entry for the function
        SymbolEntry *fun_se = new SymbolEntry (

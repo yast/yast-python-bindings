@@ -116,8 +116,16 @@ public:
 
 
 private:
-    
 
+    /**
+     * Find function in Global Dictionary
+     * confirm if function is from imported module or not
+     * return 1 if module is in dictionary and function too
+     * retrun 0 if module is in dictionary and function not
+     * return -1 if missing both (module and dinctionary)
+     **/
+
+    int findModuleFuncInDict(string module, string function);
 
     /**
      * Convert a Python list to a YCPList.
