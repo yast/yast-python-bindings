@@ -70,14 +70,14 @@ public:
      **/
     static YPython * yPython();
 
-   /**
+    /**
      * Access the static _pMainDicts
      * 
      **/
 
     PyObject* pMainDicts();
 
-   /**
+    /**
      * static _pMainDicts includes dictionaries of all imported python modules
      * 
      **/

@@ -52,8 +52,6 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-lycp -ly2			\
 		-Xlinker --no-whole-archive	\
 		-ly2util			\
-                -ly2				\
-		-lYCPDeclarations		\
 		-version-info 2:0
 
 libYCP_la_LIBADD = libYCPTypes.la #libYCPDeclarations.la

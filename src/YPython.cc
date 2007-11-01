@@ -603,6 +603,23 @@ PyObject* YPython::fromYCPTermToPythonTerm (YCPValue ycp_Term) {
     return Term_NewString(ycp_Term->asTerm()->name().c_str(), value);
 }
 
+/**
+ * init namespace
+ * @param char * name of module
+ * @param char * name of function
+ * @return namespace of YCP
+ */
+
+static Y2Namespace * getNs (const char * ns_name, const char * func_name) {
+  Import import(ns_name);	// has a static cache
+  Y2Namespace *ns = import.nameSpace();
+  if (ns == NULL) {
+     y2error ("... for a Python call of %s", func_name);
+  } else {
+     ns->initialize ();
+  }
+  return ns;
+}
 
 /**
   * Convert Python Function to YCPCode.
@@ -612,57 +629,28 @@ PyObject* YPython::fromYCPTermToPythonTerm (YCPValue ycp_Term) {
  **/
 
 YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
-
     
-    FunctionTypePtr sym_tp = new FunctionType(Type::Any);
+
     PyObject *fun_code = PyFunction_GetCode(pyFun);
-    char *fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
-
+    string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
     string file_path = PyString_AsString(((PyCodeObject *) fun_code)->co_filename);
-
-    //printf ("meno funckie %s\n", fun_name);
-    //printf ("meno suboru %s\n", file_path.c_str());
+    
     
     //found last "/" in path
     size_t found = file_path.find_last_of("/");
     //extract module name from path
     string module_name = file_path.substr(found+1);
-
-    file_path = YCPPathSearch::find (YCPPathSearch::Module, module_name);
-
-    if (file_path.empty())
-       file_path = YCPPathSearch::find (YCPPathSearch::Include, module_name);
-
-    if (file_path.empty())
-       file_path = YCPPathSearch::find (YCPPathSearch::Client, module_name);
-
-    if (file_path.empty()) {
-       y2error("Finding file where is function %s failed", fun_name);
-       return YCPNull();
-    }
-    
-    //found last  "/" in path
-    found = file_path.find_last_of("/");
-
-    string path = file_path.substr(0,found+1);
-
-    setenv("PYTHONPATH", path.c_str(), 1);
-
-    YPython::loadModule (file_path);
-
-    //extract module name from path
-    module_name = file_path.substr(found+1);
-
     //delete last 3 chars from module name ".py"
-    module_name.erase(module_name.size()-3); //delete ".py"
+    module_name.erase(module_name.size()-3);
 
-    //found last  "/" in path
-    Y2Namespace *ns = new YPythonNamespace (module_name);
+
+    Y2Namespace *ns = getNs (module_name.c_str(),fun_name.c_str());
 
     if (ns) {
-       TableEntry *sym_te = ns->table ()->find (fun_name);
+       cout <<"ns bolo najdene!!! "<< endl;
+       TableEntry *sym_te = ns->table ()->find (fun_name.c_str());
        if (sym_te == NULL) {
-	  y2error ("No such symbol %s::%s", module_name.c_str(), fun_name);
+	  y2error ("No such symbol %s::%s", module_name.c_str(), fun_name.c_str());
 	  return YCPNull();
        }
        SymbolEntryPtr sym_entry = sym_te->sentry();
@@ -670,7 +658,7 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
        return YCPReference(sym_entry);
 
     } else {
-       y2error("Creating namespace for function %s failed", fun_name);
+       y2error("Creating namespace for function %s failed", fun_name.c_str());
        return YCPNull();
 
     }
