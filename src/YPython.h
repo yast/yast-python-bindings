@@ -127,6 +127,14 @@ private:
 
     int findModuleFuncInDict(string module, string function);
 
+   /**
+     * Adding module name and function into 
+     * global dictionary 
+     * (necessary for calling python function via reference)
+     **/
+    bool addModuleAndFunction(string module, string fun_name, PyObject* function);
+
+
     /**
      * Convert a Python list to a YCPList.
      **/
@@ -168,7 +176,16 @@ private:
      **/
     PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
 
+    /**
+     * Prepare YCPReference for calling python function in YCP via reference
+     **/
     YCPValue fromPythonFunToReference (PyObject* pyFun);
+
+
+    /**
+     * Function find in namespace function and return symbol entry
+     **/
+    YCPValue findSymbolEntry(Y2Namespace *ns, string module, string function);
 
 protected:
 

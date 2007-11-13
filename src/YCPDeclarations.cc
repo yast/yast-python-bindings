@@ -2,21 +2,27 @@
 #include <iostream>
 using std::string;
 using std::vector;
-#define DBG(str) \
-    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
-    std::cerr.flush()
-//#define DBG(str)
+//#define DBG(str) \
+//    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
+//    std::cerr.flush()
+#define DBG(str)
 
 
 /********** STATIC MEMBERS **********/
+int YCPDeclarations::_initial = 0;
+
 std::auto_ptr<YCPDeclarations> YCPDeclarations::_instance;
 YCPDeclarations *YCPDeclarations::instance()
 {
+
+    DBG("Called YCPDeclarations::instance()");
     if (_instance.get() == 0){
         _instance = std::auto_ptr<YCPDeclarations>(new YCPDeclarations());
     }
     return _instance.get();
 }
+
+
 /********** STATIC MEMBERS END **********/
 
 
@@ -164,6 +170,7 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
 YCPDeclarations::YCPDeclarations()
 {
     DBG("YCPDeclarations - constructor");
+    YCPDeclarations::_initial = 1;
     _py_self = PyImport_ImportModule("YCPDeclarations");
     if (_py_self == NULL){
         DBG("YCPDeclarations::YCPDeclarations() - Failed to import YCPDeclarations module!");
@@ -174,18 +181,25 @@ YCPDeclarations::~YCPDeclarations()
 {
     
     DBG("YCPDeclarations - destructor");
- 
-    int cache_len = _cache.size();
-    for (int i=0; i < cache_len; i++){
-        delete _cache[i];
-    }
+    if (Initialized()) {
+       int cache_len = _cache.size();
+       for (int i=0; i < cache_len; i++){
+           delete _cache[i];
+       }
 
-    if (_py_self != NULL)
-        Py_DECREF(_py_self);
-       
-    //_instance = std::auto_ptr<YCPDeclarations>(NULL);
+       if (_py_self != NULL)
+          Py_DECREF(_py_self);
+    }  
+    YCPDeclarations::_initial = 0; 
 }
 
+
+bool YCPDeclarations::Initialized() {
+    if (YCPDeclarations::_initial == 1)
+       return true;
+    else
+       return false;
+}
 
 
 int YCPDeclarations::numParams(PyFunctionObject *func)

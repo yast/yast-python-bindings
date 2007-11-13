@@ -85,8 +85,20 @@ class YCPDeclarations {
      */
     const cache_function_t *_getCachedFunction(PyFunctionObject *func) const;
 
+
+    /**
+     * The value indicates if YCPDeclarations was initialized
+     *  1 - initialized 0 - non initialized
+     */
+    static int _initial;
+
   public:
     ~YCPDeclarations();   
+
+    /**
+     * Return true if YCPDeclarations was initialized.
+     */
+    bool Initialized();
 
     /**
      * Return number of parameters in declaration or -1 if function is not registered.

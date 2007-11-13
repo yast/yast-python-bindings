@@ -230,6 +230,111 @@ YPythonNamespace::YPythonNamespace (string name)
   
 }
 
+
+YPythonNamespace::YPythonNamespace (string name, PyObject* function)
+      : m_name (name),
+        m_all_methods (true) {
+
+
+  PyObject * fun_code;    //code of function
+
+  //Declarations (using YPCDelcarations python module)
+  YCPDeclarations *decl = YCPDeclarations::instance();
+  //YCPDeclarations *decl = new YCPDeclarations();
+  
+  FunctionTypePtr sym_tp;
+  std::vector<constTypePtr> list_of_types;
+  int tmp;
+
+  int count = 0;         // position. arbitrary numbering
+  long num = 0;          //number of function arguments
+
+
+  fun_code = PyFunction_GetCode(function);
+  num = ((PyCodeObject *) fun_code)->co_argcount;
+  string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
+         
+  if (decl->exists((PyFunctionObject *)function) 
+      && decl->numParams((PyFunctionObject *)function) == num){
+
+     sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)function));
+
+     list_of_types = decl->params((PyFunctionObject *)function);
+     tmp = list_of_types.size();
+     for (int i=0; i < tmp; i++){
+         sym_tp->concat(list_of_types[i]);
+     }
+  } else {
+     sym_tp = new FunctionType(Type::Any);
+     //y2milestone ("Number of parameters: %d", num);
+     //add types and number of arguments into SymbolEntry table
+     for (long j = 0; j < num; j++) {
+         sym_tp->concat(Type::Any);    
+     }
+  }
+  //y2milestone ("Callable function %s", PyString_AsString(item));
+  // symbol entry for the function
+  SymbolEntry *fun_se = new SymbolEntry (
+	this,
+	count++,	         // position. arbitrary numbering. must stay consistent when?
+	fun_name.c_str(), // passed to Ustring, no need to strdup
+	SymbolEntry::c_function, 
+	sym_tp);
+  fun_se->setGlobal (true);
+
+  // enter it to the symbol table
+  enterSymbol (fun_se, 0);
+
+
+  y2milestone ("(special) YPythonNamespace finish");
+
+}
+
+SymbolEntry * YPythonNamespace::AddFunction (PyObject* function) {
+
+  //Declarations (using YPCDelcarations python module)
+  YCPDeclarations *decl = YCPDeclarations::instance();
+  int tmp;
+  std::vector<constTypePtr> list_of_types;
+  FunctionTypePtr sym_tp;
+  PyObject *fun_code = PyFunction_GetCode(function);
+  int num = ((PyCodeObject *) fun_code)->co_argcount;
+  string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
+         
+  if (decl->exists((PyFunctionObject *)function) 
+      && decl->numParams((PyFunctionObject *)function) == num){
+
+     sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)function));
+
+     list_of_types = decl->params((PyFunctionObject *)function);
+     tmp = list_of_types.size();
+     for (int i=0; i < tmp; i++){
+         sym_tp->concat(list_of_types[i]);
+     }
+  } else {
+     sym_tp = new FunctionType(Type::Any);
+     //y2milestone ("Number of parameters: %d", num);
+     //add types and number of arguments into SymbolEntry table
+     for (long j = 0; j < num; j++) {
+         sym_tp->concat(Type::Any);    
+     }
+  }
+  // symbol entry for the function
+  SymbolEntry *fun_se = new SymbolEntry (
+	this,
+	0,	        // position. arbitrary numbering. must stay consistent when?
+	fun_name.c_str(),       // passed to Ustring, no need to strdup
+	SymbolEntry::c_function, 
+	sym_tp);
+
+  fun_se->setGlobal (true);
+
+  enterSymbol (fun_se, 0);
+
+  return fun_se;
+}
+
+
 YPythonNamespace::~YPythonNamespace ()
 {
 
@@ -261,14 +366,18 @@ YCPValue YPythonNamespace::evaluate (bool cse)
     return YCPNull ();
 }
 
+
 // It seems that this is the standard implementation. why would we
 // ever want it to be different?
 Y2Function* YPythonNamespace::createFunctionCall (const string name, constFunctionTypePtr required_type)
 {
     y2debug ("Python creating function call for %s", name.c_str ());
-    TableEntry *func_te = table ()->find (name.c_str (), SymbolEntry::c_function);
+    //TableEntry *func_te = table ()->find (name.c_str (), SymbolEntry::c_function);
+    TableEntry *func_te = table ()->find (name.c_str ());
+
     if (func_te)
     {
+        //cout << "namespace: " << m_name << " function: " << name << endl;
 	constTypePtr t = required_type ? required_type : (constFunctionTypePtr)func_te->sentry()->type ();
 	if (m_all_methods)
 	{
@@ -279,6 +388,8 @@ Y2Function* YPythonNamespace::createFunctionCall (const string name, constFuncti
 	    return new Y2PythonSubCall (m_name, name, t);
 	}
     }
+    
+    //cout << "namespace: " << m_name << " function: " << name << endl;
     y2error ("No such function %s", name.c_str ());
     return NULL;
 }
