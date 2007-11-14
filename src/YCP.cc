@@ -41,12 +41,15 @@ PyObject * Import_YCPNameSpace (PyObject *args);
 
 PyObject * Init_UI (PyObject *args);
 
-PyObject * SCR_Run (const char *scr_command, PyObject *args);
+//PyObject * SCR_Run (const char *scr_command, PyObject *args);
+
+PyObject * _SCR_Run (PyObject *args);
 
 void Py_y2logger(PyObject *args);
 
 void init_wfm ();
 
+bool RegSCR();
 
 static bool HandleSymbolTable (const SymbolEntry & se) {
 
@@ -101,25 +104,12 @@ static PyObject * ycp_init_ui(PyObject *self, PyObject *args) {
   return Init_UI (args);
 }
 
-static PyObject * ycp_scr_read(PyObject *self, PyObject *args) {
 
-  return  SCR_Run ("SCR::Read", args);
+static PyObject * ycp_scr_handle(PyObject *self, PyObject *args) {
+
+  return _SCR_Run(args);
 }
 
-static PyObject * ycp_scr_write(PyObject *self, PyObject *args) {
-
-  return  SCR_Run ("SCR::Write", args);
-}
-
-static PyObject * ycp_scr_execute(PyObject *self, PyObject *args) {
-
-  return  SCR_Run ("SCR::Execute", args);
-}
-
-static PyObject * ycp_scr_dir(PyObject *self, PyObject *args) {
-
-  return  SCR_Run ("SCR::Dir", args);
-}
 
 static PyObject * ycp_y2logger (PyObject *self, PyObject *args) {
 
@@ -145,14 +135,18 @@ static PyMethodDef new_module_methods[] = {
 };
 
 
+/**
+ * This is necessary for regulat (python style) calling SCR from python
+ */
+static PyMethodDef scr_methods[] = {
+    {"__scr_run", ycp_scr_handle, METH_VARARGS, "Calling SCR from python"},
+    {NULL, NULL, 0, NULL}
+};
+
 static PyMethodDef YCPMethods[] = {
   {"run",  ycp_handle_function, METH_VARARGS, "Calling YCP from Python"},
   {"import_module",  ycp_import_namespace, METH_VARARGS, "Import namespace from YCP module"},
   {"init_ui",  ycp_init_ui, METH_VARARGS, "Initialization of UI for YCP"},
-  {"SCR_Read",  ycp_scr_read, METH_VARARGS, "SCR Read function"},
-  {"SCR_Write",  ycp_scr_write, METH_VARARGS, "SCR Write function"},
-  {"SCR_Execute",  ycp_scr_execute, METH_VARARGS, "SCR Execute function"},
-  {"SCR_Dir",  ycp_scr_dir, METH_VARARGS, "SCR Dir function"},
   {"y2logger", ycp_y2logger, METH_VARARGS, "Logging error, debug messages and milestones in python"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
@@ -223,6 +217,7 @@ PyMODINIT_FUNC initycp(void) {
   code = PyRun_String(func_y2debug, Py_single_input, dict, dict);
   Py_XDECREF(code);
 
+  RegSCR();
 }
 
 
@@ -282,6 +277,59 @@ bool RegFunctions(char *NameSpace, YCPList list_functions) {
 
 }
 
+
+bool RegSCR() {
+
+    string func_read =
+      "def Read(*args):\n\
+        return __scr_run(0, *args)";
+
+    string func_write =
+      "def Write(*args):\n\
+        return __scr_run(1, *args)";
+
+    string func_dir =
+      "def Dir(*args):\n\
+        return __scr_run(2, *args)";
+
+    string func_execute =
+      "def Execute(*args):\n\
+        return __scr_run(3, *args)";
+
+
+    // Dictionary of ycp module
+    PyObject *ycp_dict = PyModule_GetDict(Self);
+    if (ycp_dict == NULL) return false;
+
+    // Init new module with name NameSpace and method __run (see new_module_methods)
+    PyObject *new_module = Py_InitModule("SCR", scr_methods);
+    if (new_module == NULL) return false;
+
+    // Add new initialized module into ycp dictionary (can be accessed via ycp.NameSpace)
+    PyDict_SetItemString(ycp_dict, "SCR", new_module);
+
+    // Dictionary of new_module - there will be registered all functions
+    PyObject *new_module_dict = PyModule_GetDict(new_module);
+    if (new_module_dict == NULL) return false;
+
+    PyObject *code;
+  
+    // Register function into dictionary of new module. Returns new reference - must be decremented
+    code = PyRun_String(func_read.c_str(), Py_single_input, new_module_dict, new_module_dict);
+    Py_XDECREF(code);
+
+    code = PyRun_String(func_write.c_str(), Py_single_input, new_module_dict, new_module_dict);
+    Py_XDECREF(code);
+
+    code = PyRun_String(func_dir.c_str(), Py_single_input, new_module_dict, new_module_dict);
+    Py_XDECREF(code);
+
+    code = PyRun_String(func_execute.c_str(), Py_single_input, new_module_dict, new_module_dict);
+    Py_XDECREF(code);
+
+    return true;
+
+}
 
 Y2Component *owned_wfmc = 0;
 
@@ -400,8 +448,7 @@ PyObject * Import_YCPNameSpace (PyObject *args) {
 
 }
 
-
-PyObject * SCR_Run (const char *scr_command, PyObject *args) {
+PyObject * _SCR_Run (PyObject *args) {
 
   // access directly the statically declared builtins
   extern StaticDeclaration static_declarations;
@@ -411,17 +458,65 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   YCPValue ycpPath = YCPNull ();
   PyObject * pPythonValue;
   PyObject * pReturnValue;
+
+  //-1 - error
+  // 0 - SCR::Read
+  // 1 - SCR::Write
+  // 2 - SCR::Dir
+  // 3 - SCR::Execute
+  int type_scr = -1;
     
   YPython *ypython = YPython::yPython ();
   char *temp; 
   temp = (char *) malloc(20);
-  temp = strcpy(temp, scr_command);
+
+
+  if (number_args>0) {
+     pPythonValue = PyTuple_GetItem(args, 0);
+     if (PyInt_Check(pPythonValue))
+        type_scr = PyInt_AsLong(pPythonValue);
+     else {
+        y2error("The first argument must be integer...");
+        return Py_None;
+     }
+
+  } else {
+     y2error("At least 2 arguments are necessary...");
+     return Py_None;
+  }
+
+  switch (type_scr) {
+
+    case 0:
+      temp = strcpy(temp, "SCR::Read");
+      break;
+
+    case 1:
+      temp = strcpy(temp, "SCR::Write");
+      break;
+
+    case 2:
+      temp = strcpy(temp, "SCR::Dir");
+      break;
+
+    case 3:
+      temp = strcpy(temp, "SCR::Execute");
+      break;
+
+    default:
+      temp = strcpy(temp, "NONE");
+  }
+
+
+
+
+  //temp = strcpy(temp, scr_command);
 
   declaration_t *bi_dt = static_declarations.findDeclaration(temp);
 
   
   if (bi_dt == NULL) {
-     y2error ("No such builtin '%s'", scr_command);
+     y2error ("No such builtin '%s'", temp);
      return PyExc_RuntimeError;
   }
 
@@ -433,37 +528,16 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   }
 
 
-  for (int i=0; i< number_args; i++) {
+  for (int i=1; i< number_args; i++) {
       pPythonValue = PyTuple_GetItem(args, i);
       if (pPythonValue) {
           ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
-
-         //convert the first argument to path
-         if (i==0) {
-            if (ycpArg->isString()) {
-               //ycpArg = YCPPath(ycpArg->asString()->value());
-
-	       ycpPath = YCPPath(ycpArg->asString()->value());
-            } else {
-               y2error ("String argument is necessary.");
-               //printf("String argument is necessary.\n");
-               return  PyExc_TypeError;
-            }
-
-	    if (ycpArg.isNull()) {
-		y2error ("Problem converting 1st argument to path.");
-                //printf("Problem converting 1st argument to path.\n");
-                return PyExc_RuntimeError;
-
-	    }
-         }
-
 
 	 if (ycpArg.isNull ()) {
 	    // an error has already been reported, now refine it.
 	    // Can't know parameter name?
 	    y2error ("... when passing parameter %d to builtin %s",
-		     i, scr_command);
+		     i, temp);
 	    return  PyExc_RuntimeError;
 	 }
 
@@ -472,10 +546,10 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 	 // bytecode. (Which is OK here)
 	 // The actual parameter's YCode becomes owned by the function call?
         
-	 YConst *param_c = new YConst (YCode::ycConstant, (i==0)? ycpPath:ycpArg);
+	 YConst *param_c = new YConst (YCode::ycConstant, ycpArg);
 
 	 // for attaching the parameter, must get the real type so that it matches
-	 constTypePtr act_param_tp = Type::vt2type ((i==0) ? ycpPath->valuetype():ycpArg->valuetype());
+	 constTypePtr act_param_tp = Type::vt2type (ycpArg->valuetype());
 
 	 // Attach the parameter
 	 // Returns NULL if OK, Type::Error if excessive argument
@@ -486,7 +560,7 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 	    if (err_tp->isError ()) {
 		// where we were called from.
 		y2error ("Excessive parameter to builtin %s",
-			 scr_command);
+			 temp);
 	    } else {
 		y2internal ("attachParameter returned %s",
 			    err_tp->toString ().c_str ());
@@ -509,15 +583,16 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
   if (err_tp != NULL) {
      // apparently the error was already reported?
      y2error ("Error type %s when finalizing builtin %s",
-	      err_tp->toString ().c_str (), scr_command);
+	      err_tp->toString ().c_str (), temp);
 	return PyExc_RuntimeError;
   }
  
   // go call it now!
-  y2debug ("Python is calling builtin %s", scr_command);
+  y2debug ("Python is calling builtin %s", temp);
 
   ycpRetValue = YCPNull();
   ycpRetValue = bi_call->evaluate (false /* no const subexpr elim */);
+
   /*
   if (ycpRetValue->isList())
      printf("jj ycpRetValue->isList() %s\n", ycpRetValue->toString().c_str());
@@ -525,7 +600,6 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
 
   delete bi_call;
   free(temp);
-
 
   pReturnValue = ypython->YCPTypeToPythonType(ycpRetValue);
 
@@ -535,8 +609,6 @@ PyObject * SCR_Run (const char *scr_command, PyObject *args) {
      return Py_None;
 
 }
-
-
 
 
 
