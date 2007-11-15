@@ -55,7 +55,7 @@ class YCPDeclarations {
      * object.
      */
     YCPDeclarations();
-    
+
     /**
      * Return item from function map which has key key.
      * Return borrowed reference!
@@ -88,18 +88,12 @@ class YCPDeclarations {
 
 
     /**
-     * The value indicates if YCPDeclarations was initialized
-     *  1 - initialized 0 - non initialized
+     * Try to initialize _py_self. If _py_self is already initialized, nothing is done.
      */
-    static int _initial;
+    bool _init();
 
   public:
-    ~YCPDeclarations();   
-
-    /**
-     * Return true if YCPDeclarations was initialized.
-     */
-    bool Initialized();
+    ~YCPDeclarations();
 
     /**
      * Return number of parameters in declaration or -1 if function is not registered.
@@ -121,13 +115,17 @@ class YCPDeclarations {
      */
     constTypePtr returnType(PyFunctionObject *pointer_to_function);
 
+    /**
+     * Initialize class.
+     */
+    bool init();
 
   //static
   private:
     /**
      * Here is stored pointer to YCPDeclare object.
      */
-    static std::auto_ptr<YCPDeclarations> _instance;
+    static YCPDeclarations _instance;
   public:
     /**
      * Return pointer to instance of YCPDeclare object.

@@ -1,27 +1,22 @@
 #include "YCPDeclarations.h"
 #include <iostream>
+
+#define y2log_component "YCPDeclarations"
+#include <ycp/y2log.h>
+
 using std::string;
 using std::vector;
-//#define DBG(str) \
-//    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
-//    std::cerr.flush()
-#define DBG(str)
+#define DBG(str) \
+    std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
+    std::cerr.flush()
 
 
 /********** STATIC MEMBERS **********/
-int YCPDeclarations::_initial = 0;
-
-std::auto_ptr<YCPDeclarations> YCPDeclarations::_instance;
+YCPDeclarations YCPDeclarations::_instance;
 YCPDeclarations *YCPDeclarations::instance()
 {
-
-    DBG("Called YCPDeclarations::instance()");
-    if (_instance.get() == 0){
-        _instance = std::auto_ptr<YCPDeclarations>(new YCPDeclarations());
-    }
-    return _instance.get();
+    return &_instance;
 }
-
 
 /********** STATIC MEMBERS END **********/
 
@@ -49,27 +44,28 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
     cache_function_t *function;
     Py_ssize_t tuple_size;
 
-    DBG("Called _cacheFunction(" << (long)func << ")");
+    if (!_init())
+        return;
 
     if (_isInCache(func)){
-        DBG("YCPDeclarations::_cacheFunction(" << (long)func << ") - is in cache");
+        y2debug("function (%ld, %s) is already in cache.", (long)func, PyString_AsString(func->func_name));
         return;
     }
 
     item = _getItemFromFunctionMap((PyObject *)func);
     if (item == NULL || !PyDict_Check(item)){
-        DBG("YCPDeclarations::_cacheFunction(" << (long)func << ") - " << "error in item: " << (long)item);
+        y2debug("function (%ld, %s) is not declared using YCPDeclare", (long)func, PyString_AsString(func->func_name));
         return;
     }
 
     return_type = PyDict_GetItemString(item, "return_type");
     if (return_type == NULL || !PyString_Check(return_type)){
-        DBG("YCPDeclarations::_cacheFunction(" << (long)func << ") - " << "error in return_type: " << (long)return_type);
+        y2debug("Invalid return type of function (%ld, %s)", (long)func, PyString_AsString(func->func_name));
         return;
     }
     params = PyDict_GetItemString(item, "parameters");
     if (params == NULL || !PyTuple_Check(params)){
-        DBG("YCPDeclarations::_cacheFunction(" << (long)func << ") - " << "error in params: " << (long)params);
+        y2debug("Invalid parameters of function (%ld, %s)", (long)func, PyString_AsString(func->func_name));
         return;
     }
 
@@ -91,7 +87,7 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
 
     //add new function item
     _cache.push_back(function);
-    DBG("_cacheFunction(" << (long)func << ") - _cache.size() : " << _cache.size());
+    y2debug("function (%ld, %s) cached", (long)func, PyString_AsString(func->func_name));
 }
 
 const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyFunctionObject *func) const
@@ -99,24 +95,28 @@ const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyF
     cache_function_t *ret = NULL;
     int len = _cache.size();
 
-    DBG("");
-    DBG("_getCachedFunction(" << (long)func << ") - " << "start searching");
+    y2debug("Searching for function (%ld, %s)...", (long)func, PyString_AsString(func->func_name));
     for (int i=0; i < len; i++){
-        DBG("== " << "_cache[" << i << "]->function: " << (long)_cache[i]->function);
         if (_cache[i]->function == func){
+            y2debug("    ==> Function found on position %d", i);
             ret = _cache[i];
             break;
         }
     }
 
-    DBG("_getCachedFunction(" << (long)func << ") -> " << (long)ret);
-    DBG("");
+    if (ret == NULL){
+        y2debug("    ==> Function not found");
+    }
+
     return ret;
 }
 
 
 PyObject *YCPDeclarations::_getItemFromFunctionMap(PyObject *key)
 {
+    if (!_init())
+        return NULL;
+
     if (_py_self == NULL)
         return NULL;
 
@@ -124,9 +124,9 @@ PyObject *YCPDeclarations::_getItemFromFunctionMap(PyObject *key)
     PyObject *func_map = PyDict_GetItemString(dict, "_function_map");
 
     if (!PyDict_Check(func_map)){
+        y2error("Map _function_map not found in python module YCPDeclarations");
         return NULL;
     }
-    DBG("_function_map : " << (long)func_map);
 
     return PyDict_GetItem(func_map, key);
 }
@@ -160,6 +160,27 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
     // default:
     return Type::Any;
 }
+
+
+bool YCPDeclarations::_init()
+{
+    if (_py_self != NULL)
+        return true;
+
+    if (!Py_IsInitialized()){
+        y2error("Python interpret is not initialized!");
+        return false;
+    }
+
+    _py_self = PyImport_ImportModule("YCPDeclarations");
+    if (_py_self == NULL){
+        y2error("Failed to import YCPDeclarations module!");
+        return false;
+    }
+
+    y2milestone("YCPDeclarations successfuly initialized!");
+    return true;
+}
 /********** PRIVATE END **********/
 
 
@@ -167,38 +188,22 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
 
 /********** PUBLIC **********/
 
-YCPDeclarations::YCPDeclarations()
+YCPDeclarations::YCPDeclarations() : _py_self(NULL)
 {
-    DBG("YCPDeclarations - constructor");
-    YCPDeclarations::_initial = 1;
-    _py_self = PyImport_ImportModule("YCPDeclarations");
-    if (_py_self == NULL){
-        DBG("YCPDeclarations::YCPDeclarations() - Failed to import YCPDeclarations module!");
-    }
+    y2debug("Constructor called");
 }
 
 YCPDeclarations::~YCPDeclarations()
 {
-    
-    DBG("YCPDeclarations - destructor");
-    if (Initialized()) {
-       int cache_len = _cache.size();
-       for (int i=0; i < cache_len; i++){
-           delete _cache[i];
-       }
+    int cache_len = _cache.size();
+    for (int i=0; i < cache_len; i++){
+        delete _cache[i];
+    }
 
-       if (_py_self != NULL)
-          Py_DECREF(_py_self);
-    }  
-    YCPDeclarations::_initial = 0; 
-}
+    if (_py_self != NULL)
+        Py_DECREF(_py_self);
 
-
-bool YCPDeclarations::Initialized() {
-    if (YCPDeclarations::_initial == 1)
-       return true;
-    else
-       return false;
+    y2debug("Destructor called");
 }
 
 
@@ -210,6 +215,8 @@ int YCPDeclarations::numParams(PyFunctionObject *func)
     if (function == NULL)
         return -1;
 
+    y2debug("Number of parameters of function (%ld, %s) is %d",
+            (long)func, PyString_AsString(func->func_name), (int)function->parameters.size());
     return function->parameters.size();
 }
 
@@ -242,5 +249,10 @@ constTypePtr YCPDeclarations::returnType(PyFunctionObject *func)
     }
 
     return function->return_type;
+}
+
+bool YCPDeclarations::init()
+{
+    return _init();
 }
 /********** PUBLIC END **********/

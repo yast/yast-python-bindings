@@ -27,6 +27,7 @@
 
 
 #include "YCPTypes.h"
+#include "YCPDeclarations.h"
 
 /**
  * Store pointer to ycp module itself.
@@ -218,6 +219,9 @@ PyMODINIT_FUNC initycp(void) {
   Py_XDECREF(code);
 
   RegSCR();
+
+  // Initialization of YCPDeclarations module
+  YCPDeclarations::instance()->init();
 }
 
 
