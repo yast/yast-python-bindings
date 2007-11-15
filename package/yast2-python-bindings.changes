@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Nov 14 17:31:31 CET 2007 - juhliarik@suse.cz
+
+- Adding solution for calling python function via reference
+- Adding support for calling YCode in Sequencer from python
+- Reimplementation SCR
+- V 2.16.0 
+
+-------------------------------------------------------------------
 Fri Sep 9 18:00:33 CEST 2007 - juhliarik@suse.cz
 - Adding support for calling SCR
 - Adding support for ycp types symbol, term, path

@@ -29,9 +29,10 @@ libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
 # binary part of the python module
 libYCP_la_SOURCES =				\
 	$(liby2lang_python_la_SOURCES)		\
+        $(libYCPDeclarations_la_SOURCES)	\
 	YCP.cc					\
-	PythonLogger.cc PythonLogger.h
-
+	PythonLogger.cc PythonLogger.h		\
+	YPythonNamespace.cc YPythonNamespace.h
 
 
 install-data-hook:
@@ -40,9 +41,7 @@ install-data-hook:
 
 # are there enough yast libraries?
 # check with y2base, integrate them like y2pm does
-# Originally, of the py2* there was only py2plugin here
-# with the assumption that it would bring in the other plugins.
-# But it does not work.
+
 libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-L$(libdir) -L$(plugindir)	\
 		-Xlinker --whole-archive	\

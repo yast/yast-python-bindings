@@ -46,7 +46,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 >>> import ycp
 >>>
->>> ycp.import_module("test")
+>>> ycp.import_module('test')
 True
 >>>
 >>> ycp.test.suma(2,3)
@@ -56,7 +56,7 @@ True
 
 2. How to call UI from YaST in Python
 =====================================
-- there is important function: ycp.init_ui("qt")
+- there is important function: ycp.init_ui('qt')
 that initialize UI from YaST
 
 Python 2.5.1 (r251:54863, Aug 17 2007, 22:45:43)
@@ -65,13 +65,13 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 >>> import ycp
 >>>
->>> ycp.init_ui("qt")
+>>> ycp.init_ui('qt')
 True
 >>>
->>> ycp.import_module("Popup")
+>>> ycp.import_module('Popup')
 True
 >>>
->>> ycp.Popup.Message("Example text")
+>>> ycp.Popup.Message('Example text')
 >>> 
 
 
@@ -88,7 +88,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 >>> import ycp
 >>>
->>> ycp.SCR_Execute(".target.bash_output","pwd")
+>>> ycp.SCR.Execute(ycp.Path('.target.bash_output'),'pwd')
 {'exit': 0, 'stderr': '', 'stdout': '/home/user\n'}
 >>>  
 
@@ -100,16 +100,16 @@ for building ycp type such as symbol, path or term
 
 
 >>>
->>> path = Path(".my.path")
+>>> path = Path('.my.path')
 >>>  
 
 
 >>>
->>> symbol = Symbol("Enabled")
+>>> symbol = Symbol('Enabled')
 >>>  
 
 >>>
->>> term = Term("VBox",Term("Label","&Example Label"), Term("PushButton", "&So What"))
+>>> term = Term('VBox',Term('Label','&Example Label'), Term('PushButton', '&So What'))
 >>>   
 
 5. Calling python module from YCP

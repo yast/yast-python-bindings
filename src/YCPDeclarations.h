@@ -5,6 +5,7 @@
 #include <ycp/Type.h>
 #include <vector>
 #include <string>
+#include <memory>
 
 /**
  * This class stores information about declarations in python module which were
