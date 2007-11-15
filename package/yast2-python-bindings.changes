@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov 15 13:34:40 CET 2007 - juhliarik@suse.cz
+
+- Addded correction in makefile and for YCPDeclaration
+- V 2.16.1
+
+-------------------------------------------------------------------
 Wed Nov 14 17:31:31 CET 2007 - juhliarik@suse.cz
 
 - Adding solution for calling python function via reference
