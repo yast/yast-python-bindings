@@ -29,10 +29,9 @@ libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
 # binary part of the python module
 libYCP_la_SOURCES =				\
 	$(liby2lang_python_la_SOURCES)		\
-        $(libYCPDeclarations_la_SOURCES)	\
 	YCP.cc					\
-	PythonLogger.cc PythonLogger.h		\
-	YPythonNamespace.cc YPythonNamespace.h
+	PythonLogger.cc PythonLogger.h
+
 
 
 install-data-hook:
@@ -53,7 +52,7 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-ly2util			\
 		-version-info 2:0
 
-libYCP_la_LIBADD = libYCPTypes.la #libYCPDeclarations.la
+libYCP_la_LIBADD = libYCPTypes.la libpy2lang_python.la#libYCPDeclarations.la
 
 
 libpy2lang_python_la_LDFLAGS = -version-info 2:0
