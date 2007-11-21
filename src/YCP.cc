@@ -199,7 +199,7 @@ PyMODINIT_FUNC initycp(void) {
         gettext.textdomain(domain)";
 
 
-  cout << textdomain << endl;
+  //cout << textdomain << endl;
 
   string _fun = "_ = gettext.gettext";
 
