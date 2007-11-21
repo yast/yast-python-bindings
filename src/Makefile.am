@@ -2,7 +2,8 @@
 # Makefile.am for python-bindings/src
 #
 
-AM_CXXFLAGS = -DY2LOG=\"Python\" -DMODULEDIR=\"$(moduledir)\"
+AM_CXXFLAGS = -DY2LOG=\"Python\" -DMODULEDIR=\"$(moduledir)\"	\
+		-DLOCALEDIR=\"${localedir}\"
 
 MY_PYTHON_VENDORARCH = $(subst /usr,$(prefix),$(PYTHON_VENDORARCH))
 #pythonpydir = $(MY_PYTHON_VENDORARCH)/YaST

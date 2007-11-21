@@ -32,6 +32,8 @@
 /**
  * Store pointer to ycp module itself.
  */
+
+
 static PyObject *Self;
 
 YCPList * ycp_ListFunctions;
@@ -45,6 +47,8 @@ PyObject * Init_UI (PyObject *args);
 //PyObject * SCR_Run (const char *scr_command, PyObject *args);
 
 PyObject * _SCR_Run (PyObject *args);
+
+
 
 void Py_y2logger(PyObject *args);
 
@@ -186,6 +190,18 @@ PyMODINIT_FUNC initycp(void) {
         file, line, func, txt = traceback.extract_stack(None, 2)[0]\n\
         y2logger(0, file, line, func, message)";
 
+  string textdomain =
+      "def textdomain(domain):\n\
+        gettext.bindtextdomain(domain, '";
+
+  textdomain +=LOCALEDIR;
+  textdomain +="')\n\
+        gettext.textdomain(domain)";
+
+
+  cout << textdomain << endl;
+
+  string _fun = "_ = gettext.gettext";
 
   PyRun_SimpleString("import sys, traceback");
   Self = Py_InitModule("ycp", YCPMethods);
@@ -195,7 +211,16 @@ PyMODINIT_FUNC initycp(void) {
   traceback = PyImport_AddModule("traceback");
 
   PyModule_AddObject(Self,"traceback",traceback);
+
+  PyRun_SimpleString("import gettext");
+  PyObject * gettext = PyImport_AddModule("gettext");
+
+
+
+  PyModule_AddObject(Self,"gettext",gettext);
   init_wfm ();
+  
+  //cout <<"local dir" <<LOCALEDIR << endl;
 
   PyObject *dict = PyModule_GetDict(Self);
   PyObject *code;
@@ -216,6 +241,12 @@ PyMODINIT_FUNC initycp(void) {
   Py_XDECREF(code);
 
   code = PyRun_String(func_y2debug, Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(textdomain.c_str(), Py_single_input, dict, dict);
+  Py_XDECREF(code);
+
+  code = PyRun_String(_fun.c_str(), Py_single_input, dict, dict);
   Py_XDECREF(code);
 
   RegSCR();
@@ -814,6 +845,8 @@ void Py_y2logger(PyObject *args) {
      y2error("Wrong number of arguments");
   }
 }
+
+
 
 
 void delete_all () {
