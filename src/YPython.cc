@@ -210,8 +210,11 @@ YPython::callInner (string module, string function, bool method,
     //convert python value to YCPValue
     if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
-    else
+    else{
+        y2error("PyObject_CallObject(pFunc, pArgs) failed!");
+        PyErr_Print();
         y2error("pReturn == 0");
+    }
     //delete pReturn
     Py_CLEAR(pReturn);
 
@@ -830,6 +833,7 @@ YCPValue YPythonCode::evaluate(bool cse) {
           result = YPython::yPython()->PythonTypeToYCPType(pReturn); // create YCP value
        } else {
           y2error("pReturn == 0");
+          PyErr_Print();
        }
     }
     return result;
