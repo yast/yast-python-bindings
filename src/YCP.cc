@@ -20,6 +20,7 @@
 #include <ycp/YCPPath.h>
 #include <ycp/YCPTerm.h>
 #include <ycp/YCPString.h>
+#include <ycp/YCPVoid.h>
 #include <ycp/SymbolTable.h>
 
 #include "YPython.h"
@@ -201,9 +202,13 @@ PyMODINIT_FUNC initycp(void) {
 
   //cout << textdomain << endl;
 
-  string _fun = "_ = gettext.gettext";
+  string _fun = 
+        "def _(str): \n\
+          return gettext.gettext(str)";
 
+  
   PyRun_SimpleString("import sys, traceback");
+  PyRun_SimpleString(_fun.c_str());
   Self = Py_InitModule("ycp", YCPMethods);
 
   initYCPTypes(Self);
@@ -738,12 +743,14 @@ PyObject * Call_YCPFunction (PyObject *args) {
          pPythonValue = PyTuple_GetItem(args, i);
          if (pPythonValue) {
              ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
-
+            //transform YCPNull to YCPVoid
+            if (ycpArg.isNull()) {
+                ycpArg = YCPVoid();
+            }
             /*XXX
 	    if (fun_type->parameterType(i-2)->matchvalue(ycpArg) != 0) {
                y2error ("Wrong type of argumment %d",i-2);
                return PyExc_TypeError;
-
 	    }*/
             bool ok = func_call->appendParameter (ycpArg);
 	    if (!ok) {
