@@ -202,8 +202,9 @@ PyMODINIT_FUNC initycp(void) {
 
   //cout << textdomain << endl;
 
+  // added space - important for checking texdomain during make package
   string _fun = 
-        "def _(str): \n\
+        "def _" "(str): \n\
           return gettext.gettext(str)";
 
   
