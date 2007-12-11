@@ -151,7 +151,9 @@ YPython::loadModule(string module)
            y2error("Can't import module %s", module_name.c_str());
 
            if (PyErr_Occurred() != NULL){
-               PyErr_Print();
+              //string err = PyErrorHandler();
+              y2error("Python error: %s", PyErrorHandler().c_str());
+               //PyErr_Print();
            }
 
            return YCPError("The module was not imported");
@@ -186,40 +188,54 @@ YPython::callInner (string module, string function, bool method,
 {
     PyObject* pMainDict;  // dictionary of module
     PyObject* pFunc;      // function from dictionary
-    PyObject* pArgs;      // tuple object of argument for function
+    PyObject* pArgs = NULL;      // tuple object of argument for function
     PyObject* pReturn;    // return value from python
     YCPValue result = YCPNull ();
 
     //obtain correct dictionary for module
     pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
     //obtain function from dictionary
+
+    if (PyDict_Contains(pMainDict,PyString_FromString(function.c_str())) ==1)
+       cout <<"jj nasiel..." << endl;
     pFunc = PyDict_GetItemString(pMainDict, function.c_str());
-    pArgs = PyTuple_New(argList->size()-1);
+
+    if (argList->size() !=0)
+       pArgs = PyTuple_New(argList->size()-1);
 
     //Parsing argumments
     PyObject *pArg;
-    y2milestone ("name of function %s and number of arguments %d", function.c_str(), argList->size()-1);
+    //y2milestone ("name of function %s and number of arguments %d", function.c_str(), argList->size()-1);
     for ( int i=1; i < argList->size(); i++ ) {
         pArg = YCPTypeToPythonType(argList->value(i));
         PyTuple_SetItem(pArgs,i-1, pArg);
     }
     //calling function from python
-    pReturn = PyObject_CallObject(pFunc, pArgs);
+
+    if (PyCallable_Check(pFunc))
+       cout <<"OKI" <<endl;
+    //pReturn = PyObject_CallFunction(pFunc, NULL);
+    pReturn = PyObject_Call(pFunc, pArgs, NULL);
+
+    cout <<" jj 2" << endl;
     //delete arguments
     Py_CLEAR(pArgs);
     //convert python value to YCPValue
+    //y2milestone("111");
     if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
     else{
         y2error("PyObject_CallObject(pFunc, pArgs) failed!");
-        PyErr_Print();
-        y2error("pReturn == 0");
+        if (PyErr_Occurred() != NULL){
+           y2error("Python error: %s", PyErrorHandler().c_str());
+           //PyErr_Print();
+        }
     }
     //delete pReturn
     Py_CLEAR(pReturn);
 
     if (result.isNull ()) {
-        y2error ("Result is NULL when returning from %s", function.c_str());
+        //y2error ("Result is NULL when returning from %s", function.c_str());
         result = YCPVoid ();
     }
 
@@ -805,6 +821,62 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
 
 
 
+string YPython::PyErrorHandler() {
+   /* process Python-related errors */
+   /* call after Python API raises an exception */
+ 
+   PyObject *errobj, *errdata, *errtraceback, *pystring;
+
+   string result = "error type: ";
+   /* get latest python exception info */
+   PyErr_Fetch(&errobj, &errdata, &errtraceback);
+ 
+   pystring = NULL;
+   if (errobj != NULL &&
+      (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
+      (PyString_Check(pystring))
+      )
+       //strcpy(save_error_type, PyString_AsString(pystring));
+      result += PyString_AsString(pystring);
+   else
+      result += "<unknown exception type>";
+   Py_XDECREF(pystring);
+   result +="; error value: ";
+
+   pystring = NULL;
+   if (errdata != NULL &&
+      (pystring = PyObject_Str(errdata)) != NULL &&
+      (PyString_Check(pystring))
+      )
+       //strcpy(save_error_info, PyString_AsString(pystring));
+      result += PyString_AsString(pystring);
+   else
+       //strcpy(save_error_info, "<unknown exception data>");
+      result += "<unknown exception value>";
+   Py_XDECREF(pystring);
+
+   result +="; error traceback: ";
+
+   pystring = NULL;
+   if (errdata != NULL &&
+      (pystring = PyObject_Str(errtraceback)) != NULL &&
+      (PyString_Check(pystring))
+      )
+       //strcpy(save_error_info, PyString_AsString(pystring));
+      result += PyString_AsString(pystring);
+   else
+       //strcpy(save_error_info, "<unknown exception data>");
+      result += "<unknown exception traceback>";
+   Py_XDECREF(pystring);
+   //printf("%s\n%s\n", save_error_type, save_error_info);
+   Py_XDECREF(errobj);
+   Py_XDECREF(errdata);         /* caller owns all 3 */
+   Py_XDECREF(errtraceback);    /* already NULL'd out */
+   return result;
+
+}
+
+
 YPythonCode::YPythonCode (PyObject *pFunc):YCode() {
     m_kind = YCode::yeReference;
     _pFunc = pFunc;
@@ -833,7 +905,10 @@ YCPValue YPythonCode::evaluate(bool cse) {
           result = YPython::yPython()->PythonTypeToYCPType(pReturn); // create YCP value
        } else {
           y2error("pReturn == 0");
-          PyErr_Print();
+          if (PyErr_Occurred() != NULL){
+             y2error("Python error: %s", YPython::PyErrorHandler().c_str());
+             //PyErr_Print();
+          }
        }
     }
     return result;

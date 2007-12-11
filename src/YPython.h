@@ -113,7 +113,11 @@ public:
      */
     PyObject *YCPTypeToPythonType(YCPValue);
 
-
+   /**
+     * Handler for python errors, info will be saved into  yast logs
+     * FUnction saves info from void PyErr_Fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback)
+     **/
+    static string PyErrorHandler();
 
 private:
 

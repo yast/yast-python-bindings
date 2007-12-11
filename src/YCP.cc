@@ -20,6 +20,7 @@
 #include <ycp/YCPPath.h>
 #include <ycp/YCPTerm.h>
 #include <ycp/YCPString.h>
+#include <ycp/YCPVoid.h>
 #include <ycp/SymbolTable.h>
 
 #include "YPython.h"
@@ -201,9 +202,14 @@ PyMODINIT_FUNC initycp(void) {
 
   //cout << textdomain << endl;
 
-  string _fun = "_ = gettext.gettext";
+  // added space - important for checking texdomain during make package
+  string _fun = 
+        "def _" "(str): \n\
+          return gettext.gettext(str)";
 
+  
   PyRun_SimpleString("import sys, traceback");
+  PyRun_SimpleString(_fun.c_str());
   Self = Py_InitModule("ycp", YCPMethods);
 
   initYCPTypes(Self);
@@ -660,6 +666,8 @@ PyObject * Call_YCPFunction (PyObject *args) {
 
   
   YPython *ypython = YPython::yPython ();
+
+  
   if (number_args >= 2) {
      //obtain name of namespace (first argument)
      pPythonValue = PyTuple_GetItem(args, 0);
@@ -685,7 +693,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      if (pPythonValue) {
         if (PyString_Check(pPythonValue)) {
            func_name = strcpy(func_name, PyString_AsString(pPythonValue)); 
-
+           //y2milestone("Call_YCPFunction: NS: %s FUN: %s",ns_name, func_name);
         } else {
            y2error ("Wrong type of name for function. String is necessary.");
            //printf("Wrong type of name for function. String is necessary..\n");
@@ -702,6 +710,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      //printf("function: %s\n", func_name);
      // create namespace
      Y2Namespace *ns = getNs (ns_name, func_name);
+     //y2milestone("jj");
      if (ns == NULL) {
         y2error ("Creating namespace fault.");
         //printf("Creating namespace fault..\n");
@@ -726,7 +735,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
 	y2error ("No such function %s::%s", ns_name, func_name);
         //printf("No such symbol %s::%s\n", ns_name, func_name);
         return PyExc_RuntimeError;
-     }
+     }     
      if (fun_type->parameterCount() > (number_args-2)) {
         y2error ("Too much arguments");
         return PyExc_SyntaxError;
@@ -738,12 +747,14 @@ PyObject * Call_YCPFunction (PyObject *args) {
          pPythonValue = PyTuple_GetItem(args, i);
          if (pPythonValue) {
              ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
-
+            //transform YCPNull to YCPVoid
+            if (ycpArg.isNull()) {
+                ycpArg = YCPVoid();
+            }
             /*XXX
 	    if (fun_type->parameterType(i-2)->matchvalue(ycpArg) != 0) {
                y2error ("Wrong type of argumment %d",i-2);
                return PyExc_TypeError;
-
 	    }*/
             bool ok = func_call->appendParameter (ycpArg);
 	    if (!ok) {
@@ -766,6 +777,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      }
 
      ycpRetValue = func_call->evaluateCall ();
+
      delete func_call;
      if (ycpRetValue.isNull ()) {
 	y2error ("Return value of function %s is NULL", func_name);
