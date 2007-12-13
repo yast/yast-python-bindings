@@ -83,7 +83,7 @@ static bool HandleSymbolTable (const SymbolEntry & se) {
  */
 
 static Y2Namespace * getNs (const char * ns_name, const char * func_name) {
-  Import import(ns_name);	// has a static cache
+  Import import((strcmp(ns_name,"UI")==0) ? "UI2": ns_name);	// has a static cache
   Y2Namespace *ns = import.nameSpace();
   if (ns == NULL) {
      y2error ("... for a Python call of %s", func_name);
@@ -457,7 +457,10 @@ PyObject * Import_YCPNameSpace (PyObject *args) {
          
            return pResult;
         }
-        Import import(ns_name);	// has a static cache
+
+      
+        Import import((strcmp(ns_name,"UI")==0) ? "UI2": ns_name); // has a static cache
+
         Y2Namespace *ns = import.nameSpace();
         if (ns == NULL) {
 
@@ -706,11 +709,10 @@ PyObject * Call_YCPFunction (PyObject *args) {
         return PyExc_SyntaxError;
 
      }
-     //printf("namespace: %s\n", ns_name);
-     //printf("function: %s\n", func_name);
+
      // create namespace
      Y2Namespace *ns = getNs (ns_name, func_name);
-     //y2milestone("jj");
+
      if (ns == NULL) {
         y2error ("Creating namespace fault.");
         //printf("Creating namespace fault..\n");

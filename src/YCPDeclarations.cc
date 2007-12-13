@@ -42,7 +42,8 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
     PyObject *return_type;
     PyObject *tmp;
     cache_function_t *function;
-    Py_ssize_t tuple_size;
+    //Py_ssize_t tuple_size;
+    int tuple_size;
 
     if (!_init())
         return;
@@ -80,7 +81,8 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
 
     //parameters:
     tuple_size = PyTuple_Size(params);
-    for (Py_ssize_t i=0; i < tuple_size; i++){
+    //for (Py_ssize_t i=0; i < tuple_size; i++){
+    for (int i=0; i < tuple_size; i++){
         tmp = PyTuple_GetItem(params, i);
         function->parameters.push_back(_interpretType(PyString_AsString(tmp)));
     }

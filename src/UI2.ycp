@@ -1,0 +1,225 @@
+{
+ 
+  module "UI2";
+ 
+  global string AskForExistingDirectory (string startDir, string headline) { 
+    return UI::AskForExistingDirectory(startDir, headline);
+  }
+ 
+  global string AskForExistingFile (string startWith, string fil, string headline) {
+    return UI::AskForExistingFile(startWith, fil, headline);
+  }
+ 
+  global string AskForSaveFileName (string startWith, string fil, string headline) {
+    return UI::AskForSaveFileName(startWith, fil, headline);
+  }
+
+  global void BusyCursor () {
+    UI::BusyCursor();
+  }
+
+  global boolean CloseDialog() {
+    return UI::CloseDialog();
+  }
+
+  global list< map <string, any> > CollectUserInput() {
+    return UI::CollectUserInput();
+  }
+
+  global list< map <string, any> > CollectUserInputT(term ID) {
+    return UI::CollectUserInput(ID);
+  }
+
+  global void DumpWidgetTree () {
+    UI::DumpWidgetTree();
+  }
+
+  global void FakeUserInput () {
+    UI::FakeUserInput();
+  }
+
+  global void FakeUserInputA (any nextUserInput) {
+    UI::FakeUserInput(nextUserInput);
+  }
+  
+  global map GetDisplayInfo () {
+    return UI::GetDisplayInfo();
+  }
+
+  global string GetLanguage (boolean  strip_encoding) {
+    return UI::GetLanguage(strip_encoding);
+  }
+
+  //global string GetModulename () {
+  //  return UI::GetModulename();
+  //}
+
+  global string GetProductName () {
+    return UI::GetProductName();
+  }
+
+  global string Glyph (symbol glyph) {
+    return UI::Glyph(glyph);
+  }
+
+  global any HasSpecialWidget(symbol widget) {
+    return UI::HasSpecialWidget(widget);
+  }
+
+  global boolean ChangeWidget (symbol widgetId, symbol property, any newValue) {
+    return UI::ChangeWidget(widgetId, property, newValue);
+  }
+
+  global boolean ChangeWidgetT (term widgetId, symbol property, any newValue) {
+    return UI::ChangeWidget(widgetId, property, newValue);
+  }
+
+  global boolean ChangeWidgetTT (term widgetId, term property, any newValue) {
+    return UI::ChangeWidget(widgetId, property, newValue);
+  }
+
+  global void CheckShortcuts () {
+    UI::CheckShortcuts();
+  }
+
+  global void MakeScreenShot (string filename) {
+    UI::MakeScreenShot(filename);
+  }
+
+  global void NormalCursor () {
+    UI::NormalCursor();
+  }
+
+  global boolean OpenDialog (term widget) {
+    return UI::OpenDialog(widget);
+  }
+
+  global boolean OpenDialogT (term opts, term widget) {
+    return UI::OpenDialog(opts, widget);
+  }
+
+  global void PlayMacro (string macroFileName) {
+    UI::PlayMacro(macroFileName);
+  }
+
+  global any PollInput () {
+    return UI::PollInput();
+  }
+
+  global void PostponeShortcutCheck () {
+    UI::PostponeShortcutCheck();
+  }
+
+  global any QueryWidget (symbol widgetId, symbol property) {
+    return UI::QueryWidget(widgetId, property);
+  }
+
+  global any QueryWidgetST (symbol widgetId, term property) {
+    return UI::QueryWidget(widgetId, property);
+  }
+
+  global any QueryWidgetTT (term widgetId, term property) {
+    return UI::QueryWidget(widgetId, property);
+  }
+
+  global any QueryWidgetTS (term widgetId, symbol property) {
+    return UI::QueryWidget(widgetId, property);
+  }
+
+  global void RecalcLayout () {
+    UI::RecalcLayout();
+  }
+
+  global any Recode (string from, string to, string text) {
+    return UI::Recode (from, to, text);
+  }
+
+  global void RecordMacro (string macroFileName) {
+    UI::RecordMacro(macroFileName);
+  }
+
+  global void RedrawScreen () {
+    UI::RedrawScreen();
+  }
+
+  global boolean ReplaceWidget (symbol id, term newWidget) {
+    return UI::ReplaceWidget (id, newWidget);
+  }
+
+  global boolean ReplaceWidgetT (term id, term newWidget) {
+    return UI::ReplaceWidget (id, newWidget);
+  }
+
+  global any RunInTerminal (string external_program) {
+    return UI::RunInTerminal(external_program);
+  }
+
+  global any RunPkgSelection (term pkgSelId) {
+    return UI::RunPkgSelection (pkgSelId);
+  }
+
+  global void SetConsoleFont (string console_magic, string font, string screen_map, string unicode_map, string encoding) {
+    UI::SetConsoleFont(console_magic, font, screen_map, unicode_map, encoding);
+  }
+
+  global boolean SetFocus (symbol widgetId) {
+    return UI::SetFocus(widgetId);
+  }
+
+  global boolean SetFocusT (term widgetId) {
+    return UI::SetFocus(widgetId);
+  }
+
+  global void SetFunctionKeys (map<string,integer> fkeys) {
+    UI::SetFunctionKeys(fkeys);
+  }
+
+  global void SetKeyboard () {
+    UI::SetKeyboard();
+  }
+
+  global void SetLanguage (string lang) {
+    UI::SetLanguage (lang);
+  }
+
+  global void SetLanguageS (string lang, string encoding) {
+    UI::SetLanguage (lang, encoding);
+  }
+
+  global void SetModulename (string mod) {
+    UI::SetModulename(mod);
+  }
+
+  global void SetProductName (string prod) {
+    UI::SetProductName(prod);
+  }
+
+  global void StopRecordMacro (){
+    UI::StopRecordMacro();
+  }
+
+  global any TimeoutUserInput (integer timeout_millisec) {
+    return UI::TimeoutUserInput(timeout_millisec);
+  }
+
+  global any UserInput () {
+    return UI::UserInput();
+  }
+
+  global map <string, any> WaitForEvent () {
+    return UI::WaitForEvent();
+  }
+
+  global boolean WidgetExists (symbol widgetId) {
+    return UI::WidgetExists(widgetId);
+  }
+
+  global boolean WidgetExistsT (term widgetId) {
+    return UI::WidgetExists(widgetId);
+  }
+
+  global boolean WizardCommand (term wizardCommand) {
+    return UI::WizardCommand (wizardCommand);
+  }
+
+}

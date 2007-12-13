@@ -146,7 +146,7 @@ YPython::loadModule(string module)
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       pMain = PyImport_ImportModule(module_name.c_str());
+       pMain = PyImport_ImportModule((char *)module_name.c_str());
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
 
@@ -188,20 +188,19 @@ YPython::callInner (string module, string function, bool method,
 {
     PyObject* pMainDict;  // dictionary of module
     PyObject* pFunc;      // function from dictionary
-    PyObject* pArgs = NULL;      // tuple object of argument for function
+    PyObject* pArgs;      // tuple object of argument for function
     PyObject* pReturn;    // return value from python
     YCPValue result = YCPNull ();
 
     //obtain correct dictionary for module
     pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
     //obtain function from dictionary
-
-    if (PyDict_Contains(pMainDict,PyString_FromString(function.c_str())) ==1)
-       cout <<"jj nasiel..." << endl;
     pFunc = PyDict_GetItemString(pMainDict, function.c_str());
 
     if (argList->size() !=0)
        pArgs = PyTuple_New(argList->size()-1);
+    else
+       pArgs = NULL;
 
     //Parsing argumments
     PyObject *pArg;
@@ -211,17 +210,12 @@ YPython::callInner (string module, string function, bool method,
         PyTuple_SetItem(pArgs,i-1, pArg);
     }
     //calling function from python
+    pReturn = PyObject_CallObject(pFunc, pArgs);
 
-    if (PyCallable_Check(pFunc))
-       cout <<"OKI" <<endl;
-    //pReturn = PyObject_CallFunction(pFunc, NULL);
-    pReturn = PyObject_Call(pFunc, pArgs, NULL);
-
-    cout <<" jj 2" << endl;
     //delete arguments
     Py_CLEAR(pArgs);
+
     //convert python value to YCPValue
-    //y2milestone("111");
     if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
     else{
@@ -558,8 +552,8 @@ YCPMap YPython::fromPythonDictToYCPMap (PyObject* pPythonDict) {
             return ycp_Map;
 
         PyObject *key, *value;
-        Py_ssize_t pos = 0;
-
+        //Py_ssize_t pos = 0;
+        int pos = 0;
         while (PyDict_Next(pPythonDict, &pos, &key, &value)) {
             ycp_key = PythonTypeToYCPType(key);
             ycp_value = PythonTypeToYCPType(value);

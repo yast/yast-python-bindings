@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Dec 11 11:23:25 CET 2007 - juhliarik@suse.cz
+
+- Backporting to sle10-sp2
+- V 2.13.2 
+
+-------------------------------------------------------------------
 Wed Dec  5 10:18:40 CET 2007 - juhliarik@suse.cz
 
 - Added patch for problem with handling error from python

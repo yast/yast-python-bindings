@@ -47,7 +47,7 @@ libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
 		-Xlinker --whole-archive	\
 		-lpy2scr			\
 		-lpy2wfm			\
-		-lscr -lpy2UI			\
+		-lscr -lyui			\
 		-lycp -ly2			\
 		-Xlinker --no-whole-archive	\
 		-ly2util			\
@@ -103,11 +103,17 @@ libpy2lang_python_la_SOURCES =				\
 # CLEANFILES = \
 #	pythonxsi.c
 
+module_DATA =						\
+	UI2.ycp
+
+
+
 INCLUDES = -I$(srcdir)/include -I$(includedir) ${ZYPP_CFLAGS} -I/usr/include/python
 
 # generated from YaPI.pm.in by configure
 # nodist_module_DATA = YaPI.pm
 
 #EXTRA_DIST = $(pythonpy_DATA) $(module_DATA)
-EXTRA_DIST = $(pythonpy_DATA)
+EXTRA_DIST = $(pythonpy_DATA) $(module_DATA)
 
+include $(top_srcdir)/Makefile.am.common
