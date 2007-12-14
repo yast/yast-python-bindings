@@ -2,11 +2,11 @@
 
 @HEADER@
 BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel
-
+BuildRequires:  yast2-core >= 2.13.40
 
 
 # YCPValue::valuetype_str()
-Requires:	yast2-core >= 2.13.28
+Requires:	yast2-core >= 2.13.40
 Requires:	python
 
 
@@ -29,7 +29,8 @@ rm $RPM_BUILD_ROOT/%{_libdir}/python/site-packages/libYCP.la
 %defattr (-, root, root)
 @plugindir@/libpy2lang_python.so.*
 @plugindir@/libpy2lang_python.so
-
+%dir @moduledir@
+@moduledir@/UI2.y*
 
 # libYCP goes elsewhere
 # %dir %{_libdir}/python
