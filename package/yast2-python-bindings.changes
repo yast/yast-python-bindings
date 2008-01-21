@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 21 11:25:09 CET 2008 - juhliarik@suse.cz
+
+- Added pacth for bug#355064 - problem with SCR.Write
+- V 2.16.3 
+
+-------------------------------------------------------------------
 Wed Dec  5 10:18:40 CET 2007 - juhliarik@suse.cz
 
 - Added patch for problem with handling error from python
