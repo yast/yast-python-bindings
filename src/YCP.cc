@@ -572,7 +572,11 @@ PyObject * _SCR_Run (PyObject *args) {
   for (int i=1; i< number_args; i++) {
       pPythonValue = PyTuple_GetItem(args, i);
       if (pPythonValue) {
-          ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+
+         if (pPythonValue != Py_None)
+            ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+         else 
+            ycpArg = YCPVoid();
 
 	 if (ycpArg.isNull ()) {
 	    // an error has already been reported, now refine it.
@@ -586,17 +590,19 @@ PyObject * _SCR_Run (PyObject *args) {
          // Such YConsts without a specific type produce invalid
 	 // bytecode. (Which is OK here)
 	 // The actual parameter's YCode becomes owned by the function call?
-        
 	 YConst *param_c = new YConst (YCode::ycConstant, ycpArg);
 
 	 // for attaching the parameter, must get the real type so that it matches
 	 constTypePtr act_param_tp = Type::vt2type (ycpArg->valuetype());
+            
+            
 
 	 // Attach the parameter
 	 // Returns NULL if OK, Type::Error if excessive argument
 	 // Other errors (bad code, bad type) shouldn't happen
 
 	 constTypePtr err_tp = bi_call->attachParameter (param_c, act_param_tp);
+
 	 if (err_tp != NULL) {
 	    if (err_tp->isError ()) {
 		// where we were called from.
@@ -666,6 +672,8 @@ PyObject * Call_YCPFunction (PyObject *args) {
 
   
   YPython *ypython = YPython::yPython ();
+
+  
   if (number_args >= 2) {
      //obtain name of namespace (first argument)
      pPythonValue = PyTuple_GetItem(args, 0);
@@ -691,7 +699,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      if (pPythonValue) {
         if (PyString_Check(pPythonValue)) {
            func_name = strcpy(func_name, PyString_AsString(pPythonValue)); 
-
+           //y2milestone("Call_YCPFunction: NS: %s FUN: %s",ns_name, func_name);
         } else {
            y2error ("Wrong type of name for function. String is necessary.");
            //printf("Wrong type of name for function. String is necessary..\n");
@@ -708,6 +716,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      //printf("function: %s\n", func_name);
      // create namespace
      Y2Namespace *ns = getNs (ns_name, func_name);
+     //y2milestone("jj");
      if (ns == NULL) {
         y2error ("Creating namespace fault.");
         //printf("Creating namespace fault..\n");
@@ -732,7 +741,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
 	y2error ("No such function %s::%s", ns_name, func_name);
         //printf("No such symbol %s::%s\n", ns_name, func_name);
         return PyExc_RuntimeError;
-     }
+     }     
      if (fun_type->parameterCount() > (number_args-2)) {
         y2error ("Too much arguments");
         return PyExc_SyntaxError;
@@ -772,7 +781,6 @@ PyObject * Call_YCPFunction (PyObject *args) {
         //printf("Problem with finishing arguments for adding arguments of function %s\n", func_name);
         return  PyExc_RuntimeError;
      }
-
      ycpRetValue = func_call->evaluateCall ();
      delete func_call;
      if (ycpRetValue.isNull ()) {
@@ -784,6 +792,7 @@ PyObject * Call_YCPFunction (PyObject *args) {
      delete []func_name;
 
      pReturnValue = ypython->YCPTypeToPythonType(ycpRetValue);
+
      Py_INCREF(pReturnValue);
      return pReturnValue;
      
