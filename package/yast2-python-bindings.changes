@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 23 13:06:19 CET 2008 - juhliarik@suse.cz
+
+- Added pacth for bug#355064 - problem with SCR.Write
+- V 2.13.3
+ 
+-------------------------------------------------------------------
 Tue Dec 11 11:23:25 CET 2007 - juhliarik@suse.cz
 
 - Backporting to sle10-sp2 fate# 302103
