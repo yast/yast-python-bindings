@@ -575,7 +575,13 @@ PyObject * _SCR_Run (PyObject *args) {
   for (int i=1; i< number_args; i++) {
       pPythonValue = PyTuple_GetItem(args, i);
       if (pPythonValue) {
-          ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+
+//B#355064 - problem with SCR.Write
+         if (pPythonValue != Py_None)
+            ycpArg = ypython->PythonTypeToYCPType(pPythonValue);
+         else 
+            ycpArg = YCPVoid();
+//B#355064 - end
 
 	 if (ycpArg.isNull ()) {
 	    // an error has already been reported, now refine it.
