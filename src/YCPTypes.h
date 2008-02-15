@@ -98,6 +98,8 @@ PyObject *Code_New(PyObject *value);
  */
 bool initYCPTypes(PyObject *module);
 
+bool initYCPTermType(PyObject *module);
+
 bool isYCPType(PyObject *);
 
 

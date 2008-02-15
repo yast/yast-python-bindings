@@ -24,6 +24,16 @@ bool initYCPTypes(PyObject *module)
     return true;
 }
 
+bool initYCPTermType(PyObject *module)
+{
+    if (PyType_Ready(&TermType) < 0)
+        return false;
+	Py_INCREF(&TermType);
+    PyModule_AddObject(module, "Term", (PyObject *)&TermType);
+
+    return true;
+}
+
 bool isYCPType(PyObject *obj)
 {
     if (isSymbol(obj) || isPath(obj) || isTerm(obj))

@@ -192,36 +192,39 @@ YPython::callInner (string module, string function, bool method,
     PyObject* pReturn;    // return value from python
     YCPValue result = YCPNull ();
 
-    //obtain correct dictionary for module
+    // obtain correct dictionary for module
     pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
-    //obtain function from dictionary
 
-    if (PyDict_Contains(pMainDict,PyString_FromString(function.c_str())) ==1)
-       cout <<"jj nasiel..." << endl;
-    pFunc = PyDict_GetItemString(pMainDict, function.c_str());
+    // obtain function from dictionary
+    if (PyDict_Contains(pMainDict,PyString_FromString(function.c_str())))
+       pFunc = PyDict_GetItemString(pMainDict, function.c_str());
+	else {
+	   y2error("Function %s is not found.", function.c_str());
+	   return result;
+	}
 
     if (argList->size() !=0)
        pArgs = PyTuple_New(argList->size()-1);
 
-    //Parsing argumments
+    // Parsing argumments
     PyObject *pArg;
-    //y2milestone ("name of function %s and number of arguments %d", function.c_str(), argList->size()-1);
+
     for ( int i=1; i < argList->size(); i++ ) {
         pArg = YCPTypeToPythonType(argList->value(i));
         PyTuple_SetItem(pArgs,i-1, pArg);
     }
-    //calling function from python
 
+    // calling function from python
     if (PyCallable_Check(pFunc))
-       cout <<"OKI" <<endl;
-    //pReturn = PyObject_CallFunction(pFunc, NULL);
-    pReturn = PyObject_Call(pFunc, pArgs, NULL);
-
-    cout <<" jj 2" << endl;
-    //delete arguments
+       pReturn = PyObject_Call(pFunc, pArgs, NULL);
+	else {
+	   y2error("Function %s is not callable.", function.c_str());
+	   return result;
+	}
+    // delete arguments
     Py_CLEAR(pArgs);
-    //convert python value to YCPValue
-    //y2milestone("111");
+
+    // convert python value to YCPValue
     if (pReturn)
         result = PythonTypeToYCPType(pReturn); // create YCP value
     else{
@@ -231,12 +234,11 @@ YPython::callInner (string module, string function, bool method,
            //PyErr_Print();
         }
     }
-    //delete pReturn
+    // delete pReturn
     Py_CLEAR(pReturn);
 
     if (result.isNull ()) {
-        //y2error ("Result is NULL when returning from %s", function.c_str());
-        result = YCPVoid ();
+       result = YCPVoid ();
     }
 
     return result;
@@ -487,7 +489,7 @@ PyObject* YPython::fromYCPListToPythonTuple (YCPValue ycp_List) {
     if (ycp_List->isList()) {
         pPythonTuple = PyTuple_New(ycp_List->asList()->size());
 
-        y2milestone ("Size of list %d",ycp_List->asList()->size());
+        y2debug ("Size of list %d",ycp_List->asList()->size());
         for ( int i = 0; i < ycp_List->asList()->size(); i++ ) {
             pItem = YCPTypeToPythonType(ycp_List->asList()->value(i));
             ret = PyTuple_SetItem(pPythonTuple, i, pItem);
