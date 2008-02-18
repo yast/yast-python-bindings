@@ -12,7 +12,7 @@
 #include <ycp/YExpression.h>
 #include <ycp/YStatement.h>
 #include <ycp/Import.h>
-#include <yui/YUIComponent.h>
+#include <ycp-ui/YUIComponent.h>
 #include <wfm/Y2WFMComponent.h>
 #include <ycp/Parser.h>
 #include <ycp/YCPMap.h>
