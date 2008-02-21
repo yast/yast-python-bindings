@@ -1,13 +1,15 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel
+BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel yast2-ycp-ui-bindings-devel
 
 
 
 # YCPValue::valuetype_str()
-Requires:	yast2-core >= 2.16.34
-BuildRequires:	yast2-core-devel >= 2.16.34
+Requires:	yast2-core       >= 2.16.37
+BuildRequires:	yast2-core-devel >= 2.16.37
+BuildRequires:  yast2-ycp-ui-bindings-devel >= 2.16.37
+Requires:       yast2-ycp-ui-bindings       >= 2.16.37
 Requires:	python
 
 
