@@ -13,6 +13,7 @@
 #include <ycp/YStatement.h>
 #include <ycp/Import.h>
 #include <ycp-ui/YUIComponent.h>
+//#include <yui/YUIComponent.h>
 #include <wfm/Y2WFMComponent.h>
 #include <ycp/Parser.h>
 #include <ycp/YCPMap.h>
@@ -389,7 +390,7 @@ PyObject * InitTerm(PyObject *args)
 
 		// Init new module with name NameSpace and method __run (see new_module_methods)
 		PyObject *new_module = Py_InitModule(widget_ns.c_str(), term_methods);
-		if (new_module == NULL) return false;
+		if (new_module == NULL) return pResult;
 
     	initYCPTermType(new_module);
 
@@ -398,7 +399,7 @@ PyObject * InitTerm(PyObject *args)
 		PyDict_SetItemString(dict, widget_ns.c_str(), new_module);
 
 		PyObject *new_module_dict = PyModule_GetDict(new_module);
-		if (new_module_dict == NULL) return false;
+		if (new_module_dict == NULL) return pResult;
 
 		for (int i=0; i<ycpTermList->size(); i++) 
 		{
@@ -426,15 +427,16 @@ PyObject * InitTerm(PyObject *args)
 
 
 	delete ycpTermList;
-	return Py_True;
+    
+	return PyBool_FromLong(1);
 }
 
 /**
  * Returns Py_True if name of widget was successful changed
- * @param string actual name of widget
- * @param string real name of widget from YCP (it is not neccessary 
+ * @param string current name of widget
+ * @param string new name of widget 
+ * @param string original name of widget in YaST (it is not neccessary 
  *  if actual name is same than real name)
- * @param string new name of widget
  * @return pointer to PyObject (Py_True) on success or Py_False
  */
 PyObject * ChangeWidgetName(PyObject *args)
@@ -442,9 +444,9 @@ PyObject * ChangeWidgetName(PyObject *args)
 	int number_args = PyTuple_Size(args);
 	// adding false into pResult
 	PyObject *pResult = PyBool_FromLong(0);
-	string actual_name;
+	string current_name;
 	string new_name;
-	string real_name;
+	string original_name;
 	PyObject *pPythonValue;
 	PyObject *dict = PyModule_GetDict(Self);
 	string command;
@@ -452,15 +454,16 @@ PyObject * ChangeWidgetName(PyObject *args)
 	int in_dict =0;
 	PyObject * main_module = PyImport_AddModule("__main__");
 	PyObject * main_dict = PyModule_GetDict(main_module);
+	PyObject * current_term;
 
 	switch(number_args)
 	{
 	case 2:
-		// adding 1st argument (actual name)
+		// adding 1st argument (current name)
 		pPythonValue = PyTuple_GetItem(args, 0);
 		if (PyString_Check(pPythonValue)) 
 		{
-			actual_name = PyString_AsString(pPythonValue); 
+			current_name = PyString_AsString(pPythonValue); 
 
 		} else {
 			y2error ("Wrong type of the 1st argument. String is necessary.");
@@ -469,28 +472,38 @@ PyObject * ChangeWidgetName(PyObject *args)
 
  		in_dict = PyDict_Contains(dict, pPythonValue);
 
+		current_term = PyDict_GetItemString(dict, current_name.c_str());
+
 		//in_dict = PyDict_Contains(dict, PyString_FromString("__dict__"));
 
 		if (in_dict == 0) 
 		{
-			y2error ("Main dictionary doesn't include widget %s", actual_name.c_str());
+			y2error ("Main dictionary doesn't include widget %s", current_name.c_str());
 			return pResult;
 		} else if (in_dict == -1)
 		{
-			y2error ("Checking of main dictionary for widget %s failed.", actual_name.c_str());
+			y2error ("Checking of main dictionary for widget %s failed.", current_name.c_str());
 			return pResult;
 			
 		}
 
-		y2debug("Widget %s was found in main dictionary", actual_name.c_str());
+		y2debug("Widget %s was found in main dictionary", current_name.c_str());
+
+		current_term = PyDict_GetItemString(dict, current_name.c_str());
+
+		if (!PyFunction_Check(current_term))
+		{			
+			y2error ("%s is not function.", current_name.c_str());
+			return pResult;
+		}
 
 		// initialize list of terms
 		InitYCPTermList();
 
-		if (!ycpTermList->contains(YCPString(actual_name.c_str())))
+		if (!ycpTermList->contains(YCPString(current_name.c_str())))
 		{
 			delete ycpTermList;
-			y2error ("Checking of list widget names for widget %s failed.", actual_name.c_str());
+			y2error ("Checking of list widget names for widget %s failed.", current_name.c_str());
 			return pResult;
 		}
 
@@ -506,10 +519,18 @@ PyObject * ChangeWidgetName(PyObject *args)
 			y2error ("Wrong type of the 2nd argument. String is necessary.");
 			return pResult;
 		}
-		
-		y2milestone("Renaming widget name %s", actual_name.c_str());
+
+		in_dict = PyDict_Contains(dict, pPythonValue);
+
+		if (in_dict) 
+		{
+			y2error ("Main dictionary include names %s", new_name.c_str());
+			return pResult;
+		}
+
+		y2milestone("Renaming widget name %s", current_name.c_str());
 		// deleting widget name
-		command = "del ycp.__dict__['" + actual_name + "']";
+		command = "del ycp.__dict__['" + current_name + "']";
 		y2milestone("Command for deleting widget: %s",command.c_str());
 			
 		code = PyRun_String(command.c_str(), Py_single_input, main_dict, dict);
@@ -517,7 +538,7 @@ PyObject * ChangeWidgetName(PyObject *args)
 
 		// adding new name
 		command = "def " + new_name + "(*args):";
-		command += "\n\treturn Term('" + actual_name + "', *args)";
+		command += "\n\treturn Term('" + current_name + "', *args)";
 		y2milestone("Command for adding widget: %s",command.c_str());
 
 		code = PyRun_String(command.c_str(), Py_single_input, dict, dict);
@@ -528,11 +549,11 @@ PyObject * ChangeWidgetName(PyObject *args)
 
 	case 3:
 
-		// adding 1st argument (actual name)
+		// adding 1st argument (current name)
 		pPythonValue = PyTuple_GetItem(args, 0);
 		if (PyString_Check(pPythonValue)) 
 		{
-			actual_name = PyString_AsString(pPythonValue); 
+			current_name = PyString_AsString(pPythonValue); 
 
 		} else {
 			y2error ("Wrong type of the 1st argument. String is necessary.");
@@ -543,54 +564,73 @@ PyObject * ChangeWidgetName(PyObject *args)
 
 		if (in_dict == 0) 
 		{
-			y2error ("Main dictionary doesn't include widget %s", actual_name.c_str());
+			y2error ("Main dictionary doesn't include widget %s", current_name.c_str());
 			return pResult;
 		} else if (in_dict == -1)
 		{
-			y2error ("Checking of main dictionary for widget %s failed.", actual_name.c_str());
+			y2error ("Checking of main dictionary for widget %s failed.", current_name.c_str());
 			return pResult;
 			
 		}
 
-		y2debug("Widget %s was found in main dictionary", actual_name.c_str());
+		y2debug("Widget %s was found in main dictionary", current_name.c_str());
 
-		// adding 2nd argument (original widget name)
+		current_term = PyDict_GetItemString(dict, current_name.c_str());
+
+		if (!PyFunction_Check(current_term))
+		{			
+			y2error ("%s is not function.", current_name.c_str());
+			return pResult;
+		}
+
+
+		// adding 2nd argument (new name)
 		pPythonValue = PyTuple_GetItem(args, 1);
 		if (PyString_Check(pPythonValue)) 
 		{
-			real_name = PyString_AsString(pPythonValue); 
+			new_name = PyString_AsString(pPythonValue); 
 
 		} else {
 			y2error ("Wrong type of the 2nd argument. String is necessary.");
 			return pResult;
 		}
 
-		// initialize list of terms
-		InitYCPTermList();
 
-		if (!ycpTermList->contains(YCPString(real_name.c_str())))
+		in_dict = PyDict_Contains(dict, pPythonValue);
+
+		if (in_dict) 
 		{
-			delete ycpTermList;
-			y2error ("Checking of list widget names for widget %s failed.", real_name.c_str());
+			y2error ("Main dictionary include names %s", new_name.c_str());
 			return pResult;
 		}
-
-		delete ycpTermList;
 
 		// adding 3rd argument (new name)
 		pPythonValue = PyTuple_GetItem(args, 2);
 		if (PyString_Check(pPythonValue)) 
 		{
-			new_name = PyString_AsString(pPythonValue); 
+			original_name = PyString_AsString(pPythonValue); 
 
 		} else {
 			y2error ("Wrong type of the 3rd argument. String is necessary.");
 			return pResult;
 		}
 		
-		y2milestone("Renaming widget name %s", actual_name.c_str());
+		// initialize list of terms
+		InitYCPTermList();
+
+		if (!ycpTermList->contains(YCPString(original_name.c_str())))
+		{
+			delete ycpTermList;
+			y2error ("Checking of list widget names for widget %s failed.", original_name.c_str());
+			return pResult;
+		}
+
+		delete ycpTermList;
+
+
+		y2milestone("Renaming widget name %s", current_name.c_str());
 		// deleting widget name
-		command = "del ycp.__dict__['" + actual_name + "']";
+		command = "del ycp.__dict__['" + current_name + "']";
 		y2milestone("Command for deleting widget: %s",command.c_str());
 			
 		code = PyRun_String(command.c_str(), Py_single_input, main_dict, dict);
@@ -598,7 +638,7 @@ PyObject * ChangeWidgetName(PyObject *args)
 
 		// adding new name
 		command = "def " + new_name + "(*args):";
-		command += "\n\treturn Term('" + real_name + "', *args)";
+		command += "\n\treturn Term('" + original_name + "', *args)";
 		y2milestone("Command for adding widget: %s",command.c_str());
 
 		code = PyRun_String(command.c_str(), Py_single_input, dict, dict);
@@ -732,7 +772,6 @@ Y2Component *owned_wfmc = 0;
 void init_wfm () 
 {
 
-	//printf("Calling init_wfm ()\n");
 	if (Y2WFMComponent::instance () == 0) 
 	{
 		owned_wfmc = Y2ComponentBroker::createClient ("wfm");
