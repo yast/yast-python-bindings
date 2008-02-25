@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 25 10:20:06 CET 2008 - juhliarik@suse.cz
+
+- Added support for creating known widget names in ycp module
+- V 2.16.6
+
+-------------------------------------------------------------------
 Thu Feb 21 17:55:30 CET 2008 - sh@suse.de
 
 - Added new UI packages to Requires/BuildRequires in .spec file
