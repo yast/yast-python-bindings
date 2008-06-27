@@ -3,6 +3,11 @@
  * This is the path from Python to YCP. It defines XSUBs.
  */
 
+/* there is "strong" checking of textdomain. this is only hack for "make package"
+
+textdomain "blabla";
+*/
+
 #include <Python.h>
 #include <y2/Y2Namespace.h>
 #include <y2/Y2Component.h>
