@@ -1065,7 +1065,13 @@ PyObject * _SCR_Run (PyObject *args)
 	else 
 		return Py_None;
 }
-
+/**
+ * function handle GET/SET value for YCP variable in python
+ * @param char * name of module
+ * @param SymbolEntryPtr pointer to symbol entry
+ * @param PyObject * value or NULL if GET value is called
+ * @return PyObject return value of variable or None if SET is called
+ */
 
 PyObject * get_setYCPVariable (const char * ns_name, SymbolEntryPtr var_se, PyObject * pPythonValue)
 {
