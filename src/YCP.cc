@@ -40,6 +40,8 @@ static PyObject *Self;
 
 YCPList * ycpListFunctions;
 
+YCPList * ycpListVariables;
+
 YCPList * ycpTermList;
 
 PyObject * CallYCPFunction (PyObject *args);
@@ -74,6 +76,8 @@ static bool HandleSymbolTable (const SymbolEntry & se)
 			cout << type->parameters()->toString() << endl;
      		*/
 
+	} else if (se.isVariable ()) {
+		ycpListVariables->add(YCPString(se.name()));
 	}
 	return true;
 }
@@ -675,7 +679,7 @@ bool isRegistered(PyObject *dict, const char *NameSpace)
 	return ret;
 }
 
-bool RegFunctions(char *NameSpace, YCPList list_functions) 
+bool RegFunctions(char *NameSpace, YCPList list_functions, YCPList list_variables) 
 {
 
 	// Dictionary of ycp module
@@ -683,7 +687,7 @@ bool RegFunctions(char *NameSpace, YCPList list_functions)
 	if (ycp_dict == NULL) return false;
 
 	// If already registered return true
-    if (isRegistered(ycp_dict, NameSpace)) return true;
+	if (isRegistered(ycp_dict, NameSpace)) return true;
 
 
 	// Init new module with name NameSpace and method __run (see new_module_methods)
@@ -700,6 +704,8 @@ bool RegFunctions(char *NameSpace, YCPList list_functions)
 	PyObject *code;
 	string func_def;
 	string function;
+	
+	// register functions from ycp to python module 
 	for (int i=0; i<list_functions.size();i++) {
 		function = list_functions->value(i)->asString()->value(); 
 		func_def = "def " + function + "(*args):";
@@ -709,9 +715,21 @@ bool RegFunctions(char *NameSpace, YCPList list_functions)
 		code = PyRun_String(func_def.c_str(), Py_single_input, new_module_dict, new_module_dict);
 		Py_XDECREF(code);
 	}
-	return true;
 
+	// adding variables like function from ycp to module
+	for (int i=0; i<list_variables.size();i++) {
+		function = list_variables->value(i)->asString()->value(); 
+		func_def = "def " + function + "(*args):";
+		func_def += "\n\treturn __run(\"" + string(NameSpace) + "\", \"" + function + "\", *args)";
+
+		// Register function into dictionary of new module. Returns new reference - must be decremented
+		code = PyRun_String(func_def.c_str(), Py_single_input, new_module_dict, new_module_dict);
+		Py_XDECREF(code);
+	}
+
+	return true;
 }
+
 
 
 bool RegSCR() 
@@ -867,11 +885,13 @@ PyObject * ImportYCPNameSpace (PyObject *args)
 			else
 				ns->initialize ();
 			ycpListFunctions = new YCPList();
+		        ycpListVariables = new YCPList();
 			ns->table()->forEach (&HandleSymbolTable);	
-			RegFunctions(ns_name, *ycpListFunctions);
+			RegFunctions(ns_name, *ycpListFunctions, *ycpListVariables);
 
 			delete [] ns_name;
 			delete ycpListFunctions;
+		        delete ycpListVariables;
 
 			pResult = PyBool_FromLong(1);
 		}
@@ -1042,6 +1062,29 @@ PyObject * _SCR_Run (PyObject *args)
 }
 
 
+PyObject * get_setYCPVariable (const char * ns_name, SymbolEntryPtr var_se, PyObject * pPythonValue)
+{
+	
+	YPython *ypython = YPython::yPython ();
+	PyObject *pReturnValue; 
+	YCPValue ycpSetValue;
+	
+	if (!pPythonValue)
+	{
+		y2debug("Python GET value in %s for %s", ns_name, var_se->name());		
+		pReturnValue = ypython->YCPTypeToPythonType(var_se->value());
+		Py_INCREF(pReturnValue);
+		return pReturnValue;
+	} else {
+		y2debug("Python SET value in %s for %s", ns_name, var_se->name());
+		ycpSetValue = ypython->PythonTypeToYCPType(pPythonValue);
+		var_se->setValue(ycpSetValue);
+	}
+
+	return Py_None;
+}
+
+
 
 PyObject * CallYCPFunction (PyObject *args) 
 {
@@ -1108,6 +1151,29 @@ PyObject * CallYCPFunction (PyObject *args)
 			return PyExc_RuntimeError;
 		}
 		SymbolEntryPtr sym_entry = sym_te->sentry();
+		if (sym_entry->isVariable())
+		{
+			if ((number_args > 1) && (number_args < 4))
+			{
+				if (number_args == 2)
+				{	
+					return get_setYCPVariable(ns_name, sym_entry,NULL);
+				} else {
+					pPythonValue = PyTuple_GetItem(args, 2);
+					if (pPythonValue)
+					{	
+						return get_setYCPVariable(ns_name, sym_entry, pPythonValue);
+					} else {
+						y2error ("Getting argument failed.");
+						return PyExc_SyntaxError;
+					}
+				}
+
+			} else {
+				y2error ("Too much arguments for variable in YCP");
+				return PyExc_RuntimeError;
+			}
+		}
 		constFunctionTypePtr fun_type = (constFunctionTypePtr)sym_entry->type();
 		Y2Function *func_call = ns->createFunctionCall (func_name, NULL);
      
