@@ -69,6 +69,13 @@ bool RegSCR();
 
 void InitYCPTermList();
 
+/**
+ * Function check SymbolEntry and add name
+ * to ycpListFunctions if it is function or
+ * add it to ycpListVariables if it is variable
+ * @param const SymbolEntry for analyse
+ * @return bool always return true
+ */
 static bool HandleSymbolTable (const SymbolEntry & se) 
 {
 	if (se.isFunction ()) {
@@ -108,42 +115,76 @@ static Y2Namespace * getNs (const char * ns_name, const char * func_name)
 	return ns;
 }
 
-
+/**
+ * defined function for "run" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from CallYCPFunction()
+ */
 static PyObject * ycp_handle_function(PyObject *self, PyObject *args) 
 {
 	return CallYCPFunction (args);
 }
 
-
+/**
+ * defined function for "import_module" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from ImportYCPNameSpace()
+ */
 static PyObject * ycp_import_namespace(PyObject *self, PyObject *args) 
 {
 	return ImportYCPNameSpace (args);
 }
 
+/**
+ * defined function for "init_ui" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from InitUI()
+ */
 static PyObject * ycp_init_ui(PyObject *self, PyObject *args) 
 {
 	return InitUI (args);
 }
 
 
-static PyObject * ycp_scr_handle(PyObject *self, PyObject *args) 
-{
-	return _SCR_Run(args);
-}
-
-
+/**
+ * defined function for "y2logger" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * always Py_None
+ */
 static PyObject * ycp_y2logger (PyObject *self, PyObject *args) 
 {
 	PyY2logger(args);
 	return Py_None;
 }
 
-
+/**
+ * defined function for "widget_names" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from InitTerm()
+ */
 static PyObject * ycp_init_term(PyObject *self, PyObject *args) 
 {
 	return InitTerm(args);
 }
 
+
+/**
+ * defined function for "__change_widget_name" from static python module ycp
+ * it is in static PyMethodDef YCPMethods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from ChangeWidgetName()
+ */
 static PyObject * ycp_change_widget_name(PyObject *self, PyObject *args)
 {
 	return ChangeWidgetName(args);
@@ -159,9 +200,21 @@ static PyMethodDef new_module_methods[] =
 	{NULL, NULL, 0, NULL}
 };
 
+/**
+ * defined function for "__scr_run" from python module for SCR 
+ * it is in static PyMethodDef scr_methods[]
+ * @param PyObject *self
+ * @param PyObject *args
+ * @return PyObject * return value from _SCR_Run()
+ */
+static PyObject * ycp_scr_handle(PyObject *self, PyObject *args) 
+{
+	return _SCR_Run(args);
+}
+
 
 /**
- * This is necessary for regulat (python style) calling SCR from python
+ * This is necessary for regular (python style) calling SCR from python
  */
 static PyMethodDef scr_methods[] = 
 {
@@ -178,6 +231,9 @@ static PyMethodDef term_methods[] =
 	{NULL, NULL, 0, NULL}
 };
 
+/**
+ * Basic definition of methods python module ycp
+ */
 static PyMethodDef YCPMethods[] = 
 {
 	{"run",  ycp_handle_function, METH_VARARGS, "Calling YCP from Python"},
@@ -188,6 +244,12 @@ static PyMethodDef YCPMethods[] =
 	{"__change_widget_name", ycp_change_widget_name, METH_VARARGS, "Function for changing widget name"},
 	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
+
+
+/**
+ * Init function for python module ycp
+ * it includes definition of debug function and support for localization
+ */
 
 PyMODINIT_FUNC initycp(void) 
 {	
@@ -287,7 +349,9 @@ PyMODINIT_FUNC initycp(void)
     //InitTerm(NULL);
 }
 
-
+/**
+ * All names of known widget from YCP are added to ycpTermList
+ */
 void InitYCPTermList()
 {
 	// adding terms   
@@ -360,12 +424,15 @@ void InitYCPTermList()
 
 }
 
-
+/**
+ * Function handle adding all known widgets to python namespace (module ycp)
+ * it is usefull for writting UI in python. 
+ */
 
 PyObject * InitTerm(PyObject *args)
 {
 	int number_args = PyTuple_Size(args);
-    // adding false into pResult
+	// adding false into pResult
 	PyObject *pResult = PyBool_FromLong(0);
 
 	PyObject *dict = PyModule_GetDict(Self);
@@ -380,7 +447,7 @@ PyObject * InitTerm(PyObject *args)
 	{
 		
 		PyObject *pPythonValue = PyTuple_GetItem(args, 0);
-        string widget_ns = "term";
+		string widget_ns = "term";
 
 		if (pPythonValue) 
 		{
@@ -401,7 +468,7 @@ PyObject * InitTerm(PyObject *args)
 		PyObject *new_module = Py_InitModule(widget_ns.c_str(), term_methods);
 		if (new_module == NULL) return pResult;
 
-    	initYCPTermType(new_module);
+		initYCPTermType(new_module);
 
 		
 		// Add new initialized module into ycp dictionary
@@ -670,6 +737,9 @@ PyObject * ChangeWidgetName(PyObject *args)
 /**
  * Returns true if NameSpace is registered (is key) in dictionary dict.
  * Otherwise returns false;
+ * @param PyObject *dict - main dictionary of module ycp(python)
+ * @param char *NameSpace - name of namespace
+ * @return true on success
  */
 bool isRegistered(PyObject *dict, const char *NameSpace)
 {
@@ -684,6 +754,13 @@ bool isRegistered(PyObject *dict, const char *NameSpace)
 	return ret;
 }
 
+/**
+ * Register functions and variables from namespace to python module
+ * @param char *NameSpace - name of namespace
+ * @param YCPList list_functions - names of functions
+ * @param YCPList list_variables - names of variables
+ * @return true on success
+ */
 bool RegFunctions(char *NameSpace, YCPList list_functions, YCPList list_variables) 
 {
 
@@ -736,7 +813,10 @@ bool RegFunctions(char *NameSpace, YCPList list_functions, YCPList list_variable
 }
 
 
-
+/**
+ * Register SCR namespace with 4 functions: Read, Write, Dir and Execute
+ * @return true on success
+ */
 bool RegSCR() 
 {
     string func_read =
@@ -792,6 +872,9 @@ bool RegSCR()
 
 Y2Component *owned_wfmc = 0;
 
+/**
+ * Init WFM
+ */
 void init_wfm () 
 {
 
@@ -806,6 +889,12 @@ void init_wfm ()
 
 Y2Component *owned_uic = 0;
 
+
+/**
+ * Init UI - select: ncurses, qt or gtk
+ * @param PyObject *args - string - type of UI 
+ * @return PyObject * true on success
+ */
 PyObject * InitUI (PyObject *args) 
 {
 
@@ -862,7 +951,12 @@ PyObject * InitUI (PyObject *args)
 	return PyBool_FromLong(1);
 }
 
-
+/**
+ * Function import module written in YCP.
+ * It means that create module into namespace of python module ycp
+ * @param PyObject *args - string - include name of module written in YCP 
+ * @return PyObject * true on success
+ */
 PyObject * ImportYCPNameSpace (PyObject *args) 
 {
 	PyObject* pResult = PyBool_FromLong(0);
@@ -908,7 +1002,11 @@ PyObject * ImportYCPNameSpace (PyObject *args)
 
 	return pResult;
 }
-
+/**
+ * General function handles running SCR command
+ * @param PyObject *args - tuple of arguments for running SCR 
+ * @return PyObject * result of running SCR
+ */
 PyObject * _SCR_Run (PyObject *args) 
 {
 	// access directly the statically declared builtins
@@ -1096,7 +1194,11 @@ PyObject * get_setYCPVariable (const char * ns_name, SymbolEntryPtr var_se, PyOb
 }
 
 
-
+/**
+ * Function handles calling ycp function from python
+ * @param PyObject *args - tuple with namespace name of function and args for function
+ * @return PyObject return result of running function
+ */
 PyObject * CallYCPFunction (PyObject *args) 
 {
 	int number_args = PyTuple_Size(args);
@@ -1257,6 +1359,12 @@ PyObject * CallYCPFunction (PyObject *args)
 		return PyExc_SyntaxError;
 	}    
 }
+
+/**
+ * General function handles calling debug function in python like: 
+ * y2mileston(), y2error() etc.
+ * @param PyObject *args - tuple of args for debug function
+ */
 
 void PyY2logger(PyObject *args) 
 {
