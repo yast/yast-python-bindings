@@ -11,14 +11,16 @@
 
 AC_PROGRAM_PATH(PYTHON, python)
 if test -z "$PYTHON" ; then
-    AC_MSG_ERROR(python is missing; please install python 2.5.)
+    AC_MSG_ERROR(python is missing; please install python 2.6.)
 fi
 AC_SUBST(PYTHON)
 
+##AC_CHECK_HEADER(python2.6/Python.h, , AC_MSG_ERROR(Headers for Python are missing. Please install the package python-devel.) )
+
 ## -pthread -fno-strict-aliasing -DNDEBUG -O2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -g -fPIC
 ## Find out what compiler/linker flags an embedded Python interpreter needs
-PYTHON_CFLAGS=-lpython2.5
-PYTHON_LDFLAGS=-lpython2.5
+PYTHON_CFLAGS=-lpython2.6
+PYTHON_LDFLAGS=-lpython2.6
 
 AC_SUBST(PYTHON_CFLAGS)
 AC_SUBST(PYTHON_LDFLAGS)

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep  9 13:26:32 CEST 2008 - visnov@suse.cz
+
+- build with python 2.6
+- 2.17.2 
+
+-------------------------------------------------------------------
 Mon Jun 27 15:26:06 CET 2008 - juhliarik@suse.cz
 - added support for GET/SET variables in YCP module (bnc #402684)
 - 2.17.1
