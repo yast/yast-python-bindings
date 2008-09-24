@@ -1422,7 +1422,7 @@ void PyY2logger(PyObject *args)
 				y2error("Wrong type of argument"); 
 		}
 
-		y2_logger_function(level, Y2LOG, file.c_str(), line, function.c_str(),"%s", message.c_str());
+		y2_logger(level, Y2LOG, file.c_str(), line, function.c_str(),"%s", message.c_str());
 	} else {
 		y2error("Wrong number of arguments");
 	}
