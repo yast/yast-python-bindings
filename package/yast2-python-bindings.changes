@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Dec 15 15:40:14 CET 2008 - juhliarik@suse.cz
+
+- added fix for problem with strict-aliasing (bnc #444472) 
+- 2.17.4
+
+-------------------------------------------------------------------
 Wed Sep 24 14:32:12 CEST 2008 - visnov@suse.cz
 
 - y2debug is always logged (bnc#426554) 

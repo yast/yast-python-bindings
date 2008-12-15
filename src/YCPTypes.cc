@@ -12,13 +12,13 @@ bool initYCPTypes(PyObject *module)
         return false;
     if (PyType_Ready(&CodeType) < 0)
         return false;
-    Py_INCREF(&SymbolType);
+    Py_INCREF((PyObject *)&SymbolType);
     PyModule_AddObject(module, "Symbol", (PyObject *)&SymbolType);
-    Py_INCREF(&PathType);
+    Py_INCREF((PyObject *)&PathType);
     PyModule_AddObject(module, "Path", (PyObject *)&PathType);
-    Py_INCREF(&TermType);
+    Py_INCREF((PyObject *)&TermType);
     PyModule_AddObject(module, "Term", (PyObject *)&TermType);
-    Py_INCREF(&CodeType);
+    Py_INCREF((PyObject *)&CodeType);
     PyModule_AddObject(module, "Code", (PyObject *)&CodeType);
 
     return true;
@@ -28,7 +28,7 @@ bool initYCPTermType(PyObject *module)
 {
     if (PyType_Ready(&TermType) < 0)
         return false;
-	Py_INCREF(&TermType);
+	Py_INCREF((PyObject *)&TermType);
     PyModule_AddObject(module, "Term", (PyObject *)&TermType);
 
     return true;
