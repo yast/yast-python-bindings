@@ -13,7 +13,7 @@ Requires:       yast2-ycp-ui-bindings       >= 2.16.37
 Requires:	python
 
 
-Summary:	-
+Summary:	Python bindings for the YaST platform.
 
 %description
 -
