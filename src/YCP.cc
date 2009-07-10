@@ -28,6 +28,7 @@ textdomain "blabla";
 #include <ycp/YCPString.h>
 #include <ycp/YCPVoid.h>
 #include <ycp/SymbolTable.h>
+#include <cctype>
 
 #include "YPython.h"
 #include "PythonLogger.h"
@@ -734,6 +735,37 @@ PyObject * ChangeWidgetName(PyObject *args)
 
 }
 
+
+/**
+ * Translates the specified namespace to a Python-compatible identifier.
+ * This involves ensuring that all characters are either letters, numbers, or
+ * underscores, and that the first character is a letter or underscore.
+ * @param const string* original - The original namespace
+ * @return A string containing the translated, Python-compatible namespace
+ */
+string translate_namespace(const string* original) {
+
+    string translated;
+
+    // Iterate through all characters of the original namespace
+    for (string::const_iterator it = original->begin(); it != original->end(); it++) {
+        // Accept only letters, numbers, underscores
+        if ((isalnum(*it)) || (*it == '_'))
+            translated.push_back(*it);
+        else
+            // Replace invalid characters with underscores
+            translated.push_back('_');
+    }
+
+    // If the first character is not a letter or underscore,
+    // replace it with an underscore
+    if ((!isalpha(*original->begin())) && (*original->begin() != '_'))
+        translated[0] = '_';
+
+    return translated;
+}
+
+
 /**
  * Returns true if NameSpace is registered (is key) in dictionary dict.
  * Otherwise returns false;
@@ -763,6 +795,9 @@ bool isRegistered(PyObject *dict, const char *NameSpace)
  */
 bool RegFunctions(char *NameSpace, YCPList list_functions, YCPList list_variables) 
 {
+	// Translate the original namespace to a Python-compatible identifier
+	string original = string(NameSpace);
+	string translated = translate_namespace(&original);
 
 	// Dictionary of ycp module
 	PyObject *ycp_dict = PyModule_GetDict(Self);
@@ -777,7 +812,8 @@ bool RegFunctions(char *NameSpace, YCPList list_functions, YCPList list_variable
 	if (new_module == NULL) return false;
 
 	// Add new initialized module into ycp dictionary (can be accessed via ycp.NameSpace)
-	PyDict_SetItemString(ycp_dict, NameSpace, new_module);
+        PyDict_SetItemString(ycp_dict, translated.c_str(), new_module);
+
 
 	// Dictionary of new_module - there will be registered all functions
 	PyObject *new_module_dict = PyModule_GetDict(new_module);
