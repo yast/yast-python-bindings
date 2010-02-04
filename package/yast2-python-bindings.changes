@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb  4 14:44:29 CET 2010 - juhliarik@suse.cz
+
+- added patch from (bnc#520499) it solves problem with importing 
+  names
+- 2.19.0 
+
+-------------------------------------------------------------------
 Wed Sep 24 14:32:12 CEST 2008 - visnov@suse.cz
 
 - y2debug is always logged (bnc#426554) 
