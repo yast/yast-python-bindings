@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  6 12:42:58 CEST 2010 - juhliarik@suse.cz
+
+- added patch for building with python 2.7
+- 2.20.0
+
+-------------------------------------------------------------------
 Thu Feb  4 14:44:29 CET 2010 - juhliarik@suse.cz
 
 - added patch from (bnc#520499) it solves problem with importing 
