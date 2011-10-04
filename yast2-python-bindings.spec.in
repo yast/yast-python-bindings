@@ -2,7 +2,7 @@
 
 @HEADER@
 Group:	System/YaST
-License: GPL v2 only
+License: GPL-2.0
 BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel yast2-ycp-ui-bindings-devel
 
 
