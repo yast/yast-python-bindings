@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov 25 12:24:35 UTC 2011 - coolo@suse.com
+
+- add libtool as buildrequire to avoid implicit dependency
+
+-------------------------------------------------------------------
 Mon Sep  6 12:42:58 CEST 2010 - juhliarik@suse.cz
 
 - added patch for building with python 2.7

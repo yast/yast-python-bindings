@@ -3,8 +3,7 @@
 @HEADER@
 Group:	System/YaST
 License: GPL-2.0
-BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel yast2-ycp-ui-bindings-devel
-
+BuildRequires:	blocxx-devel curl-devel gcc-c++ yast2-core-devel yast2-devtools python-devel libxcrypt-devel yast2-ycp-ui-bindings-devel libtool
 
 
 # YCPValue::valuetype_str()
