@@ -12,6 +12,9 @@ BuildRequires:	yast2-core-devel >= 2.16.37
 BuildRequires:  yast2-ycp-ui-bindings-devel >= 2.16.37
 Requires:       yast2-ycp-ui-bindings       >= 2.16.37
 Requires:	python
+%if 0%{?suse_version} < 1220
+BuildRequires:  libxcrypt-devel
+%endif
 
 
 Summary:	Python bindings for the YaST platform.
