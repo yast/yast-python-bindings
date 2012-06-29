@@ -522,9 +522,9 @@ PyObject* YPython::fromYCPMapToPythonDict (YCPValue ycp_Map) {
     if (ycp_Map->isMap()) {
         pPythonDict = PyDict_New();
 
-        for (YCPMapIterator it = ycp_Map->asMap()->begin(); it != ycp_Map->asMap()->end(); ++it ) {
-            pKey = YCPTypeToPythonType(it.key());
-            pValue = YCPTypeToPythonType(it.value());
+        for (YCPMap::const_iterator it = ycp_Map->asMap()->begin(); it != ycp_Map->asMap()->end(); ++it) {
+            pKey = YCPTypeToPythonType(it->first);
+            pValue = YCPTypeToPythonType(it->second);
 
             if (pValue && pKey){
                 ret = PyDict_SetItem(pPythonDict, pKey, pValue);
