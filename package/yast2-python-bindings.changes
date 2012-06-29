@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jun 29 14:14:02 CEST 2012 - aschnell@suse.de
+
+- blocxx is no longer needed for build
+
+-------------------------------------------------------------------
 Tue Jun 26 16:08:35 CEST 2012 - aschnell@suse.de
 
 - adapted to namespace changes in yast2-core
