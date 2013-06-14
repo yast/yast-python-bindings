@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun 11 16:39:52 UTC 2013 - jmatejek@suse.com
+
+- install to correct python directory (fixes file conflict with
+  python-base)
+- 2.20.2
+
+-------------------------------------------------------------------
 Fri Jun 29 14:14:02 CEST 2012 - aschnell@suse.de
 
 - blocxx is no longer needed for build
@@ -23,9 +30,9 @@ Mon Sep  6 12:42:58 CEST 2010 - juhliarik@suse.cz
 -------------------------------------------------------------------
 Thu Feb  4 14:44:29 CET 2010 - juhliarik@suse.cz
 
-- added patch from (bnc#520499) it solves problem with importing 
+- added patch from (bnc#520499) it solves problem with importing
   names
-- 2.19.0 
+- 2.19.0
 
 -------------------------------------------------------------------
 Mon Dec 15 15:40:14 CET 2008 - juhliarik@suse.cz
@@ -35,14 +42,14 @@ Mon Dec 15 15:40:14 CET 2008 - juhliarik@suse.cz
 -------------------------------------------------------------------
 Wed Sep 24 14:32:12 CEST 2008 - visnov@suse.cz
 
-- y2debug is always logged (bnc#426554) 
+- y2debug is always logged (bnc#426554)
 - 2.17.3
 
 -------------------------------------------------------------------
 Tue Sep  9 13:26:32 CEST 2008 - visnov@suse.cz
 
 - build with python 2.6
-- 2.17.2 
+- 2.17.2
 
 -------------------------------------------------------------------
 Mon Jun 27 15:26:06 CET 2008 - juhliarik@suse.cz
@@ -59,26 +66,26 @@ Mon Feb 25 10:20:06 CET 2008 - juhliarik@suse.cz
 Thu Feb 21 17:55:30 CET 2008 - sh@suse.de
 
 - Added new UI packages to Requires/BuildRequires in .spec file
-- V 2.16.5 
+- V 2.16.5
 
 -------------------------------------------------------------------
 Wed Feb 20 14:11:42 CET 2008 - sh@suse.de
 
 - New include path for YUIComponent.h
-- V 2.16.4 
+- V 2.16.4
 
 -------------------------------------------------------------------
 Mon Jan 21 11:25:09 CET 2008 - juhliarik@suse.cz
 
 - Added pacth for bug#355064 - problem with SCR.Write
-- V 2.16.3 
+- V 2.16.3
 
 -------------------------------------------------------------------
 Wed Dec  5 10:18:40 CET 2007 - juhliarik@suse.cz
 
 - Added patch for problem with handling error from python
 - Correction for handling adding None(nil) as argument to yast function
-- V 2.16.2 
+- V 2.16.2
 
 -------------------------------------------------------------------
 Thu Nov 15 13:34:40 CET 2007 - juhliarik@suse.cz
@@ -92,7 +99,7 @@ Wed Nov 14 17:31:31 CET 2007 - juhliarik@suse.cz
 - Adding solution for calling python function via reference
 - Adding support for calling YCode in Sequencer from python
 - Reimplementation SCR
-- V 2.16.0 
+- V 2.16.0
 
 -------------------------------------------------------------------
 Fri Sep 9 18:00:33 CEST 2007 - juhliarik@suse.cz
@@ -112,6 +119,5 @@ Fri Aug 10 18:12:33 CEST 2007 - mvidner@suse.cz
 -------------------------------------------------------------------
 Mon Aug  6 14:19:33 CEST 2007 - juhliarik@suse.cz
 
-- initial version 
-V 2.15.1 
-
+- initial version
+V 2.15.1

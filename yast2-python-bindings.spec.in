@@ -29,7 +29,7 @@ and also Python scripts can use YaST agents, APIs and modules.
 
 @INSTALL@
 rm $RPM_BUILD_ROOT/@plugindir@/libpy2lang_python.la
-rm $RPM_BUILD_ROOT/%{_libdir}/python/site-packages/libYCP.la
+rm $RPM_BUILD_ROOT/%{python_sitearch}/libYCP.la
 
 @CLEAN@
 
@@ -38,8 +38,7 @@ rm $RPM_BUILD_ROOT/%{_libdir}/python/site-packages/libYCP.la
 @plugindir@/libpy2lang_python.so.*
 @plugindir@/libpy2lang_python.so
 
-
 # libYCP goes elsewhere
 # %dir %{_libdir}/python
-%{_libdir}/python/site-packages
+%{python_sitearch}/*
 %doc @docdir@
