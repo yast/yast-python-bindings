@@ -29,7 +29,7 @@ CFLAGS="${CFLAGS} ${PYTHON_CFLAGS}"
 CXXFLAGS="${CXXFLAGS} ${PYTHON_CFLAGS}"
 
 ## Where to install modules
-PYTHON_VENDORARCH=${libdir}/python`python -c &#x27;import sys; print sys.version@&lt;:@:3@:&gt;@&#x27;`
+PYTHON_VENDORARCH=${libdir}/python`python -c 'import sys; print sys.version@<:@:3@:>@'`
 AC_SUBST(PYTHON_VENDORARCH)
 
 ## make a literal of yast2dir so that it can be used in python instead
