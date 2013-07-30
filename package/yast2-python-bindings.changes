@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul 30 08:29:22 UTC 2013 - yast-devel@opensuse.org
+
+- version 3.0.0
+
+-------------------------------------------------------------------
 Tue Jun 11 16:39:52 UTC 2013 - jmatejek@suse.com
 
 - install to correct python directory (fixes file conflict with
