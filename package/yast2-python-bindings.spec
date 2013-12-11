@@ -26,7 +26,7 @@ Source0:        %{name}-%{version}.tar.bz2
 Group:	        System/YaST
 License:        GPL-2.0
 BuildRequires:	curl-devel gcc-c++ yast2-core-devel python-devel yast2-ycp-ui-bindings-devel libtool
-BuildRequires:  yast2-devtools >= 3.0.6
+BuildRequires:  yast2-devtools >= 3.1.10
 
 # YCPValue::valuetype_str()
 Requires:	yast2-core       >= 2.16.37
