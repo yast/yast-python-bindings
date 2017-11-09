@@ -1,6 +1,6 @@
+#include <Python.h>
 #include <ycp/YCode.h>
 #include <ycp/YCPCode.h>
-#include <Python.h>
 #include <ycp/y2log.h>
 #include "ytypes.h"
 

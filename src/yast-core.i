@@ -9,12 +9,9 @@ using namespace std;
 %}
 
 %{
-#include <ycp/YCPFloat.h>
 #include "yast.h"
-#include <ycp/YCPCode.h>
-#include <ycp/YCPMap.h>
-#include <ycp/YCPByteblock.h>
 #include "YPythonCode.h"
+#include <ycp/YCPByteblock.h>
 %}
 
 %include ycp.i

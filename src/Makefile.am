@@ -16,7 +16,7 @@ _ycp_la_LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(py2langdir)
 
 _ycp_la_LIBADD = -L$(py2langdir) -lpy2UI
 
-_ycp_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS}
+_ycp_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate
 
 py2lang_LTLIBRARIES = libpy2lang_python.la
 
@@ -24,7 +24,7 @@ libpy2lang_python_la_SOURCES = Y2PythonClientComponent.cc Y2CCPythonClient.cc
 
 libpy2lang_python_la_LDFLAGS = -lpython2.7 ${PYTHON_LDFLAGS} -Wl,-rpath=$(pyexecdir)
 
-libpy2lang_python_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS}
+libpy2lang_python_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate
 
 AM_CXXFLAGS = -DY2LOG=\"Python\"
 

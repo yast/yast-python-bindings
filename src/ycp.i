@@ -1,3 +1,108 @@
+%ignore YCPValueRep;
+%rename(Value) YCPValue;
+%include <ycp/YCPValue.h>
+%extend YCPValue {
+    const char * valuetype_str() {
+        return (*($self))->valuetype_str();
+    }
+    bool isVoid() {
+        return (*($self))->isVoid();
+    }
+    bool isBoolean() {
+        return (*($self))->isBoolean();
+    }
+    bool isInteger() {
+        return (*($self))->isInteger();
+    }
+    bool isFloat() {
+        return (*($self))->isFloat();
+    }
+    bool isString() {
+        return (*($self))->isString();
+    }
+    bool isByteblock() {
+        return (*($self))->isByteblock();
+    }
+    bool isPath() {
+        return (*($self))->isPath();
+    }
+    bool isSymbol() {
+        return (*($self))->isSymbol();
+    }
+    bool isList() {
+        return (*($self))->isList();
+    }
+    bool isTerm() {
+        return (*($self))->isTerm();
+    }
+    bool isMap() {
+        return (*($self))->isMap();
+    }
+    bool isCode() {
+        return (*($self))->isCode();
+    }
+    bool isBreak() {
+        return (*($self))->isBreak();
+    }
+    bool isReturn() {
+        return (*($self))->isReturn();
+    }
+    bool isEntry() {
+        return (*($self))->isEntry();
+    }
+    bool isReference() {
+        return (*($self))->isReference();
+    }
+    YCPVoid asVoid() {
+        return (*($self))->asVoid();
+    }
+    YCPBoolean asBoolean() {
+        return (*($self))->asBoolean();
+    }
+    YCPInteger asInteger() {
+        return (*($self))->asInteger();
+    }
+    YCPFloat asFloat() {
+        return (*($self))->asFloat();
+    }
+    YCPString asString() {
+        return (*($self))->asString();
+    }
+    YCPByteblock asByteblock() {
+        return (*($self))->asByteblock();
+    }
+    YCPPath asPath() {
+        return (*($self))->asPath();
+    }
+    YCPSymbol asSymbol() {
+        return (*($self))->asSymbol();
+    }
+    YCPList asList() {
+        return (*($self))->asList();
+    }
+    YCPTerm asTerm() {
+        return (*($self))->asTerm();
+    }
+    YCPMap asMap() {
+        return (*($self))->asMap();
+    }
+    YCPCode asCode() {
+        return (*($self))->asCode();
+    }
+    YCPEntry asEntry() {
+        return (*($self))->asEntry();
+    }
+    YCPReference asReference() {
+        return (*($self))->asReference();
+    }
+    bool equal (const YCPValue&v) {
+        return (*($self))->equal(v);
+    }
+    YCPOrder compare(const YCPValue &v, bool rl = false) {
+        return (*($self))->compare(v, rl);
+    }
+}
+
 %ignore YCPTermRep;
 %rename(Term) YCPTerm;
 %include <ycp/YCPTerm.h>

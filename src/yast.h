@@ -1,3 +1,4 @@
+#include <Python.h>
 #include <y2/Y2Namespace.h>
 #include <y2/Y2Component.h>
 #include <y2/Y2ComponentCreator.h>
@@ -20,7 +21,6 @@
 #include <ycp/SymbolTable.h>
 #include <yui/YUILoader.h>
 #include <yui/YSettings.h>
-#include <Python.h>
 
 #include <string>
 #include <cstdarg>

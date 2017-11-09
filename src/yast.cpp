@@ -57,7 +57,7 @@ void SetYCPVariable(const string & namespace_name, const string & variable_name,
     TableEntry *sym_te = ns->table ()->find (variable_name.c_str());
 
     if (sym_te == NULL) {
-        y2error ("No such symbol %s::%s", namespace_name, variable_name);
+        y2error ("No such symbol %s::%s", namespace_name.c_str(), variable_name.c_str());
         return;
     }
 
@@ -77,7 +77,7 @@ YCPValue GetYCPVariable(const string & namespace_name, const string & variable_n
     TableEntry *sym_te = ns->table ()->find (variable_name.c_str());
 
     if (sym_te == NULL) {
-        y2error ("No such symbol %s::%s", namespace_name, variable_name);
+        y2error ("No such symbol %s::%s", namespace_name.c_str(), variable_name.c_str());
         return YCPNull();
     }
 
