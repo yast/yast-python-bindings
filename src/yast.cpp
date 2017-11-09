@@ -26,6 +26,16 @@ YCPTerm Opt(char * opt, ...)
     return YCPTerm("opt", l);
 }
 
+bool widget_names()
+{
+    PyObject *global = PyEval_GetGlobals();
+    PyObject *ret = PyRun_String("from yast import *", Py_file_input, global, global);
+    if (!ret)
+        return false;
+    Py_XDECREF(ret);
+    return true;
+}
+
 static Y2Namespace * getNs(const char * ns_name)
 {
     Import import(ns_name); // has a static cache

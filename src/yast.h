@@ -34,4 +34,5 @@ bool import_module(const string & ns_name);
 
 YCPTerm Id(string id);
 YCPTerm Opt(char * opt, ...);
+bool widget_names();
 

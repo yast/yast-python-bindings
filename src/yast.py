@@ -1,13 +1,4 @@
-from ycp import YCPSymbol as Symbol
-from ycp import YCPList as List
-from ycp import YCPString as String
-from ycp import YCPTerm as Term
-from ycp import YCPInteger as Integer
-from ycp import YCPBoolean as Boolean
-from ycp import YCPFloat as Float
-from ycp import YCPCode as Code
-from ycp import YCPMap as Map
-from ycp import Id, Opt
+from ycp import Id, Opt, Symbol, List, String, Term, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
 def import_module(module):
     from ycp import import_module as ycp_import_module
