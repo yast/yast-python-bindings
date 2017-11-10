@@ -38,8 +38,10 @@ Y2Component *Y2CCPythonClient::create ( const char * name) const
   }
 
   y2debug("test existence of file %s", client_path.c_str());
-  if (access(client_path.c_str(), R_OK) == -1) //no file or no read permission
+  if (access(client_path.c_str(), R_OK) == -1) { //no file or no read permission
+    y2error("%s does not exist!", client_path.c_str());
     return NULL;
+  }
 
   Y2PythonClientComponent* rc = Y2PythonClientComponent::instance();
   rc->setClient(client_path);

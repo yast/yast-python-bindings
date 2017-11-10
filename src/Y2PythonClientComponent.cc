@@ -64,10 +64,7 @@ YCPValue callClient(const string& client)
     res = PyRun_SimpleFile(fp, client.c_str());
     Py_Finalize();
     fclose(fp);
-    if (res < 0) {
-        return YCPBoolean(false);
-    }
-    return YCPBoolean(true);
+    return YCPBoolean(res >= 0);
 }
 
 
