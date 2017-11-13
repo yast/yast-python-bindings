@@ -1,113 +1,31 @@
-#
-# Makefile.am for python-bindings/src
-#
+BUILT_SOURCES = ycp.py
+ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h
+	$(SWIG) $(AX_SWIG_PYTHON_OPT) -c++ -I/usr/include/YaST2 -o $@ $<
 
-AM_CXXFLAGS = -DY2LOG=\"Python\" -DMODULEDIR=\"$(moduledir)\"	\
-		-DLOCALEDIR=\"${localedir}\"
+# Remove non-standard syntax unrecognized by swig from YCPMap.h
+YCPMap.h:
+	sed 's/__attribute__ ((deprecated)) //g' /usr/include/YaST2/ycp/YCPMap.h > YCPMap.h
 
-MY_PYTHON_VENDORARCH = $(subst /usr,$(prefix),$(PYTHON_VENDORARCH))
-#pythonpydir = $(MY_PYTHON_VENDORARCH)/YaST
-pythonpydir = $(MY_PYTHON_VENDORARCH)/site-packages
-pythonsodir = $(MY_PYTHON_VENDORARCH)/site-packages
+python_PYTHON = ycp.py yast.py
 
+pyexec_LTLIBRARIES = _ycp.la
 
-pythonpy_DATA = YCPDeclarations.py
+_ycp_la_SOURCES = yast-core_wrap.cxx yast.cpp yast-core.i ytypes.i ycp.i YPythonCode.cc
 
-# plugin, libtool forces 'lib' prefix
-plugin_LTLIBRARIES = libpy2lang_python.la
-noinst_LTLIBRARIES = libYCPTypes.la liby2lang_python.la libYCPDeclarations.la
-pythonso_LTLIBRARIES = libYCP.la
+_ycp_la_LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(py2langdir)
 
-libYCPTypes_la_SOURCES = YCPTypes.cc YCPTypes.h \
-                         YCPTypes/YCPTypesInternal.cc YCPTypes/YCPTypesInternal.h \
-                         YCPTypes/Path.cc \
-                         YCPTypes/Symbol.cc \
-                         YCPTypes/Code.cc \
-                         YCPTypes/Term.cc
+_ycp_la_LIBADD = -L$(py2langdir) -lpy2UI
 
-libYCPDeclarations_la_SOURCES = YCPDeclarations.cc YCPDeclarations.h
+_ycp_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate
 
-# binary part of the python module
-libYCP_la_SOURCES =				\
-	$(liby2lang_python_la_SOURCES)		\
-	YCP.cc					\
-	PythonLogger.cc PythonLogger.h
+py2lang_LTLIBRARIES = libpy2lang_python.la
 
+libpy2lang_python_la_SOURCES = Y2PythonClientComponent.cc Y2CCPythonClient.cc
 
+libpy2lang_python_la_LDFLAGS = -lpython2.7 ${PYTHON_LDFLAGS} -Wl,-rpath=$(pyexecdir)
 
-install-data-hook:
-	$(LN_S) -f libYCP.so $(DESTDIR)$(pythonsodir)/ycp.so
+libpy2lang_python_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate
 
+AM_CXXFLAGS = -DY2LOG=\"Python\"
 
-# are there enough yast libraries?
-# check with y2base, integrate them like y2pm does
-
-libYCP_la_LDFLAGS = $(PYTHON_LDFLAGS)		\
-		-L$(libdir) -L$(plugindir)	\
-		-Xlinker --whole-archive	\
-		-lpy2scr			\
-		-lpy2wfm			\
-		-lscr -lpy2UI			\
-		-lycp -ly2			\
-		-Xlinker --no-whole-archive	\
-		-ly2util			\
-		-version-info 2:0
-
-libYCP_la_LIBADD = libYCPTypes.la libpy2lang_python.la#libYCPDeclarations.la
-
-
-libpy2lang_python_la_LDFLAGS = -version-info 2:0
-
-liby2lang_python_la_LDFLAGS = -version-info 2:0
-
-
-# the yast libraries are apparently necessary when we're loaded by python.
-libpy2lang_python_la_LDFLAGS = $(PYTHON_LDFLAGS)	\
-		-L$(libdir) -L$(plugindir)	\
-		-lycp -ly2 -ly2util
-
-libpy2lang_python_la_LIBADD = libYCPTypes.la libYCPDeclarations.la
-
-
-liby2lang_python_la_LIBADD  = $(PYTHON_LDFLAGS)
-
-
-liby2lang_python_la_SOURCES =				\
-	YPython.cc YPython.h
-
-# Auto-generated stub for dynamic loading of python modules.
-# And also register the interface to the YCP module
-## which is linked in already and won't be in the standard python location.
-#
-# This results in a linker warning:
-# *** Warning: Linking the shared library libpy2lang_python.la against the
-# *** static library /usr/lib/python5/.../DynaLoader.a is not portable!
-#
-# According to mls@suse.de this warning can safely be disregarded:
-# The SuSE DynaLoader is compiled with -fPIC for just this situation.
-#
-# -- sh@suse.de 2003-07-24
-#pythonxsi.c:
-#	python -MExtUtils::Embed -e xsinit -- -o pythonxsi.c -std
-# See "man pythonembed"
-
-
-# the plugin adds the liby2 component interface
-
-libpy2lang_python_la_SOURCES =				\
-	$(liby2lang_python_la_SOURCES)			\
-	Y2CCPython.cc Y2CCPython.h			\
-	YPythonNamespace.cc YPythonNamespace.h		\
-	Y2PythonComponent.cc Y2PythonComponent.h	
-
-# CLEANFILES = \
-#	pythonxsi.c
-
-INCLUDES = -I$(srcdir)/include -I$(includedir) ${ZYPP_CFLAGS} -I/usr/include/python
-
-# generated from YaPI.pm.in by configure
-# nodist_module_DATA = YaPI.pm
-
-#EXTRA_DIST = $(pythonpy_DATA) $(module_DATA)
-EXTRA_DIST = $(pythonpy_DATA)
-
+CLEANFILES = ycp.py yast-core_wrap.cxx YCPMap.h

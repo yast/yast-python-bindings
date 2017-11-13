@@ -9,11 +9,15 @@
 @YAST2-CHECKS-COMMON@
 @YAST2-CHECKS-PROGRAM@
 
-AC_PROGRAM_PATH(PYTHON, python)
-if test -z "$PYTHON" ; then
-    AC_MSG_ERROR(python is missing; please install python 2.6.)
-fi
-AC_SUBST(PYTHON)
+AM_PATH_PYTHON([2.7])
+AX_PYTHON_DEVEL
+AX_PKG_SWIG([], [], AC_MSG_ERROR([SWIG is required to build.]))
+AX_SWIG_PYTHON
+AC_PROG_CXX
+
+yast_plugin_dir=${libdir}/YaST2/plugin
+AC_SUBST([py2langdir], [$yast_plugin_dir])
+AC_SUBST([pkgpy2langdir], [\${yast_plugin_dir}])
 
 ##AC_CHECK_HEADER(python2.6/Python.h, , AC_MSG_ERROR(Headers for Python are missing. Please install the package python-devel.) )
 

@@ -27,3 +27,14 @@ Makefile.am.common
 .dep
 tmp.*
 *.log
+ar-lib
+compile
+config.h.in~
+py-compile
+src/.deps/
+src/.libs/
+src/YCPMap.h
+*.la
+*.lo
+src/yast-core_wrap.cxx
+src/ycp.py
