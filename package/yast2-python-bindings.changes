@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Wed Nov  8 21:35:20 UTC 2017 - dmulder@suse.com
 
-- Rewrite the python bindings using swig
+- Rewrite the python bindings using swig fate#324146
 
 -------------------------------------------------------------------
 Wed Nov 13 15:56:18 UTC 2013 - jreidinger@suse.com
