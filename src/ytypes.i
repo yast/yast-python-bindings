@@ -5,7 +5,7 @@ YCPValue pyval_to_ycp(PyObject *input)
     void *arg = 0;
 
     if (input == Py_None)
-        return YCPVoid();
+        return YCPNull();
     if (PyBool_Check(input)) {
         if (PyObject_Compare(input, Py_True) == 0)
             return YCPBoolean(true);
