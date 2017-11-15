@@ -118,3 +118,6 @@ def Term(*args):
     if l is not None:
         return YCPTerm(name, l)
     return YCPTerm(name)
+
+def YCPWizard(*args):
+    return run("Wizard", *args)
