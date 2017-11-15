@@ -16,6 +16,7 @@ using namespace std;
 
 %include ycp.i
 %include ytypes.i
+%include y2log.i
 
 %typemap(out) YCPValue {
     $result = ycp_to_pyval($1);
