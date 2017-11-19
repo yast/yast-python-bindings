@@ -1,5 +1,5 @@
 import ycpbuiltins
-from ycp import Opt, Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
+from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
 from ycp import Term as YCPTerm
 
@@ -118,6 +118,12 @@ def Term(*args):
     if l is not None:
         return YCPTerm(name, l)
     return YCPTerm(name)
+
+def Opt(*args):
+    l = List()
+    for arg in args:
+        l.add(Symbol(arg))
+    return YCPTerm("opt", l)
 
 def YCPWizard(*args):
     return run("Wizard", *args)

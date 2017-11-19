@@ -32,6 +32,5 @@ void SetYCPVariable(const string & namespace_name, const string & variable_name,
 YCPValue GetYCPVariable(const string & namespace_name, const string & variable_name);
 bool import_module(const string & ns_name);
 
-YCPTerm Opt(char * opt, ...);
 bool widget_names();
 

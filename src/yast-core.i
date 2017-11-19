@@ -34,6 +34,5 @@ using namespace std;
     $1 = PyFunction_Check(PyTuple_GetItem($input, 0));
 }
 
-%varargs(25, char * opt = NULL) Opt;
 %include "yast.h"
 
