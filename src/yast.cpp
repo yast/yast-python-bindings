@@ -1,12 +1,5 @@
 #include "yast.h"
 
-YCPTerm Id(string id)
-{
-    auto l = YCPList();
-    l.push_back(YCPSymbol(id));
-    return YCPTerm("id", l);
-}
-
 YCPTerm Opt(char * opt, ...)
 {
     va_list args;

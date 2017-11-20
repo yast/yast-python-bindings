@@ -1,5 +1,5 @@
 import ycpbuiltins
-from ycp import Id, Opt, Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
+from ycp import Opt, Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
 from ycp import Term as YCPTerm
 
@@ -121,3 +121,14 @@ def Term(*args):
 
 def YCPWizard(*args):
     return run("Wizard", *args)
+
+# Id can take argument other than string
+def Id(arg, dont_force_sym = False):
+  from ycp import pyval_to_ycp
+  l = List()
+  if isinstance(arg, str) and not dont_force_sym:
+      l.add(Symbol(arg))
+  else:
+      l.add(pyval_to_ycp(arg))
+  return YCPTerm("id", l)
+
