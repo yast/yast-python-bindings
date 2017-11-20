@@ -13,35 +13,29 @@ def get_caller_loginfo(frames):
     details = "%s:%s "%(os.path.basename(info[0]), info[1])
     return details
 
-# placeholder for proper logging function
-# currently just dumps to stderr (should
-# however write to yast log file)
 def y2milestone(*args):
-    print get_caller_loginfo(2) + sformat(*args)
+    from ycp import y2milestone
+    y2milestone(get_caller_loginfo(2) + sformat(*args))
 
-# placeholder for proper logging function
-# currently just dumps to stderr (should
-# however write to yast log file
 def y2warning(*args):
-    print get_caller_loginfo(2) + sformat(*args)
+    from ycp import y2warning
+    y2warning(get_caller_loginfo(2) + sformat(*args))
 
-# placeholder for proper logging function
-# currently just dumps to stderr (should
-# however write to yast log file)
 def y2error(*args):
-    print get_caller_loginfo(2) + sformat(*args)
+    from ycp import y2error
+    y2error(get_caller_loginfo(2) + sformat(*args))
 
-# placeholder for proper logging function
-# currently just dumps to stderr (should 
-# however write to yast log file)
 def y2debug(*args):
-    print get_caller_loginfo(2) + sformat(*args)
+    from ycp import y2debug
+    y2debug(get_caller_loginfo(2) + sformat(*args))
 
-# placeholder for proper logging function
-# currently just dumps to stderr (should 
-# however write to yast log file)
 def y2internal(*args):
-    print get_caller_loginfo(2) + sformat(*args)
+    from ycp import y2internal
+    y2internal(get_caller_loginfo(2) + sformat(*args))
+
+def y2security(*args):
+    from ycp import y2security
+    y2security(get_caller_loginfo(2) + sformat(*args))
 
 # placeholder for Buildins.foreach
 def foreach(listOrMap):
