@@ -10,32 +10,37 @@ def get_caller_loginfo(frames):
     for i in range(0, frames):
         frame = frame.f_back
     info = inspect.getframeinfo(frame)
-    details = "%s:%s "%(os.path.basename(info[0]), info[1])
-    return details
+    return info
 
 def y2milestone(*args):
     from ycp import y2milestone
-    y2milestone(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2milestone(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 def y2warning(*args):
     from ycp import y2warning
-    y2warning(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2warning(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 def y2error(*args):
     from ycp import y2error
-    y2error(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2error(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 def y2debug(*args):
     from ycp import y2debug
-    y2debug(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2debug(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 def y2internal(*args):
     from ycp import y2internal
-    y2internal(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2internal(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 def y2security(*args):
     from ycp import y2security
-    y2security(get_caller_loginfo(2) + sformat(*args))
+    frame_info = get_caller_loginfo(2)
+    y2security(frame_info[0], frame_info[1], frame_info[2], sformat(*args))
 
 # placeholder for Buildins.foreach
 def foreach(listOrMap):
