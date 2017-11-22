@@ -6,7 +6,7 @@ ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h
 YCPMap.h:
 	sed 's/__attribute__ ((deprecated)) //g' /usr/include/YaST2/ycp/YCPMap.h > YCPMap.h
 
-python_PYTHON = ycp.py yast.py
+python_PYTHON = ycp.py yast.py ycpbuiltins.py
 
 pyexec_LTLIBRARIES = _ycp.la
 
