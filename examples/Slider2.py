@@ -9,6 +9,8 @@
 # Unfortunately the colors don't match any more in the BarGraph widget - they
 # used to be red, blue and green. You need to use a bit of imagination
 # here. ;-)
+from yast import import_module
+import_module('UI')
 from yast import *
 class Slider2Client:
     def main(self):

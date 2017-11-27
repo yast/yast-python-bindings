@@ -4,6 +4,8 @@
 #
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
+from yast import import_module
+import_module('UI')
 from yast import *
 class WizardPopupClient:
     def main(self):
@@ -17,7 +19,7 @@ class WizardPopupClient:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(
+        Wizard(
           Opt("stepsEnabled"),
           Symbol("back"),
           "&Back",
@@ -71,7 +73,7 @@ class WizardPopupClient:
         if widget == "popup":
           UI.OpenDialog(
             Opt("defaultsize"),
-            YCPWizard(Symbol("bla"), "", Symbol("popdown"), "&Cancel", Symbol("accept"), "&Acce&pt")
+            Wizard(Symbol("bla"), "", Symbol("popdown"), "&Cancel", Symbol("accept"), "&Acce&pt")
           )
 
           UI.ReplaceWidget(

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Nov 28 15:15:11 UTC 2017 - dmulder@suse.com
+
+- Add example code ported from ruby examples; (bsc#1070212).
+- Fixes based on findings from example code
+
+-------------------------------------------------------------------
 Wed Nov  8 21:35:20 UTC 2017 - dmulder@suse.com
 
 - Rewrite the python bindings using swig fate#324146

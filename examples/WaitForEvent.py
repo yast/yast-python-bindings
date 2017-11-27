@@ -3,6 +3,8 @@
 # WaitForEvent.ycp
 #
 # Example for common usage of UI::WaitForEvent()
+from yast import import_module
+import_module('UI')
 from yast import *
 class WaitForEventClient:
     def main(self):

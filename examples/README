@@ -19,9 +19,5 @@ Example:
 
 Known problems
 
-* Directory, Pkg & SCR functions are not available, examples using these
-  functions may not be ported correctly, they certainly don't run. Due
-  to this fact we can't check if they are actually ported fully or not.
-
 * Examples using string literals with escaped unicode don't work as
   expected (e.g.  Label1_cs.rb, Label1_de.rb, Label1_ja.rb and others)

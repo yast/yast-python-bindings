@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Popup stress test: Pop up dialogs and close them all the time
+from yast import import_module
+import_module('UI')
 from yast import *
 class PopupStressTestClient:
     def main(self):

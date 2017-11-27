@@ -1,14 +1,13 @@
 # encoding: utf-8
 
+from yast import import_module
+import_module('Wizard')
+import_module('UI')
 from yast import *
 class WindowIDClient:
     def main(self):
 
-      image = Convert.convert(
-        SCR.Read(path(".target.byte"), "empty.gif"),
-        "from" : "any",
-        "to"   : "byteblock"
-      )
+      image = SCR.Read(Path(".target.byte"), "empty.gif").asByteblock()
 
       Wizard.CreateDialog()
 
@@ -32,7 +31,7 @@ class WindowIDClient:
       # string run = sformat ("/usr/X11R6/lib/xscreensaver/atlantis -window-id %1", windowID);
       ycpbuiltins.y2debug("run=%1", run)
 
-      SCR.Execute(path(".target.bash_background"), run)
+      SCR.Execute(Path(".target.bash_background"), run)
 
       UI.UserInput()
       UI.CloseDialog()

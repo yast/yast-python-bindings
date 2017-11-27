@@ -4,6 +4,8 @@
 # Purpose: Have a possibility to see whether files (.txt, .rtf)
 #          such as licenses, release-notes are displayed correctly
 #          in text mode (ncurses) or graphical UI (qt).
+from yast import import_module
+import_module('UI')
 from yast import *
 import cgi
 class RichTextLicenseClient:
@@ -35,7 +37,7 @@ class RichTextLicenseClient:
 
         if button == "load":
           name = UI.AskForExistingFile(".", file_ext, "Select text file")
-          text2 = Convert.to_string(SCR.Read(path(".target.string"), name))
+          text2 = SCR.Read(Path(".target.string"), name).asString()
 
           if text2 == None:
             text2 = ""

@@ -4,6 +4,8 @@
 #
 # Windows partition splitter,
 # this time with two sliders
+from yast import import_module
+import_module('UI')
 from yast import *
 class WinResizer2Client:
     def main(self):

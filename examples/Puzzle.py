@@ -2,6 +2,8 @@
 
 # stupid puzzle
 # $Id$
+from yast import import_module
+import_module('UI')
 from yast import *
 import copy
 

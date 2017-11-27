@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Advanced table example: Icon browser
+from yast import import_module
+import_module('UI')
 from yast import *
 import copy
 
@@ -67,11 +69,7 @@ class TableIconsClient:
     # Read a directory with icons.
     #
     def readIconDir(dir)
-      iconList = Convert.convert(
-        SCR.Read(path(".target.dir"), dir),
-        "from" : "any",
-        "to"   : "list <string>"
-      )
+      iconList = SCR.Read(Path(".target.dir"), dir).asList()
       ycpbuiltins.y2debug("Dir %1: %2  entries", dir, ycpbuiltins.size(iconList))
       iconList = ycpbuiltins.sort(ycpbuiltins.filter(iconList) do |entry|
         ycpbuiltins.regexpmatch(entry, "^.*.(png|jpg|PNG|JPG)$")

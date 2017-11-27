@@ -2,6 +2,8 @@
 
 # Example for ButtonBox
 
+from yast import import_module
+import_module('UI')
 from yast import *
 
 class ButtonBox1Client:

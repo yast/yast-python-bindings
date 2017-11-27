@@ -1,9 +1,9 @@
 # encoding: utf-8
 
+from yast import import_module
+import_module('Directory')
+import_module('UI')
 from yast import *
-
-# Because we don't have access to Directory.themedir
-themedir = "/usr/share/YaST2/theme/"
 
 class TimezoneSelectorClient:
     def main(self):
@@ -71,8 +71,7 @@ class TimezoneSelectorClient:
             TimezoneSelector(
               Id("timezone"),
               Opt("notify"),
-              #Directory.themedir + "/current/worldmap/worldmap.jpg",
-              themedir + "/current/worldmap/worldmap.jpg",
+              Directory.themedir() + "/current/worldmap/worldmap.jpg",
               examples
             ),
             PushButton(Id("ok"), Opt("default"), "&Close"),
