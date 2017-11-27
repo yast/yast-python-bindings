@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Simple example for MinHeight widget
+from yast import import_module
+import_module('UI')
 from yast import *
 class MinHeight1Client:
     def main(self):

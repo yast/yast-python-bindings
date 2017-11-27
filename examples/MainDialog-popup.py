@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Multiple Main Dialogs
+from yast import import_module
+import_module('UI')
 from yast import *
 class MainDialogPopupClient:
     def main(self):

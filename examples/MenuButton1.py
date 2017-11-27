@@ -6,6 +6,8 @@
 #
 # Please note that it's pretty pointless to create menu entries without an ID:
 # You'd never know what entry the user selected.
+from yast import import_module
+import_module('UI')
 from yast import *
 class MenuButton1Client:
     def main(self):

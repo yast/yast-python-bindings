@@ -1,13 +1,15 @@
 # encoding: utf-8
 
 # Trivial example for Release Notes button 
+from yast import import_module
+import_module('UI')
 from yast import *
 
 class RelNotesButtonClient:
     def main(self):
       
       rel_notes_file =  "./RELEASE-NOTES.en.txt" if UI.TextMode() else "./RELEASE-NOTES.en.rtf"       
-      rel_notes_text = SCR.Read(path(".target.string"), rel_notes_file)
+      rel_notes_text = SCR.Read(Path(".target.string"), rel_notes_file)
       rel_notes = {"SLES12" : rel_notes_text, "Some-Add-On" : "some text" }
 
       UI.SetReleaseNotes(rel_notes)

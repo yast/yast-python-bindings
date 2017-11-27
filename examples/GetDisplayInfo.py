@@ -4,6 +4,8 @@
 #
 # Open a RichText widget with all the info map's contents and format them as HTML
 #
+from yast import import_module
+import_module('UI')
 from yast import *
 class GetDisplayInfoClient:
     def main(self):

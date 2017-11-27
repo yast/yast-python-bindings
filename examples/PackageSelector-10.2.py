@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 # Package Selector example
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class PackageSelector102Client:
     def main(self):

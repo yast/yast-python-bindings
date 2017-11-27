@@ -3,6 +3,8 @@
 # TimeoutUserInput.ycp
 #
 # Example for common usage of UI::TimeoutUserInput()
+from yast import import_module
+import_module('UI')
 from yast import *
 class TimeoutUserInputClient:
     def main(self):

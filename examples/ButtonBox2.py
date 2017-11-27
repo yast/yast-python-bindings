@@ -2,6 +2,8 @@
 
 # Demo for common ButtonBox-based dialogs
 import copy
+from yast import import_module
+import_module('UI')
 from yast import *
 
 class ButtonBox2Client:

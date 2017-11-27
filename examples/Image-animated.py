@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Animated image example
+from yast import import_module
+import_module('UI')
 from yast import *
 class ImageAnimatedClient:
     def main(self):

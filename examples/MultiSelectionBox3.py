@@ -3,6 +3,8 @@
 # Advanced MultiSelectionBox example:
 #
 # Retrieve the list of selected items and output it.
+from yast import import_module
+import_module('UI')
 from yast import *
 class MultiSelectionBox3Client:
     def main(self):

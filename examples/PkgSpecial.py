@@ -2,6 +2,8 @@
 
 # PkgSpecial example - not for general use!
 #
+from yast import import_module
+import_module('UI')
 from yast import *
 class PkgSpecialClient:
     def main(self):

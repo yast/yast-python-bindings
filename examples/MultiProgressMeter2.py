@@ -5,6 +5,8 @@
 # Change values interactively with sliders
 # and allow tests with huge numbers
 #
+from yast import import_module
+import_module('UI')
 from yast import *
 import copy
 class MultiProgressMeter2Client:

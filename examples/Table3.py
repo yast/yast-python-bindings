@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Table example: Exchange complete table content
+from yast import import_module
+import_module('UI')
 from yast import *
 class Table3Client:
     def main(self):

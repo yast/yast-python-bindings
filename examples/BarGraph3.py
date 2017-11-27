@@ -6,6 +6,8 @@
 # Create a dialog with a BarGraph with a number of segments
 # and a "+" and a "-" button for each segment.
 import copy
+from yast import import_module
+import_module('UI')
 from yast import *
 import ycpbuiltins
 

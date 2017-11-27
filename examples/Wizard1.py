@@ -4,12 +4,14 @@
 #
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
+from yast import import_module
+import_module('UI')
 from yast import *
 class Wizard1Client:
     def main(self):
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(Symbol("back"), "", Symbol("abort"), "&Cancel", Symbol("next"), "&OK")
+        Wizard(Symbol("back"), "", Symbol("abort"), "&Cancel", Symbol("next"), "&OK")
       )
 
       while True:
