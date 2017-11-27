@@ -1,31 +1,5 @@
 #include "yast.h"
 
-YCPTerm Id(string id)
-{
-    auto l = YCPList();
-    l.push_back(YCPSymbol(id));
-    return YCPTerm("id", l);
-}
-
-YCPTerm Opt(char * opt, ...)
-{
-    va_list args;
-    va_start(args, opt);
-    auto l = YCPList();
-    char * tmp = NULL;
-    l.push_back(YCPSymbol(opt));
-
-    for (int i = 0; i < 25; i++) {
-        tmp = va_arg(args, char*);
-        if (tmp != NULL)
-            l.push_back(YCPSymbol(tmp));
-    }
-
-    va_end(args);
-
-    return YCPTerm("opt", l);
-}
-
 bool widget_names()
 {
     PyObject *global = PyEval_GetGlobals();
