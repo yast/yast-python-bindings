@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 import copy
+from yast import import_module
+import_module('UI')
 from yast import *
 
 class ContextMenuClient:

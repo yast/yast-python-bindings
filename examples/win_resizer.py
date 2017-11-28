@@ -3,6 +3,8 @@
 # Advanced Slider + BarGraph example:
 #
 # Windows partition splitter.
+from yast import import_module
+import_module('UI')
 from yast import *
 class WinResizerClient:
     def main(self):

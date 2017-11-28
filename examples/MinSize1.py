@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Simple example for MinSize
+from yast import import_module
+import_module('UI')
 from yast import *
 class MinSize1Client:
     def main(self):

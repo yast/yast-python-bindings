@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Example that scrolls a lot
+from yast import import_module
+import_module('UI')
 from yast import *
 class ScrollerClient:
     def main(self):

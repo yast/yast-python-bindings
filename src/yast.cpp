@@ -234,3 +234,74 @@ YCPValue CallYCPFunction(const char * namespace_name, const char * function_name
     return ycpRetValue;
 }
 
+/**
+ * General function handles running SCR command
+ * @param char * - Name of SCR function to call
+ * @param YCPList - arguments to the function call
+ * @return YCPValue result of running SCR
+ */
+YCPValue _SCR_Run(char *function, YCPList args)
+{
+	// access directly the statically declared builtins
+	extern StaticDeclaration static_declarations;
+	YCPValue ycpArg = YCPNull();
+	YCPValue ycpRetValue = YCPNull();
+	YCPValue ycpPath = YCPNull();
+
+	declaration_t *bi_dt = static_declarations.findDeclaration(function);
+
+	if (bi_dt == NULL) {
+		y2error("No such builtin '%s'", function);
+		return YCPNull();
+	}
+
+	YEBuiltin *bi_call = new YEBuiltin(bi_dt);
+
+	for (int i = 0; i < args.size(); i++) {
+		ycpArg = args->value(i);
+
+		// Such YConsts without a specific type produce invalid
+		// bytecode. (Which is OK here)
+		// The actual parameter's YCode becomes owned by the function call?
+		YConst *param_c = new YConst(YCode::ycConstant, ycpArg);
+
+		// for attaching the parameter, must get the real type so that it matches
+		constTypePtr act_param_tp = Type::vt2type(ycpArg->valuetype());
+
+		// Attach the parameter
+		// Returns NULL if OK, Type::Error if excessive argument
+		// Other errors (bad code, bad type) shouldn't happen
+		constTypePtr err_tp = bi_call->attachParameter(param_c, act_param_tp);
+
+		if (err_tp != NULL) {
+			if (err_tp->isError()) {
+				// where we were called from.
+				y2error("Excessive parameter to builtin %s", function);
+			} else {
+				y2internal("attachParameter returned %s",
+				err_tp->toString().c_str());
+			}
+			return YCPNull();
+		}
+	}
+
+	// now must check if we got fewer parameters than needed
+	// or there was another error while resolving the overload
+	constTypePtr err_tp = bi_call->finalize(PythonLogger::instance());
+	if (err_tp != NULL) {
+		// apparently the error was already reported?
+		y2error("Error type %s when finalizing builtin %s", err_tp->toString().c_str(), function);
+		return YCPNull();
+	}
+
+	// go call it now!
+	y2debug("Python is calling builtin %s", function);
+
+	ycpRetValue = YCPNull();
+	ycpRetValue = bi_call->evaluate(false /* no const subexpr elim */);
+
+	delete bi_call;
+
+	return ycpRetValue;
+}
+

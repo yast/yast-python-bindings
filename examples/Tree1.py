@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Simple tree example
+from yast import import_module
+import_module('UI')
 from yast import *
 class Tree1Client:
     def main(self):

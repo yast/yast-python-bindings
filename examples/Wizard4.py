@@ -4,6 +4,8 @@
 #
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
+from yast import import_module
+import_module('UI')
 from yast import *
 class Wizard4Client:
     def main(self):
@@ -17,7 +19,7 @@ class Wizard4Client:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(
+        Wizard(
           Opt("treeEnabled"),
           Symbol("back"),
           "&Back",

@@ -2,6 +2,8 @@
 
 # Look into ~/.y2log. For widgets that don't get their
 # minsizes, warnings appear.
+from yast import import_module
+import_module('UI')
 from yast import *
 class TooBigClient:
     def main(self):

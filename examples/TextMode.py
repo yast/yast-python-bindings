@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Using UI::TextMode()
+from yast import import_module
+import_module('UI')
 from yast import *
 class TextModeClient:
     def main(self):

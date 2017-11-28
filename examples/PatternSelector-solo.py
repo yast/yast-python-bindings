@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 # Simple example for PatternSelector
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class PatternSelectorSoloClient:
     def main(self):

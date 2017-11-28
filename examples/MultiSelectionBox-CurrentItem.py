@@ -6,6 +6,8 @@
 # is typically NOT what an application needs: The current item is the item
 # that has the keyboard focus. It doesn't need to be selected. Most
 # applications will want to use SelectedItems rather than CurrentItem.
+from yast import import_module
+import_module('UI')
 from yast import *
 class MultiSelectionBoxCurrentItemClient:
     def main(self):

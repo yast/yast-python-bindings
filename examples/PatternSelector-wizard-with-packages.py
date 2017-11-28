@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 # Full-fledged pattern selection
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class PatternSelectorWizardWithPackagesClient:
     def main(self):
@@ -20,7 +23,7 @@ class PatternSelectorWizardWithPackagesClient:
       UI.OpenDialog(
         Opt("defaultsize"),
         #Wizard("back", "", "cancel", "&Cancel", "ok", "&OK")
-        YCPWizard(Opt("stepsEnabled"), Id("back"), "", Id("cancel"), "&Cancel", Id("ok"), "&OK")
+        Wizard(Opt("stepsEnabled"), Id("back"), "", Id("cancel"), "&Cancel", Id("ok"), "&OK")
       )
 
 

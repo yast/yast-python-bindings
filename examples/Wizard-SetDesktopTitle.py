@@ -5,6 +5,8 @@
 # Set the window title that is shown by the window manager
 # Searches for the desktop file and uses its name attribute
 # Note: this works in qt and gtk only, ncurses doesn't have a window title
+from yast import import_module
+import_module('Wizard')
 from yast import *
 class WizardSetDesktopTitleClient:
     def main(self):

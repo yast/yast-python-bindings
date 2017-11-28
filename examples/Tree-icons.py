@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Tree with icons
+from yast import import_module
+import_module('UI')
 from yast import *
 class TreeIconsClient:
     def main(self):

@@ -5,6 +5,8 @@
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
 import copy
+from yast import import_module
+import_module('UI')
 from yast import *
 class SlideShowDemoClient:
     def main(self):
@@ -59,7 +61,7 @@ class SlideShowDemoClient:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(
+        Wizard(
           Opt("stepsEnabled"),
           Id("back"),
           "&Back",

@@ -5,6 +5,8 @@
 #
 # This kind of conflict cannot be resolved.
 # Only one of the Widgets with "&A" will get a shortcut at all.
+from yast import import_module
+import_module('UI')
 from yast import *
 class ShortcutConflict4Client:
     def main(self):

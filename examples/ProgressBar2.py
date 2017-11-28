@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # ProgressBar example
+from yast import import_module
+import_module('UI')
 from yast import *
 class ProgressBar2Client:
     def main(self):

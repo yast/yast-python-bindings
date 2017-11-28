@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Typical usage example for tab widget
+from yast import import_module
+import_module('UI')
 from yast import *
 class DumbTab2Client:
     def main(self):

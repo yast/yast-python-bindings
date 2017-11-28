@@ -3,6 +3,8 @@
 # Build dialog with MuliLineEdit widget,
 # a character counter for the MuliLineEdit's contents as they are typed
 # and an OK button.
+from yast import import_module
+import_module('UI')
 from yast import *
 class MultiLineEdit4Client:
     def main(self):
