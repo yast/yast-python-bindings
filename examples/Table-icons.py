@@ -31,31 +31,38 @@ class TableIconsClient:
       UI.OpenDialog(Label("Reading icon directories..."))
 
 
-      iconList = readIconDir(Ops.add(iconBasePath, "/22x22/apps"))
+      iconList = readIconDir(iconBasePath + "/22x22/apps")
       iconList = ycpbuiltins.union(
           iconList,
-          readIconDir(Ops.add(iconBasePath, "/32x32/apps")))
+          readIconDir(iconBasePath + "/32x32/apps"))
       iconList = ycpbuiltins.union(
           iconList,
-          readIconDir(Ops.add(iconBasePath, "/48x48/apps")))
+          readIconDir(iconBasePath + "/48x48/apps"))
 
       itemList = []
 
+      test = Term("icon", "22x22/apps/" + "iconName")
+      test = Term("cell",test)
+      print "working %s"%test.toString()
+      test = Term("cell", Term("icon", "22x22/apps/" + "iconName"))
+      print "not working %s"%test.toString()
+
+
       for iconName in ycpbuiltins.foreach(iconList):
         item = Item(
-          Id(iconName),
-          iconName,
-          Term("cell", Term("icon", Ops.add("22x22/apps/", iconName))),
-          Term("cell", Term("icon", Ops.add("32x32/apps/", iconName))),
-          Term("cell", Term("icon", Ops.add("48x48/apps/", iconName)))
-        )
+                Id(iconName),
+                iconName,
+                Term("cell", Term("icon", "22x22/apps/" + iconName)),
+                Term("cell", Term("icon", "32x32/apps/" + iconName)),
+                Term("cell", Term("icon", "48x48/apps/" + iconName))
+                )
         # y2debug( "Item: %1", item );
         itemList = ycpbuiltins.add(itemList, item)
 
       UI.CloseDialog() # Close busy dialog
 
-      UI.ChangeWidget("iconTable", "IconPath", iconBasePath)
-      UI.ChangeWidget("iconTable", "Items", itemList)
+      UI.ChangeWidget(("iconTable"), "IconPath", iconBasePath)
+      UI.ChangeWidget(("iconTable"), "Items", itemList)
 
       widgetID = None
       while True:
@@ -68,14 +75,23 @@ class TableIconsClient:
 
     # Read a directory with icons.
     #
-    def readIconDir(dir)
-      iconList = SCR.Read(Path(".target.dir"), dir).asList()
+def readIconDir(dir):
+      iconList = list(SCR.Read(Path(".target.dir"), dir))
       ycpbuiltins.y2debug("Dir %1: %2  entries", dir, ycpbuiltins.size(iconList))
-      iconList = ycpbuiltins.sort(ycpbuiltins.filter(iconList) do |entry|
-        ycpbuiltins.regexpmatch(entry, "^.*.(png|jpg|PNG|JPG)$")
-      end)
-
-      copy.deepcopy(iconList)
+#      #TODO #FIXME add ycbbuiltins.filter()
+#      #TODO #FIXME add ycbbuiltins.sort()
+#      iconList = ycpbuiltins.sort(ycpbuiltins.filter(iconList) do |entry|
+#        ycpbuiltins.regexpmatch(entry, "^.*.(png|jpg|PNG|JPG)$")
+#      end)
+      filtered = []
+      for entry in iconList:
+          if ycpbuiltins.regexpmatch(entry, "^.*.(png|jpg|PNG|JPG)$"):
+              filtered.append(entry)
+      
+      
+      filtered.sort()
+      print "returning %d items"%len(filtered)
+      return copy.deepcopy(filtered)
 
 TableIconsClient().main()
 
