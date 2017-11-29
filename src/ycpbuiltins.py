@@ -3,6 +3,7 @@ from ycp import Term as YCPTerm
 
 import time, inspect, os
 from random import randint as pyrand_range
+import re
 
 # returns the caller n frames back
 def get_caller_loginfo(frames):
@@ -139,3 +140,7 @@ def substring(s, start, num_chars=None):
     except:
         retult = ""
     return result
+
+def regexpmatch(searchtext, pattern):
+    return re.search(pattern, searchtext) is not None
+
