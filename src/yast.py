@@ -134,6 +134,7 @@ del scr_meta_funcs, scr_meta_func_creator, meta_func_creator, current_module, me
 def Term(*args):
     from ycp import Term as YCPTerm
     name = args[0]
+    l = None
     if len(args) > 1:
         l = List()
         for item in args[1:]:
