@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Graph1.ycp
+from yast import import_module
+import_module('UI')
 from yast import *
 class Graph1Client:
     def main(self):

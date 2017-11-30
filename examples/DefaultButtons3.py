@@ -4,6 +4,8 @@
 #
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
+from yast import import_module
+import_module('UI')
 from yast import *
 class DefaultButtons3Client:
     def main(self):
@@ -42,7 +44,7 @@ class DefaultButtons3Client:
       help_text = "<p>This is a help text.</p>" + "<p>It should be helpful.</p>" + "<p>If it isn't helpful, it should rather not be called a <i>help text</i>.</p>" + "<p>Help texts may contain the product name (&product;) with a macro that will " + "automatically be expanded - multiple times (&product;) if needed.</p>" 
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(
+        Wizard(
           Opt("stepsEnabled"),
           Id("back"),
           "&Back",

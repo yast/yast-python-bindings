@@ -22,6 +22,8 @@
 #include <yui/YUILoader.h>
 #include <yui/YSettings.h>
 
+#include "PythonLogger.h"
+
 #include <string>
 #include <cstdarg>
 #include <sstream>
@@ -33,4 +35,5 @@ YCPValue GetYCPVariable(const string & namespace_name, const string & variable_n
 bool import_module(const string & ns_name);
 
 bool widget_names();
+YCPValue _SCR_Run(char *function, YCPList args);
 

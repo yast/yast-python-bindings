@@ -3,6 +3,8 @@
 # PollInput.ycp
 #
 # Example for common usage of UI::PollInput()
+from yast import import_module
+import_module('UI')
 from yast import *
 class PollInputClient:
     def main(self):

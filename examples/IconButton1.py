@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # PushButton with icons (relative path)
+from yast import import_module
+import_module('UI')
 from yast import *
 class IconButton1Client:
     def main(self):

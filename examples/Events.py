@@ -10,6 +10,8 @@
 #
 # Use the "Close" button to quit the example.
 import copy
+from yast import import_module
+import_module('UI')
 from yast import *
 class EventsClient:
     def main(self):

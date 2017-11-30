@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Input field width under different layout constraints
+from yast import import_module
+import_module('UI')
 from yast import *
 class TextEntryLayoutClient:
     def main(self):

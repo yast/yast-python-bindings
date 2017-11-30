@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 # Full-fledged simple patch selection
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class SimplePatchSelectorStableClient:
     def main(self):

@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Minimalistic example for tab widget
+from yast import import_module
+import_module('UI')
 from yast import *
 class DumbTab3Client:
     def main(self):

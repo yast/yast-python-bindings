@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Simple example for MultiProgressMeter
+from yast import import_module
+import_module('UI')
 from yast import *
 class MultiProgressMeter1Client:
     def main(self):

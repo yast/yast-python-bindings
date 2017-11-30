@@ -2,6 +2,9 @@
 
 # NCurses SlideShow demo: No Wizard or MultiProgressMeter widget available,
 # thus using simpler layout
+from yast import import_module
+import_module('Wizard')
+import_module('UI')
 from yast import *
 import copy
 

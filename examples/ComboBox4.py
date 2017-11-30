@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from yast import import_module
+import_module('UI')
 from yast import *
 
 # Create an editable combo box with restricted input character set.

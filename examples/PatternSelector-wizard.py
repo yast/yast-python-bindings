@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 # Full-fledged pattern selection
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class PatternSelectorWizardClient:
     def main(self):
@@ -53,7 +56,7 @@ class PatternSelectorWizardClient:
 
       button = None
       while True:
-        button = Convert.to_symbol(UI.RunPkgSelection(Id("patterns")))
+        button = UI.RunPkgSelection(Id("patterns")).asSymbol()
         ycpbuiltins.y2milestone("Pattern selector returned %1", button)
 
         detailedSelection if button == "details"

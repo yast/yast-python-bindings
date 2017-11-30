@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 # Example for a RichText widget with hyperlinks
+from yast import import_module
+import_module('UI')
 from yast import *
 class RichTextHyperlinksClient:
     def main(self):

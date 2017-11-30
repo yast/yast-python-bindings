@@ -4,6 +4,8 @@
 #
 # Note: YCP applications are discouraged from using the Wizard widget directly.
 # Use the Wizard module instead.
+from yast import import_module
+import_module('UI')
 from yast import *
 
 class DefaultButtons1Client:
@@ -43,7 +45,7 @@ class DefaultButtons1Client:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        YCPWizard(
+        Wizard(
           Opt("stepsEnabled"),
           Id("back"),
           "&Back",

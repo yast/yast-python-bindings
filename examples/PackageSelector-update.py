@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+from yast import import_module
+import_module('UI')
+import_module('Pkg')
 from yast import *
 class PackageSelectorUpdateClient:
     def main(self):
