@@ -62,9 +62,16 @@ YCPValue GetYCPVariable(const string & namespace_name, const string & variable_n
 /**
  * This is needed for importing new module from ycp.
  */
-static PyMethodDef new_module_methods[] =
-{
-    {NULL, NULL, 0, NULL}
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    NULL,                /* m_name */
+    NULL,                /* m_doc */
+    -1,                  /* m_size */
+    NULL,                /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
 };
 
 YCPList * list_functions;
@@ -93,21 +100,23 @@ static bool HandleSymbolTable (const SymbolEntry & se)
  * @param PyObject *args - string - include name of module written in YCP 
  * @return PyObject * true on success
  */
-bool import_module(const string & ns_name)
+PyObject* import_module(const string & ns_name)
 {
     Y2Namespace *ns = getNs(ns_name.c_str());
+    if (!ns) return Py_None;
 
     // Init new module with name NameSpace and method __run (see new_module_methods)
-    PyObject *new_module = Py_InitModule(ns_name.c_str(), new_module_methods);
-    if (new_module == NULL) return false;
+    moduledef.m_name = ns_name.c_str();
+    PyObject *new_module = PyModule_Create(&moduledef);
+    if (new_module == NULL) return Py_None;
 
     // Dictionary of new_module - there will be registered all functions
     PyObject *new_module_dict = PyModule_GetDict(new_module);
-    if (new_module_dict == NULL) return false;
+    if (new_module_dict == NULL) return Py_None;
 
     PyObject *code;
     auto g = PyDict_New();
-    if (!g) return false;
+    if (!g) return Py_None;
     PyDict_SetItemString(g, "__builtins__", PyEval_GetBuiltins());
 
     list_functions = new YCPList();
@@ -161,7 +170,7 @@ bool import_module(const string & ns_name)
     delete list_functions;
     delete list_variables;
 
-    return true;
+    return new_module;
 }
 
 /**

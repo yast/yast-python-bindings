@@ -7,7 +7,7 @@ YCPValue pyval_to_ycp(PyObject *input)
     if (input == Py_None)
         return YCPNull();
     if (PyBool_Check(input)) {
-        if (PyObject_Compare(input, Py_True) == 0)
+        if (PyObject_RichCompareBool(input, Py_True, Py_EQ) == 1)
             return YCPBoolean(true);
         else
             return YCPBoolean(false);

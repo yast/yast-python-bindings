@@ -3,8 +3,9 @@ from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Bytebl
 
 def import_module(module):
     from ycp import import_module as ycp_import_module
-    if ycp_import_module(module):
-        globals()[module] = __import__(module)
+    m = ycp_import_module(module)
+    if m:
+        globals()[module] = m
 
 def SCR_Run(func, *args):
     from ycp import _SCR_Run, pyval_to_ycp

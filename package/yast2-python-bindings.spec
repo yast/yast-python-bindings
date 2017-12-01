@@ -30,14 +30,14 @@ BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  libyui-devel
 BuildRequires:  make
-BuildRequires:  python
-BuildRequires:  python-devel
+BuildRequires:  python3
+BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-ycp-ui-bindings
 BuildRequires:  yast2-ycp-ui-bindings-devel
 
-Requires:       python
+Requires:       python3
 Requires:       yast2-core
 Requires:       yast2-ycp-ui-bindings
 
