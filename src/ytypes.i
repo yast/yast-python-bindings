@@ -18,6 +18,8 @@ YCPValue pyval_to_ycp(PyObject *input)
         return YCPFloat(PyFloat_AsDouble(input));
     if (PyString_Check(input))
         return YCPString(PyString_AsString(input));
+    if (PyUnicode_Check(input))
+        return YCPString(_PyUnicode_AsString(input));
     if (PyList_Check(input)) {
         auto size = PyList_Size(input);
         if (size > 0 && PyFunction_Check(PyList_GetItem(input, 0))) {
