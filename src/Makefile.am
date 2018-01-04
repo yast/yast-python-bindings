@@ -1,5 +1,5 @@
 BUILT_SOURCES = ycp.py
-ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h
+ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h y2log.i yast.h ytypes.h y2log.h PythonLogger.h Y2PythonClientComponent.h YPythonCode.h Y2CCPythonClient.h
 	$(SWIG) $(AX_SWIG_PYTHON_OPT) -py3 -c++ -I/usr/include/YaST2 -o $@ $<
 
 # Remove non-standard syntax unrecognized by swig from YCPMap.h
@@ -10,7 +10,8 @@ python_PYTHON = ycp.py yast.py ycpbuiltins.py
 
 pyexec_LTLIBRARIES = _ycp.la
 
-_ycp_la_SOURCES = yast-core_wrap.cxx yast.cpp yast-core.i ytypes.i ycp.i YPythonCode.cc PythonLogger.cc
+_ycp_la_SOURCES = yast-core_wrap.cxx yast.cpp yast-core.i ytypes.i ycp.i YPythonCode.cc PythonLogger.cc y2log.i
+noinst_HEADERS = yast.h ytypes.h y2log.h PythonLogger.h Y2PythonClientComponent.h YPythonCode.h Y2CCPythonClient.h
 
 _ycp_la_LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(py2langdir)
 
