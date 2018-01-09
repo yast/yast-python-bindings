@@ -54,7 +54,8 @@ YCPValue callClient(const string& client)
 {
     FILE *fp = fopen(client.c_str(), "r");
     int res = 0;
-    char *arg1 = (char*)client.c_str();
+    wstring wclient = wstring(client.begin(), client.end());
+    wchar_t* arg1 = (wchar_t*)wclient.c_str();
     if (fp == NULL) {
         return YCPBoolean(false);
     }

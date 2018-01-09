@@ -20,22 +20,14 @@ class PatternSelectorWizardClient:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        Wizard("back", "", "cancel", "&Cancel", "ok", "&OK")
+        Wizard(Symbol("back"), "", Symbol("cancel"), "&Cancel", Symbol("ok"), "&OK")
       )
 
 
-      help_text = _(
-        "<p>The available software for this system is shown by category in the left column.  To view a description for an item, select it in the list.</p>"
-      ) +
-        _(
-          "<p>Change the status of items by clicking on their status icon or right-click on any icon for a context menu. With the context menu you can also change the status of all items.</p>"
-        ) +
-        _(
-          "<p><b>Details</b> opens the detailed software package selection where you can view and select individual software packages.</p>"
-        ) +
-        _(
-          "<p>The <b>disk usage</b> display in the lower right corner shows the remaining disk space after all requested changes will have been performed. Please notice that hard disk partitions that are full or nearly full can degrade system performance and in some cases even cause serious problems. The system needs some available disk space to run properly.</p>"
-        )
+      help_text = "<p>The available software for this system is shown by category in the left column.  To view a description for an item, select it in the list.</p>" 
+      help_text = help_text + "<p>Change the status of items by clicking on their status icon or right-click on any icon for a context menu. With the context menu you can also change the status of all items.</p>"
+      help_text = help_text + "<p><b>Details</b> opens the detailed software package selection where you can view and select individual software packages.</p>"
+      help_text = help_text + "<p>The <b>disk usage</b> display in the lower right corner shows the remaining disk space after all requested changes will have been performed. Please notice that hard disk partitions that are full or nearly full can degrade system performance and in some cases even cause serious problems. The system needs some available disk space to run properly.</p>"
 
       UI.WizardCommand(
         Term(
@@ -56,11 +48,13 @@ class PatternSelectorWizardClient:
 
       button = None
       while True:
-        button = UI.RunPkgSelection(Id("patterns")).asSymbol()
+        button = UI.RunPkgSelection(Id("patterns"))
         ycpbuiltins.y2milestone("Pattern selector returned %1", button)
 
-        detailedSelection if button == "details"
-      end until button == "cancel" or button == "accept"
+        if button == "details":
+          detailedSelection()
+        if button == "cancel" or button == "accept":
+          break
 
       UI.CloseDialog()
 

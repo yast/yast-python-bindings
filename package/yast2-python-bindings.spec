@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-python-bindings
 #
-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -16,8 +16,11 @@
 #
 
 
+%define python_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
+%define python_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
+
 Name:           yast2-python-bindings
-Version:        4.0.0
+Version:        4.0.1
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -30,14 +33,14 @@ BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  libyui-devel
 BuildRequires:  make
-BuildRequires:  python
-BuildRequires:  python-devel
+BuildRequires:  python3
+BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-ycp-ui-bindings
 BuildRequires:  yast2-ycp-ui-bindings-devel
 
-Requires:       python
+Requires:       python3
 Requires:       yast2-core
 Requires:       yast2-ycp-ui-bindings
 
@@ -58,9 +61,7 @@ and also Python scripts can use YaST agents, APIs and modules.
 %install
 %yast_install
 
-rm %{buildroot}/%{python_sitelib}/*.pyc
-rm %{buildroot}/%{python_sitelib}/*.pyo
-rm %{buildroot}/%{python_sitearch}/*.la
+rm %{buildroot}/%{python_sitelib}/__pycache__/*.pyc
 rm %{buildroot}/%{yast_plugindir}/libpy2lang_python.la
 
 %files

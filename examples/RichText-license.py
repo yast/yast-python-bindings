@@ -37,7 +37,7 @@ class RichTextLicenseClient:
 
         if button == "load":
           name = UI.AskForExistingFile(".", file_ext, "Select text file")
-          text2 = SCR.Read(Path(".target.string"), name).asString()
+          text2 = SCR.Read(Path(".target.string"), name)
 
           if text2 == None:
             text2 = ""

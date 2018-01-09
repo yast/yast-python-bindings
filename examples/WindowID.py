@@ -3,11 +3,12 @@
 from yast import import_module
 import_module('Wizard')
 import_module('UI')
+import_module('Label')
 from yast import *
 class WindowIDClient:
     def main(self):
 
-      image = SCR.Read(Path(".target.byte"), "empty.gif").asByteblock()
+      image = SCR.Read(Path(".target.byte"), "empty.gif")
 
       Wizard.CreateDialog()
 
@@ -18,8 +19,8 @@ class WindowIDClient:
         caption,
         penguins,
         help,
-        Label.BackButton,
-        Label.NextButton
+        Label.BackButton(),
+        Label.NextButton(),
       )
 
       windowID = UI.QueryWidget(Id("img"), "WindowID")

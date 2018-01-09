@@ -3,8 +3,9 @@ from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Bytebl
 
 def import_module(module):
     from ycp import import_module as ycp_import_module
-    if ycp_import_module(module):
-        globals()[module] = __import__(module)
+    m = ycp_import_module(module)
+    if m:
+        globals()[module] = m
 
 def SCR_Run(func, *args):
     from ycp import _SCR_Run, pyval_to_ycp
@@ -133,11 +134,13 @@ del scr_meta_funcs, scr_meta_func_creator, meta_func_creator, current_module, me
 
 def Term(*args):
     from ycp import Term as YCPTerm
+    from ycp import pyval_to_ycp
     name = args[0]
+    l = None
     if len(args) > 1:
         l = List()
         for item in args[1:]:
-            l.add(item)
+            l.add(pyval_to_ycp(item))
     if l is not None:
         return YCPTerm(name, l)
     return YCPTerm(name)
