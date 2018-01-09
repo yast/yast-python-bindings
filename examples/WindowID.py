@@ -3,6 +3,7 @@
 from yast import import_module
 import_module('Wizard')
 import_module('UI')
+import_module('Label')
 from yast import *
 class WindowIDClient:
     def main(self):
@@ -18,8 +19,8 @@ class WindowIDClient:
         caption,
         penguins,
         help,
-        "Back", #Label.BackButton
-        "Next"  #Label.NextButton
+        Label.BackButton(),
+        Label.NextButton(),
       )
 
       windowID = UI.QueryWidget(Id("img"), "WindowID")
