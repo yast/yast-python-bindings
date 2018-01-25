@@ -62,6 +62,7 @@ YCPValue GetYCPVariable(const string & namespace_name, const string & variable_n
 /**
  * This is needed for importing new module from ycp.
  */
+#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     NULL,                /* m_name */
@@ -73,6 +74,12 @@ static struct PyModuleDef moduledef = {
     NULL,                /* m_clear */
     NULL,                /* m_free */
 };
+#else
+static PyMethodDef new_module_methods[] =
+{
+    {NULL, NULL, 0, NULL}
+};
+#endif
 
 YCPList * list_functions;
 YCPList * list_variables;
@@ -106,8 +113,12 @@ PyObject* import_module(const string & ns_name)
     if (!ns) return Py_None;
 
     // Init new module with name NameSpace and method __run (see new_module_methods)
+#if PY_MAJOR_VERSION >= 3
     moduledef.m_name = ns_name.c_str();
     PyObject *new_module = PyModule_Create(&moduledef);
+#else
+    PyObject *new_module = Py_InitModule(ns_name.c_str(), new_module_methods);
+#endif
     if (new_module == NULL) return Py_None;
 
     // Dictionary of new_module - there will be registered all functions
