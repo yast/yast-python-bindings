@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 29 22:44:08 UTC 2018 - dmulder@suse.com
+
+- Build both python2 and python3 versions of the bindings;
+  (bsc#1074696).
+
+-------------------------------------------------------------------
 Thu Jan  4 15:45:46 UTC 2018 - dmulder@suse.com
 
 - Convert the bindings into python3; (bsc#1074696).

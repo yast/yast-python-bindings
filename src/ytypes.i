@@ -7,7 +7,11 @@ YCPValue pyval_to_ycp(PyObject *input)
     if (input == Py_None)
         return YCPNull();
     if (PyBool_Check(input)) {
+#if PY_MAJOR_VERSION >= 3
         if (PyObject_RichCompareBool(input, Py_True, Py_EQ) == 1)
+#else
+        if (PyObject_Compare(input, Py_True) == 0)
+#endif
             return YCPBoolean(true);
         else
             return YCPBoolean(false);
@@ -18,8 +22,10 @@ YCPValue pyval_to_ycp(PyObject *input)
         return YCPFloat(PyFloat_AsDouble(input));
     if (PyString_Check(input))
         return YCPString(PyString_AsString(input));
+#if PY_MAJOR_VERSION >= 3
     if (PyUnicode_Check(input))
         return YCPString(_PyUnicode_AsString(input));
+#endif
     if (PyList_Check(input)) {
         auto size = PyList_Size(input);
         if (size > 0 && PyFunction_Check(PyList_GetItem(input, 0))) {

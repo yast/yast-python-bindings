@@ -54,8 +54,12 @@ YCPValue callClient(const string& client)
 {
     FILE *fp = fopen(client.c_str(), "r");
     int res = 0;
+#if PY_MAJOR_VERSION >= 3
     wstring wclient = wstring(client.begin(), client.end());
     wchar_t* arg1 = (wchar_t*)wclient.c_str();
+#else
+    char *arg1 = (char*)client.c_str();
+#endif
     if (fp == NULL) {
         return YCPBoolean(false);
     }
