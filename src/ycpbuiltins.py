@@ -52,7 +52,7 @@ def foreach(listOrMap):
         return None
     return listOrMap
 
-# add — Add a key/value pair to a map or list
+# add - Add a key/value pair to a map or list
 def add(listOrMap, key, value=None):
     from ycp import pyval_to_ycp
 
