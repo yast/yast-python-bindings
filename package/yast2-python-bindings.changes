@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Mar  9 16:35:09 UTC 2018 - dmulder@suse.com
+
+- Adapt the bindings to allow modules that will run in both python2
+  or python3. Also fix a py3 binary mistakenly packaged with the py2
+  bindings package (bsc#1074696).
+
+-------------------------------------------------------------------
 Mon Jan 29 22:44:08 UTC 2018 - dmulder@suse.com
 
 - Build both python2 and python3 versions of the bindings;
