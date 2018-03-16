@@ -1,4 +1,7 @@
 %module ycp
+%begin %{
+#define SWIG_PYTHON_2_UNICODE
+%}
 
 %feature("autodoc", "3");
 

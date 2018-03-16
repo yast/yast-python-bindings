@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import ycpbuiltins
 from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
@@ -135,7 +136,11 @@ del scr_meta_funcs, scr_meta_func_creator, meta_func_creator, current_module, me
 def Term(*args):
     from ycp import Term as YCPTerm
     from ycp import pyval_to_ycp
-    name = args[0]
+    from six import binary_type, text_type, PY2
+    if PY2 and isinstance(args[0], text_type):
+        name = binary_type(args[0])
+    else:
+        name = args[0]
     l = None
     if len(args) > 1:
         l = List()
@@ -147,8 +152,11 @@ def Term(*args):
 
 def Opt(*args):
     from ycp import Term as YCPTerm
+    from six import binary_type, text_type, PY2
     l = List()
     for arg in args:
+        if PY2 and isinstance(arg, text_type):
+            arg = binary_type(arg)
         l.add(Symbol(arg))
     return YCPTerm("opt", l)
 
@@ -156,9 +164,13 @@ def Opt(*args):
 def Id(arg, dont_force_sym = False):
     from ycp import pyval_to_ycp
     from ycp import Term as YCPTerm
+    from six import binary_type, text_type, PY2
     l = List()
-    if isinstance(arg, str) and not dont_force_sym:
-        l.add(Symbol(arg))
+    if isinstance(arg, text_type) and not dont_force_sym:
+        if PY2:
+            l.add(Symbol(binary_type(arg)))
+        else:
+            l.add(Symbol(arg))
     else:
         l.add(pyval_to_ycp(arg))
     return YCPTerm("id", l)

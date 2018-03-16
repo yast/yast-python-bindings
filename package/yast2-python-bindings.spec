@@ -28,9 +28,9 @@
 %define python3_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
 
 Name:           yast2-python-bindings
-Version:        4.0.2
+Version:        4.0.3
 Release:        0
-Summary:        Python3 bindings for the YaST platform
+Summary:        Python bindings for the YaST platform
 License:        GPL-2.0
 Group:          System/YaST
 
@@ -113,7 +113,9 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %__install -m 0755 %{builddir}/python3/_ycp.so* %{buildroot}/%{python3_sitearch}/
 %__ln_s %{python3_sitearch}/_ycp.so.0.0.0 %{buildroot}/%{python3_sitearch}/_ycp.so.0
 %__ln_s %{python3_sitearch}/_ycp.so.0.0.0 %{buildroot}/%{python3_sitearch}/_ycp.so
-%__install -m 0755 %{builddir}/python3/libpy2lang_python.so* %{buildroot}/%{yast_plugindir}/
+%__install -m 0755 %{builddir}/python3/libpy2lang_python.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0.0.0
+%__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so
+%__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0
 %endif
 
 %if %{with_python3}
@@ -122,8 +124,8 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %doc %{yast_docdir}
 %{python3_sitelib}/*.py
 %{python3_sitearch}/_ycp.so*
-%{yast_plugindir}/libpy2lang_python.so.*
-%{yast_plugindir}/libpy2lang_python.so
+%{yast_plugindir}/libpy2lang_python3.so.*
+%{yast_plugindir}/libpy2lang_python3.so
 %endif
 
 %files -n yast2-python-bindings

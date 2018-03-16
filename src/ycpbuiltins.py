@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from ycp import List, String, Integer, Boolean, Float, Value
 from ycp import Term as YCPTerm
 
@@ -52,7 +53,7 @@ def foreach(listOrMap):
         return None
     return listOrMap
 
-# add — Add a key/value pair to a map or list
+# add - Add a key/value pair to a map or list
 def add(listOrMap, key, value=None):
     from ycp import pyval_to_ycp
 
