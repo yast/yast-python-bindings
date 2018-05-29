@@ -22,11 +22,6 @@
 %define with_python3 0
 %endif
 
-%define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
-%define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-%define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
-%define python3_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
 Name:           yast2-python-bindings
 Version:        4.0.3
 Release:        0
@@ -50,6 +45,7 @@ BuildRequires:  python-devel
 BuildRequires:  python3
 BuildRequires:  python3-devel
 %endif
+BuildRequires:  python-rpm-macros
 BuildRequires:  swig
 BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-ycp-ui-bindings
