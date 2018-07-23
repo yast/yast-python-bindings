@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # Example of using the Wizard widget.

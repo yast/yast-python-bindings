@@ -5,6 +5,7 @@
 #
 # Create a dialog with a BarGraph with a number of segments
 # and a "+" and a "-" button for each segment.
+from __future__ import unicode_literals
 import copy
 from yast import import_module
 import_module('UI')

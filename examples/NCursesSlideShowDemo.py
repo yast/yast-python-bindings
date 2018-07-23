@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # NCurses SlideShow demo: No Wizard or MultiProgressMeter widget available,

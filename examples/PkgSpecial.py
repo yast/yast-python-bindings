@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # PkgSpecial example - not for general use!

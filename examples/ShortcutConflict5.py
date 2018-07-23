@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # Shortcut conflict resolution in a (really badly designed) wizard dialog.

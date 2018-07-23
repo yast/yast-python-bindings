@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # Popup stress test: Pop up dialogs and close them all the time
