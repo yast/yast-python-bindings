@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 23 15:56:43 UTC 2018 - dmulder@suse.com
+
+- Example code crashes on py2 bindings without a back port of
+  unicode strings
+
+-------------------------------------------------------------------
 Tue May 29 15:49:44 UTC 2018 - dmulder@suse.com
 
 - Don't package files in '/' (bsc#1095054).

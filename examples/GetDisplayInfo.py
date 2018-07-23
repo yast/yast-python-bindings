@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # encoding: utf-8
 
 # Simple demo for the UI::GetDisplayInfo() UI bultin:
