@@ -97,6 +97,11 @@ public:
      **/
     static string PyErrorHandler();
 
+    /**
+     * Prepare YCPReference for calling python function in YCP via reference
+     **/
+    YCPValue fromPythonFunToReference (PyObject* pyFun);
+
 private:
 
     /**
@@ -157,12 +162,6 @@ private:
      * Convert a YCPList to a Python tuple.
      **/
     PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
-
-    /**
-     * Prepare YCPReference for calling python function in YCP via reference
-     **/
-    YCPValue fromPythonFunToReference (PyObject* pyFun);
-
 
     /**
      * Function find in namespace function and return symbol entry
