@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import ycpbuiltins
 from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
+from YCPDeclarations import YCPDeclare as Declare
 
 from gettext import gettext
 globals()['_'] = gettext

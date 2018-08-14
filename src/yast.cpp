@@ -10,7 +10,7 @@ bool widget_names()
     return true;
 }
 
-static Y2Namespace * getNs(const char * ns_name)
+Y2Namespace * getNs(const char * ns_name)
 {
     Import import(ns_name); // has a static cache
     Y2Namespace *ns = import.nameSpace();
