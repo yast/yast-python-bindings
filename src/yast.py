@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import ycpbuiltins
 from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
+from YCPDeclarations import YCPDeclare as Declare
 
 def import_module(module):
     from ycp import import_module as ycp_import_module
