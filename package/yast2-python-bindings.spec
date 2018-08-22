@@ -26,7 +26,7 @@ Name:           yast2-python-bindings
 Version:        4.0.4
 Release:        0
 Summary:        Python bindings for the YaST platform
-License:        GPL-2.0
+License:        GPL-2.0-only
 Group:          System/YaST
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
