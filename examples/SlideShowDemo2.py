@@ -113,7 +113,7 @@ class SlideShowDemo2Client:
       )
       UI.WizardCommand(Term("SetBackButtonLabel", "S&tep"))
 
-      slideShowPage = RichText(Id("slideText"), slide_text),
+      slideShowPage = RichText(Id("slideText"), slide_text)
 
       cdTable = Table(
         Id("cdTable"),
