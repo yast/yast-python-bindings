@@ -12,7 +12,7 @@ class GetDisplayInfoClient:
       info_map = UI.GetDisplayInfo()
       info_text = "<ul>"
 
-      for capability, value in ycpbuiltins.foreach(info_map).iteritems():
+      for capability, value in ycpbuiltins.foreach(info_map).items():
         info_text = info_text + ycpbuiltins.sformat("<li>%1: %2</li>", capability, value)
 
       info_text = info_text + "<ul>"
