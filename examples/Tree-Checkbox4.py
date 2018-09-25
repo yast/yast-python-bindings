@@ -82,7 +82,7 @@ class TreeCheckbox4Client:
     def formatEvent(self, event):
       event = copy.deepcopy(event)
       html = "Event:"
-      for key, value in ycpbuiltins.foreach(event).iteritems():
+      for key, value in ycpbuiltins.foreach(event).items():
         html = html +  " " +  key + ": " + ycpbuiltins.tostring(value) + ""
 
       return html

@@ -283,7 +283,7 @@ def formatEvent(event):
       event = copy.deepcopy(event)
       html = "<h3>Event:</h3><p>"
       ycpbuiltins.y2milestone("formatEvent(%1)", event)
-      for key, value in ycpbuiltins.foreach(event).iteritems():
+      for key, value in ycpbuiltins.foreach(event).items():
           html = html +  "<font color=blue>" + key + "</font>: " + ycpbuiltins.tostring(value) + "<br>"
       html = html + "</p>"
 

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sat Sep 15 15:04:15 UTC 2018 - nopower@suse.com
+
+- Fix Id construction for python2, use items instead of iteritems
+  for python2/python3 compatability; (bsc#1108558).
+
+-------------------------------------------------------------------
 Mon Aug 20 13:57:26 CEST 2018 - schubi@suse.de
 
 - Switched license in spec file from SPDX2 to SPDX3 format.

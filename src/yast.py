@@ -164,9 +164,9 @@ def Opt(*args):
 def Id(arg, dont_force_sym = False):
     from ycp import pyval_to_ycp
     from ycp import Term as YCPTerm
-    from six import binary_type, text_type, PY2
+    from six import binary_type, string_types, PY2
     l = List()
-    if isinstance(arg, text_type) and not dont_force_sym:
+    if isinstance(arg, string_types) and not dont_force_sym:
         if PY2:
             l.add(Symbol(binary_type(arg)))
         else:
