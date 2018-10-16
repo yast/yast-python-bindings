@@ -131,5 +131,6 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %{python_sitearch}/_ycp.so*
 %{yast_plugindir}/libpy2lang_python.so.*
 %{yast_plugindir}/libpy2lang_python.so
+%license COPYING
 
 %changelog
