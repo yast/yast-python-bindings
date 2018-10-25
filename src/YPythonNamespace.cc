@@ -19,6 +19,9 @@
 #include <stdio.h>
 
 #include "YCPDeclarations.h"
+
+#include "compat.h"
+
 #define DBG(str) \
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
     std::cerr.flush()
@@ -149,6 +152,7 @@ YPythonNamespace::YPythonNamespace (string name)
   //Objects for Python API
   PyObject* pMainDict;    //global dictionary of imported module
   PyObject* pFunc;        //pionter for function from python
+  const char* pFunc_name;
   PyObject* item;         //item from dictionary
   PyObject * fun_names;   //list of keys from dictionary (YPython::yPython()->pMain())
   PyObject * fun_code;    //code of function
@@ -183,9 +187,15 @@ YPythonNamespace::YPythonNamespace (string name)
     //y2milestone ("YPythonNamespace iteration %d from all %d", i, num_fun_names);
     item = PyList_GetItem(fun_names, i); /* Can’t fail */
     //y2milestone ("YPythonNamespace item: %s", PyString_AsString(item));
+#if PY_MAJOR_VERSION >= 3
+    if (!PyUnicode_Check(item)) continue;
+    pFunc_name = _PyUnicode_AsString(item);
+#else
     if (!PyString_Check(item)) continue; /* Skip non-string */
+    pFunc_name = PyString_AsString(item);
+#endif
     //y2milestone ("item: %s", PyString_AsString(item));
-    pFunc = PyDict_GetItemString(pMainDict,PyString_AsString(item));    
+    pFunc = PyDict_GetItemString(pMainDict, pFunc_name);
     //check if symbol is callable    
 
     if (PyFunction_Check(pFunc)) {
@@ -216,7 +226,7 @@ YPythonNamespace::YPythonNamespace (string name)
        SymbolEntry *fun_se = new SymbolEntry (
 		this,
 		count++,	         // position. arbitrary numbering. must stay consistent when?
-		PyString_AsString(item), // passed to Ustring, no need to strdup
+		pFunc_name,              // passed to Ustring, no need to strdup
 		SymbolEntry::c_function, 
 		sym_tp);
        fun_se->setGlobal (true);
