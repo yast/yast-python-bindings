@@ -53,6 +53,9 @@
 #include "yast.h"
 
 #include <iostream>
+
+#include "compat.h"
+
 #define DBG(str) \
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
     std::cerr.flush()
