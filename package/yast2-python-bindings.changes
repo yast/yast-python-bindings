@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jan  9 18:37:13 UTC 2019 - dmulder@suse.com
+
+- Forward port python import capability.
+
+-------------------------------------------------------------------
 Wed Jan  9 14:52:04 UTC 2019 - dmulder@suse.com
 
 - Define yast._() as an alias to gettext(); (bsc#1121106).
