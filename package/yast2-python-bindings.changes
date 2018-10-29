@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct 29 20:06:34 UTC 2018 - dmulder@suse.com
+
+- Forward port python import capability.
+
+-------------------------------------------------------------------
 Tue Oct 16 16:16:58 CEST 2018 - schubi@suse.de
 
 - Added license file to spec.
