@@ -2,6 +2,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import ycpbuiltins
 from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
+from gettext import gettext
+def textdomain(domain):
+    from gettext import bindtextdomain, textdomain as gt_textdomain
+    bindtextdomain(domain, '@DATADIR@/YaST2/locale')
+    gt_textdomain(domain)
+
 def import_module(module):
     from ycp import import_module as ycp_import_module
     m = ycp_import_module(module)
