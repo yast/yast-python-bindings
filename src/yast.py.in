@@ -3,6 +3,7 @@ import ycpbuiltins
 from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
 
 from gettext import gettext
+globals()['_'] = gettext
 def textdomain(domain):
     from gettext import bindtextdomain, textdomain as gt_textdomain
     bindtextdomain(domain, '@DATADIR@/YaST2/locale')
