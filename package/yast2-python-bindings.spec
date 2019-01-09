@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-python-bindings
 #
-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -12,7 +12,7 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -100,18 +100,17 @@ make
 %yast_install
 rm %{buildroot}/%{python_sitelib}/*.pyc
 rm %{buildroot}/%{python_sitelib}/*.pyo
-rm %{buildroot}/%{python_sitearch}/*.la
 rm %{buildroot}/%{yast_plugindir}/*.la
+%__mkdir_p %{buildroot}/%{python_sitearch}/
+%__ln_s %{yast_plugindir}/libpy2lang_python.so %{buildroot}/%{python_sitearch}/_ycp.so
 %if %{with_python3}
 %__mkdir_p %{buildroot}/%{python3_sitelib}/
 %__install -m 0644 %{builddir}/python3/*.py %{buildroot}/%{python3_sitelib}/
 %__mkdir_p %{buildroot}/%{python3_sitearch}/
-%__install -m 0755 %{builddir}/python3/_ycp.so* %{buildroot}/%{python3_sitearch}/
-%__ln_s %{python3_sitearch}/_ycp.so.0.0.0 %{buildroot}/%{python3_sitearch}/_ycp.so.0
-%__ln_s %{python3_sitearch}/_ycp.so.0.0.0 %{buildroot}/%{python3_sitearch}/_ycp.so
 %__install -m 0755 %{builddir}/python3/libpy2lang_python.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0.0.0
 %__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so
 %__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0
+%__ln_s %{yast_plugindir}/libpy2lang_python3.so %{buildroot}/%{python3_sitearch}/_ycp.so
 %endif
 
 %if %{with_python3}
@@ -119,7 +118,7 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %defattr (-, root, root)
 %doc %{yast_docdir}
 %{python3_sitelib}/*.py
-%{python3_sitearch}/_ycp.so*
+%{python3_sitearch}/_ycp.so
 %{yast_plugindir}/libpy2lang_python3.so.*
 %{yast_plugindir}/libpy2lang_python3.so
 %endif
@@ -128,7 +127,7 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %defattr (-, root, root)
 %doc %{yast_docdir}
 %{python_sitelib}/*.py
-%{python_sitearch}/_ycp.so*
+%{python_sitearch}/_ycp.so
 %{yast_plugindir}/libpy2lang_python.so.*
 %{yast_plugindir}/libpy2lang_python.so
 %license COPYING
