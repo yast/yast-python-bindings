@@ -38,3 +38,4 @@ src/YCPMap.h
 *.lo
 src/yast-core_wrap.cxx
 src/ycp.py
+src/yast.py

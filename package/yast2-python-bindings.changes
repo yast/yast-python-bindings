@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jan  8 20:29:50 UTC 2019 - dmulder@suse.com
+
+- Provide textdomain() and gettext() functions for
+  internationization; (bsc#1121106).
+
+-------------------------------------------------------------------
 Tue Oct 16 16:16:58 CEST 2018 - schubi@suse.de
 
 - Added license file to spec.

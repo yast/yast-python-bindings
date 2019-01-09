@@ -1,6 +1,9 @@
-BUILT_SOURCES = ycp.py
+BUILT_SOURCES = ycp.py yast.py
 ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h y2log.i yast.h ytypes.h y2log.h PythonLogger.h Y2PythonClientComponent.h YPythonCode.h Y2CCPythonClient.h
 	$(SWIG) $(AX_SWIG_PYTHON_OPT) -c++ -I/usr/include/YaST2 -o $@ $<
+
+yast.py: yast.py.in
+	sed -e 's;[@]DATADIR[@];$(datadir);g' < $(srcdir)/yast.py.in > $(srcdir)/yast.py
 
 # Remove non-standard syntax unrecognized by swig from YCPMap.h
 YCPMap.h:
@@ -29,4 +32,4 @@ libpy2lang_python_la_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAG
 
 AM_CXXFLAGS = -DY2LOG=\"Python\"
 
-CLEANFILES = ycp.py yast-core_wrap.cxx YCPMap.h
+CLEANFILES = ycp.py yast.py yast-core_wrap.cxx YCPMap.h
