@@ -53,6 +53,8 @@
 #include "yast.h"
 
 #include <iostream>
+#include <fstream>
+#include <streambuf>
 
 #include "compat.h"
 
@@ -135,9 +137,8 @@ YPython::loadModule(string module)
     //delete last 3 chars from module name ".py"
     module_name.erase(module_name.size()-3); //delete ".py"
 
-    //initialize python and set the path where are python modules
+    //initialize python
     if (!Py_IsInitialized()) {
-       setenv("PYTHONPATH", path.c_str(), 1);       
        Py_Initialize();
        if (!YPython::_pMainDicts)
           YPython::_pMainDicts = PyDict_New();
@@ -149,14 +150,21 @@ YPython::loadModule(string module)
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       pMain = PyImport_ImportModule(module_name.c_str());
-       if (pMain == NULL){
+        pMain = PyModule_New(module_name.c_str());
+        PyModule_AddStringConstant(pMain, "__file__", module.c_str());
+        PyObject *localDict = PyModule_GetDict(pMain);
+        PyObject *builtins = PyEval_GetBuiltins();
+        PyDict_SetItemString(localDict, "__builtins__", builtins);
+
+        ifstream f(module.c_str());
+        string source((istreambuf_iterator<char>(f)), istreambuf_iterator<char>());
+
+        PyObject *pret = PyRun_String(source.c_str(), Py_file_input, localDict, localDict);
+        if (pret == NULL){
            y2error("Can't import module %s", module_name.c_str());
 
            if (PyErr_Occurred() != NULL){
-              //string err = PyErrorHandler();
               y2error("Python error: %s", PyErrorHandler().c_str());
-               //PyErr_Print();
            }
 
            return YCPError("The module was not imported");
@@ -167,7 +175,6 @@ YPython::loadModule(string module)
           return YCPError("The module was not imported");
     } else {
 
-       //return YCPError("The module is imported");
        y2error("The module is imported");
        return YCPVoid();
     }
