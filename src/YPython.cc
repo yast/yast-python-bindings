@@ -144,23 +144,16 @@ YPython::loadModule(string module)
           YPython::_pMainDicts = PyDict_New();
     }
 
+    PyObject* pPaths = PySys_GetObject("path");
+    PyList_Append(pPaths, PyString_FromString(path.c_str()));
     if (!YPython::_pMainDicts)
        YPython::_pMainDicts = PyDict_New();
     //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-        pMain = PyModule_New(module_name.c_str());
-        PyModule_AddStringConstant(pMain, "__file__", module.c_str());
-        PyObject *localDict = PyModule_GetDict(pMain);
-        PyObject *builtins = PyEval_GetBuiltins();
-        PyDict_SetItemString(localDict, "__builtins__", builtins);
-
-        ifstream f(module.c_str());
-        string source((istreambuf_iterator<char>(f)), istreambuf_iterator<char>());
-
-        PyObject *pret = PyRun_String(source.c_str(), Py_file_input, localDict, localDict);
-        if (pret == NULL){
+       pMain = PyImport_ImportModule(module_name.c_str());
+       if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
 
            if (PyErr_Occurred() != NULL){
