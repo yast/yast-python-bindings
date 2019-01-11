@@ -214,7 +214,13 @@ YPython::loadModule(string module)
            return YCPError("The module was not imported");
        }
 
-       int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
+       /* Something is broken somewhere, with py3 this line doesn't
+        * work when called from ruby (as a result of import "PythonModule"
+        * However when called from python (e.g. import_module("PythonModule")
+        * it works.
+        */
+       //int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
+       int ret = PyDict_SetItemString(YPython::_pMainDicts, module_name.c_str(), PyModule_GetDict(pMain));
        if (ret != 0)
           return YCPError("The module was not imported");
     } else {
