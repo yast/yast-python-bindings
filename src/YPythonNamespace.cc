@@ -187,13 +187,10 @@ YPythonNamespace::YPythonNamespace (string name)
     //y2milestone ("YPythonNamespace iteration %d from all %d", i, num_fun_names);
     item = PyList_GetItem(fun_names, i); /* Can’t fail */
     //y2milestone ("YPythonNamespace item: %s", PyString_AsString(item));
-#if PY_MAJOR_VERSION >= 3
-    if (!PyUnicode_Check(item)) continue;
-    pFunc_name = _PyUnicode_AsString(item);
-#else
-    if (!PyString_Check(item)) continue; /* Skip non-string */
-    pFunc_name = PyString_AsString(item);
-#endif
+    if (!PyStr_Check(item)){
+      continue;
+    }
+    pFunc_name = PyStr_AsString(item);
     //y2milestone ("item: %s", PyString_AsString(item));
     pFunc = PyDict_GetItemString(pMainDict, pFunc_name);
     //check if symbol is callable    

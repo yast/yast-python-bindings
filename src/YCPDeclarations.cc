@@ -51,41 +51,24 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
         return;
 
     if (_isInCache(func)){
-#if PY_MAJOR_VERSION >= 3
-        y2debug("function (%ld, %s) is already in cache.", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-        y2debug("function (%ld, %s) is already in cache.", (long)func, PyString_AsString(func->func_name));
-#endif
+        y2debug("function (%ld, %s) is already in cache.", (long)func, PyStr_AsString(func->func_name));
         return;
     }
 
     item = _getItemFromFunctionMap((PyObject *)func);
     if (item == NULL || !PyDict_Check(item)){
-#if PY_MAJOR_VERSION >= 3
-        y2debug("function (%ld, %s) is not declared using YCPDeclare", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-        y2debug("function (%ld, %s) is not declared using YCPDeclare", (long)func, PyString_AsString(func->func_name));
-#endif
+        y2debug("function (%ld, %s) is not declared using YCPDeclare", (long)func, PyStr_AsString(func->func_name));
         return;
     }
 
     return_type = PyDict_GetItemString(item, "return_type");
-#if PY_MAJOR_VERSION >= 3
     if (return_type == NULL || !PyUnicode_Check(return_type)){
-        y2debug("Invalid return type of function (%ld, %s)", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-    if (return_type == NULL || !PyString_Check(return_type)){
-        y2debug("Invalid return type of function (%ld, %s)", (long)func, PyString_AsString(func->func_name));
-#endif
+        y2debug("Invalid return type of function (%ld, %s)", (long)func, PyStr_AsString(func->func_name));
         return;
     }
     params = PyDict_GetItemString(item, "parameters");
     if (params == NULL || !PyTuple_Check(params)){
-#if PY_MAJOR_VERSION >= 3
-        y2debug("Invalid parameters of function (%ld, %s)", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-        y2debug("Invalid parameters of function (%ld, %s)", (long)func, PyString_AsString(func->func_name));
-#endif
+        y2debug("Invalid parameters of function (%ld, %s)", (long)func, PyStr_AsString(func->func_name));
         return;
     }
 
@@ -96,30 +79,18 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
     function->function = func;
 
     //return type:
-#if PY_MAJOR_VERSION >= 3
-    function->return_type = _interpretType(_PyUnicode_AsString(return_type));
-#else
-    function->return_type = _interpretType(PyString_AsString(return_type));
-#endif
+    function->return_type = _interpretType(PyStr_AsString(return_type));
 
     //parameters:
     tuple_size = PyTuple_Size(params);
     for (Py_ssize_t i=0; i < tuple_size; i++){
         tmp = PyTuple_GetItem(params, i);
-#if PY_MAJOR_VERSION >= 3
-        function->parameters.push_back(_interpretType(_PyUnicode_AsString(tmp)));
-#else
-        function->parameters.push_back(_interpretType(PyString_AsString(tmp)));
-#endif
+        function->parameters.push_back(_interpretType(PyStr_AsString(tmp)));
     }
 
     //add new function item
     _cache.push_back(function);
-#if PY_MAJOR_VERSION >= 3
-    y2debug("function (%ld, %s) cached", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-    y2debug("function (%ld, %s) cached", (long)func, PyString_AsString(func->func_name));
-#endif
+    y2debug("function (%ld, %s) cached", (long)func, PyStr_AsString(func->func_name));
 }
 
 const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyFunctionObject *func) const
@@ -127,11 +98,7 @@ const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyF
     cache_function_t *ret = NULL;
     int len = _cache.size();
 
-#if PY_MAJOR_VERSION >= 3
-    y2debug("Searching for function (%ld, %s)...", (long)func, _PyUnicode_AsString(func->func_name));
-#else
-    y2debug("Searching for function (%ld, %s)...", (long)func, PyString_AsString(func->func_name));
-#endif
+    y2debug("Searching for function (%ld, %s)...", (long)func, PyStr_AsString(func->func_name));
     for (int i=0; i < len; i++){
         if (_cache[i]->function == func){
             y2debug("    ==> Function found on position %d", i);
@@ -254,11 +221,7 @@ int YCPDeclarations::numParams(PyFunctionObject *func)
         return -1;
 
     y2debug("Number of parameters of function (%ld, %s) is %d",
-#if PY_MAJOR_VERSION >= 3
-            (long)func, _PyUnicode_AsString(func->func_name), (int)function->parameters.size());
-#else
-            (long)func, PyString_AsString(func->func_name), (int)function->parameters.size());
-#endif
+            (long)func, PyStr_AsString(func->func_name), (int)function->parameters.size());
     return function->parameters.size();
 }
 
