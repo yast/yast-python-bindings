@@ -110,7 +110,7 @@ private:
      * 
      **/
 
-    static PyObject* _pMainDicts;
+    PyObject* _pMainDicts;
     /**
      * Find function in Global Dictionary
      * confirm if function is from imported module or not

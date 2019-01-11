@@ -87,9 +87,7 @@ static bool append_to_sys_path(string& path) {
 
 YPython * YPython::_yPython = 0;
 
-PyObject * YPython::_pMainDicts = NULL;
-
-YPython::YPython(){}
+YPython::YPython():_pMainDicts(NULL){}
 
 
 YPython::~YPython(){}
