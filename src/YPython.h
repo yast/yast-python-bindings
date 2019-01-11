@@ -53,7 +53,7 @@ public:
      *
      * Returns 0 on error.
      **/
-    static YPython * yPython();
+    static YPython& yPython();
 
     /**
      * Access the static _pMainDicts

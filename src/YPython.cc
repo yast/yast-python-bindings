@@ -99,13 +99,13 @@ YPython::~YPython(){}
  * return static _yPython
  **/
 
-YPython *
+YPython&
 YPython::yPython()
 {
     if ( ! _yPython )
 	_yPython = new YPython();
 
-    return _yPython;
+    return *_yPython;
 }
 
 /**
@@ -203,7 +203,7 @@ YPython::loadModule(string module)
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       pMain = YPython::yPython()->importModule(module);
+       pMain = YPython::yPython().importModule(module);
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
 
@@ -253,7 +253,7 @@ YPython::callInner (string module, string function, bool method,
     YCPValue result = YCPNull ();
 
     // obtain correct dictionary for module
-    pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),module.c_str());
+    pMainDict = PyDict_GetItemString(YPython::yPython().pMainDicts(),module.c_str());
 
     // obtain function from dictionary
     if (PyDict_Contains(pMainDict,PyString_FromString(function.c_str())))

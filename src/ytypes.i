@@ -45,7 +45,7 @@ YCPValue pyval_to_ycp(PyObject *input)
         }
     }
     if (PyFunction_Check(input))
-        return YPython::yPython()->fromPythonFunToReference(input);
+        return YPython::yPython().fromPythonFunToReference(input);
     if (PyDict_Check(input)) {
         YCPMap m;
         if (PyDict_Size(input) == 0)

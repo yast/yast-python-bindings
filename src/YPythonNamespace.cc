@@ -61,7 +61,7 @@ public:
     //! called by YEFunction::evaluate
     virtual YCPValue evaluateCall ()
     {
-	return YPython::yPython()->callInner (
+	return YPython::yPython().callInner (
 	    m_module_name, m_local_name, isMethod (),
 	    m_call);
     }
@@ -171,7 +171,7 @@ YPythonNamespace::YPythonNamespace (string name)
   long num = 0;          //number of function arguments
 
   //obtain main dictionary of globals variables
-  pMainDict = PyDict_GetItemString(YPython::yPython()->pMainDicts(),name.c_str());
+  pMainDict = PyDict_GetItemString(YPython::yPython().pMainDicts(),name.c_str());
   if (pMainDict == NULL){
       y2error("Can't load module %s", name.c_str());
       return;
