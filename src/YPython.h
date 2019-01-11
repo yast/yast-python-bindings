@@ -34,7 +34,14 @@ class YPython
 public:
 
     /**
-     * Load a Python module - equivalent to "use" in Python.
+     *
+     * import a Python module
+     */
+
+     PyObject* importModule(string module);
+
+    /**
+     * Load a Python YAST module
      *
      * Returns a YCPError on failure, YCPVoid on success.
      **/

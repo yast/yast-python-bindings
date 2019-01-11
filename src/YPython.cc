@@ -62,6 +62,29 @@
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
     std::cerr.flush()
 
+static bool append_to_sys_path(string& path) {
+    Py_ssize_t num_paths = 0;
+    bool found = false;
+    PyObject* pPaths = PySys_GetObject("path");
+    PyObject* newPath = PyString_FromString(path.c_str());
+
+    if (pPaths == NULL) {
+        return false;
+    }
+    num_paths = PyList_Size(pPaths);
+    for (Py_ssize_t count = 0; count < num_paths; ++count) {
+        if (PyObject_RichCompareBool(PyList_GetItem(pPaths, count),
+                                     newPath, Py_EQ) == 1) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        PyList_Append(pPaths,  PyString_FromString(path.c_str()));
+    }
+    return true;
+}
+
 YPython * YPython::_yPython = 0;
 
 PyObject * YPython::_pMainDicts = NULL;
@@ -115,18 +138,16 @@ YPython::destroy()
 }
 
 
-
 /**
- * Loads a module.
+ * import a module.
  **/
-YCPValue
-YPython::loadModule(string module)
-{
+PyObject *
+YPython::importModule(string module){
     string path;
     string module_name;
-    PyObject* pModuleName;
+    PyObject* pModuleName = NULL;
     size_t found;
-    PyObject* pMain;
+    PyObject* pMain = NULL;
 
     //found last "/" in path
     found = module.find_last_of("/");
@@ -140,19 +161,49 @@ YPython::loadModule(string module)
     //initialize python
     if (!Py_IsInitialized()) {
        Py_Initialize();
-       if (!YPython::_pMainDicts)
-          YPython::_pMainDicts = PyDict_New();
     }
 
-    PyObject* pPaths = PySys_GetObject("path");
-    PyList_Append(pPaths, PyString_FromString(path.c_str()));
     if (!YPython::_pMainDicts)
        YPython::_pMainDicts = PyDict_New();
+
+    // put module path in os.path for loading
+    append_to_sys_path(path);
+
     //create python string for name of module 
     pModuleName = PyString_FromString(module_name.c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
        pMain = PyImport_ImportModule(module_name.c_str());
+    }
+    return pMain;
+}
+
+/**
+ * Loads a module.
+ **/
+YCPValue
+YPython::loadModule(string module)
+{
+    string module_name;
+    PyObject* pModuleName = NULL;
+    size_t found = 0;
+    PyObject* pMain = NULL;
+
+    //found last "/" in path
+    found = module.find_last_of("/");
+    //extract module name from path
+    module_name = module.substr(found+1);
+    //delete last 3 chars from module name ".py"
+    module_name.erase(module_name.size()-3); //delete ".py"
+
+    if (!YPython::_pMainDicts)
+       YPython::_pMainDicts = PyDict_New();
+    //create python string for name of module 
+
+    pModuleName = PyString_FromString(module_name.c_str());
+    //check if dictionary contain "dictionary" for module
+    if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
+       pMain = YPython::yPython()->importModule(module);
        if (pMain == NULL){
            y2error("Can't import module %s", module_name.c_str());
 
