@@ -15,5 +15,10 @@
 #define Py_TPFLAGS_HAVE_CLASS Py_TPFLAGS_BASETYPE
 #define PyString_AS_STRING(x) PyUnicode_AS_STRING(x)
 #define _PyLong_FromSsize_t(x) PyLong_FromSsize_t(x)
-
+#define PyStr_AsString PyUnicode_AsUTF8
+#define PyStr_Check PyUnicode_Check
+#else
+/* Compatibility macros for Python 2 */
+#define PyStr_AsString PyString_AsString
+#define PyStr_Check PyString_Check
 #endif
