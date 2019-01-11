@@ -45,7 +45,7 @@ public:
      *
      * Returns a YCPError on failure, YCPVoid on success.
      **/
-    static YCPValue loadModule(string module);
+    YCPValue loadModule(string module);
 
     /**
      * Access the static (singleton) YPython object. Create it if it isn't
@@ -62,12 +62,6 @@ public:
 
     PyObject* pMainDicts();
 
-    /**
-     * static _pMainDicts includes dictionaries of all imported python modules
-     * 
-     **/
-
-    static PyObject* _pMainDicts;
 
     /**
      * Destroy the static (singleton) YPython object and unload the embedded Python
@@ -82,8 +76,6 @@ public:
      **/
     YCPValue callInner (string module, string function, bool method,
 			YCPList argList);
-    
-    static YPython * _yPython;
 
 
     /**
@@ -102,7 +94,7 @@ public:
      * Handler for python errors, info will be saved into  yast logs
      * FUnction saves info from void PyErr_Fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback)
      **/
-    static string PyErrorHandler();
+    string PyErrorHandler();
 
     /**
      * Prepare YCPReference for calling python function in YCP via reference
@@ -111,6 +103,14 @@ public:
 
 private:
 
+    
+    static YPython * _yPython;
+    /**
+     * static _pMainDicts includes dictionaries of all imported python modules
+     * 
+     **/
+
+    static PyObject* _pMainDicts;
     /**
      * Find function in Global Dictionary
      * confirm if function is from imported module or not

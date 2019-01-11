@@ -62,7 +62,7 @@ Y2Namespace *Y2PythonComponent::import (const char* name)
     }
 
     //import module and add his dictionary to YPython::_pMainDicts
-    YPython::loadModule (module);
+    YPython::yPython().loadModule (module);
 
     // introspect, create data structures for the interpreter
     Y2Namespace *ns = new YPythonNamespace (name);
