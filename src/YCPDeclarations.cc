@@ -203,11 +203,6 @@ YCPDeclarations::~YCPDeclarations()
         delete _cache[i];
     }
 
-#if PY_MAJOR_VERSION < 3
-    if (_py_self != NULL)
-        Py_DECREF(_py_self);
-#endif
-
     y2debug("Destructor called");
 }
 
