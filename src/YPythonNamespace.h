@@ -11,7 +11,6 @@ class YPythonNamespace : public Y2Namespace
 {
 private:
     string m_name;		//! this namespace's name, eg. XML::Writer
-    bool m_all_methods;		//! add the class name to all calls
 public:
 
     /**

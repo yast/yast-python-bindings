@@ -55,8 +55,7 @@ public:
 	    m_call->add (YCPVoid ());
 	}
 
-    //! if true, the python function is passed the module name
-    virtual bool isMethod () = 0;
+    virtual bool isMethod () { return true; }
 
     //! called by YEFunction::evaluate
     virtual YCPValue evaluateCall ()
@@ -120,33 +119,8 @@ public:
     virtual string name () const { return m_local_name; }
 };
 
-class Y2PythonSubCall : public Y2PythonFunctionCall {
-public:
-    Y2PythonSubCall (const string &module_name,
-		     const string &local_name,
-		     constFunctionTypePtr function_type 
-	) :
-	Y2PythonFunctionCall (module_name, local_name, function_type)
-	{}
-    virtual bool isMethod () { return false; }
-};
-
-class Y2PythonMethodCall : public Y2PythonFunctionCall {
-public:
-    Y2PythonMethodCall (const string &module_name,
-			const string &local_name,
-                        constFunctionTypePtr function_type
-	) :
-	Y2PythonFunctionCall (module_name, local_name, function_type)
-	{}
-    virtual bool isMethod () { return true; }
-};
-
-
-
 YPythonNamespace::YPythonNamespace (string name)
-    : m_name (name),
-      m_all_methods (true)
+    : m_name (name)
 {
 
   //Objects for Python API
@@ -239,8 +213,8 @@ YPythonNamespace::YPythonNamespace (string name)
 
 
 YPythonNamespace::YPythonNamespace (string name, PyObject* function)
-      : m_name (name),
-        m_all_methods (true) {
+      : m_name (name)
+{
 
 
   PyObject * fun_code;    //code of function
@@ -386,14 +360,7 @@ Y2Function* YPythonNamespace::createFunctionCall (const string name, constFuncti
     {
         //cout << "namespace: " << m_name << " function: " << name << endl;
 	constTypePtr t = required_type ? required_type : (constFunctionTypePtr)func_te->sentry()->type ();
-	if (m_all_methods)
-	{
-	    return new Y2PythonMethodCall (m_name, name, t);
-	}
-	else
-	{
-	    return new Y2PythonSubCall (m_name, name, t);
-	}
+	return new  Y2PythonFunctionCall(m_name, name, t);
     }
     
     //cout << "namespace: " << m_name << " function: " << name << endl;
