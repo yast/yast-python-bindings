@@ -78,18 +78,6 @@ public:
 			YCPList argList);
 
 
-    /**
-     * Transform Python type to YCP type and return new YCPValue built
-     * from python object.
-     */
-    YCPValue PythonTypeToYCPType(PyObject*);
-
-    /**
-     * Transform YCP type to Python type and return reference to new
-     * Python object.
-     */
-    PyObject *YCPTypeToPythonType(YCPValue);
-
    /**
      * Handler for python errors, info will be saved into  yast logs
      * FUnction saves info from void PyErr_Fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback)
@@ -128,48 +116,6 @@ private:
      **/
     bool addModuleAndFunction(string module, string fun_name, PyObject* function);
 
-
-    /**
-     * Convert a Python list to a YCPList.
-     **/
-    YCPList fromPythonListToYCPList (PyObject* pPythonList);
-
-    /**
-     * Convert a YCPList to a Python list.
-     **/
-    PyObject* fromYCPListToPythonList (YCPValue ycp_List);
-
-    /**
-     * Convert a Python Dictionary to a YCPMap.
-     **/
-    YCPMap fromPythonDictToYCPMap (PyObject* pPythonDict);
-
-
-    /**
-     * Convert a YCPMap to a Python Dictionary.
-     **/
-    PyObject* fromYCPMapToPythonDict (YCPValue ycp_Map);
-
-    /**
-     * Convert a Python Tuple to YCPList
-     **/
-    YCPList fromPythonTupleToYCPList (PyObject* pPythonTuple);
-
-    /**
-     * Convert a YCPList to a Python tuple.
-     **/
-    PyObject* fromYCPListToPythonTuple (YCPValue ycp_List);
-
-    /**
-     * Convert a Python Tuple to YCPList
-     **/
-    YCPTerm fromPythonTermToYCPTerm (PyObject* pPythonTerm);
-
-    /**
-     * Convert a YCPList to a Python tuple.
-     **/
-    PyObject* fromYCPTermToPythonTerm (YCPValue ycp_Term);
-
     /**
      * Function find in namespace function and return symbol entry
      **/
@@ -187,9 +133,6 @@ protected:
      * Destructor.
      **/
     ~YPython();
-
-    
-
 
 };
 
