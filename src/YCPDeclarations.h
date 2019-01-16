@@ -120,7 +120,6 @@ class YCPDeclarations {
      */
     bool init();
 
-  //static
   private:
     /**
      * Here is stored pointer to YCPDeclare object.

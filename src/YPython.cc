@@ -207,12 +207,6 @@ YPython::loadModule(string modulePath)
            return YCPError("The module was not imported");
        }
 
-       /* Something is broken somewhere, with py3 this line doesn't
-        * work when called from ruby (as a result of import "PythonModule"
-        * However when called from python (e.g. import_module("PythonModule")
-        * it works.
-        */
-       //int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
        int ret = PyDict_SetItemString(YPython::_pMainDicts, module.name().c_str(), PyModule_GetDict(pMain));
        if (ret != 0)
           return YCPError("The module was not imported");
@@ -284,7 +278,6 @@ YPython::callInner (string module, string function, bool method,
         y2error("PyObject_CallObject(pFunc, pArgs) failed!");
         if (PyErr_Occurred() != NULL){
            y2error("Python error: %s", PyErrorHandler().c_str());
-           //PyErr_Print();
         }
     }
     // delete pReturn
@@ -342,7 +335,6 @@ bool YPython::addModuleAndFunction(string module, string fun_name, PyObject* fun
 	  return true;
 
        } else {
-          //PyObject * newDict = PyDict_New();
           if (PyDict_SetItemString(pMainDict, fun_name.c_str(), function) < 0) {
              y2error("Adding new function %s to local dictionary", fun_name.c_str());
              return false;
@@ -388,7 +380,6 @@ YCPValue YPython::findSymbolEntry(Y2Namespace *ns, string module, string functio
      }
 
      SymbolEntryPtr sym_entry = sym_te->sentry();
-     //cout << "entry" << sym_entry->toString()<< endl;
      return YCPReference(sym_entry);
 
   } else {
@@ -409,7 +400,6 @@ YCPValue YPython::fromPythonFunToReference (PyObject* pyFun) {
     PyObject *fun_code = PyFunction_GetCode(pyFun);
     string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
     string file_path = PyString_AsString(((PyCodeObject *) fun_code)->co_filename);
-    //int no_args = ((PyCodeObject *) fun_code)->co_argcount;
 
     //found last "/" in path
     size_t found = file_path.find_last_of("/");
@@ -484,7 +474,6 @@ string YPython::PyErrorHandler() {
       (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
       (PyString_Check(pystring))
       )
-       //strcpy(save_error_type, PyString_AsString(pystring));
       result += PyString_AsString(pystring);
    else
       result += "<unknown exception type>";
@@ -496,10 +485,8 @@ string YPython::PyErrorHandler() {
       (pystring = PyObject_Str(errdata)) != NULL &&
       (PyString_Check(pystring))
       )
-       //strcpy(save_error_info, PyString_AsString(pystring));
       result += PyString_AsString(pystring);
    else
-       //strcpy(save_error_info, "<unknown exception data>");
       result += "<unknown exception value>";
    Py_XDECREF(pystring);
 
@@ -510,13 +497,10 @@ string YPython::PyErrorHandler() {
       (pystring = PyObject_Str(errtraceback)) != NULL &&
       (PyString_Check(pystring))
       )
-       //strcpy(save_error_info, PyString_AsString(pystring));
       result += PyString_AsString(pystring);
    else
-       //strcpy(save_error_info, "<unknown exception data>");
       result += "<unknown exception traceback>";
    Py_XDECREF(pystring);
-   //printf("%s\n%s\n", save_error_type, save_error_info);
    Py_XDECREF(errobj);
    Py_XDECREF(errdata);         /* caller owns all 3 */
    Py_XDECREF(errtraceback);    /* already NULL'd out */

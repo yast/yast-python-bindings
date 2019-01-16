@@ -51,12 +51,6 @@ public:
     void result( const YCPValue & result );
 
     /**
-     * Implements the Python:: functions.
-     **/
-// not yet, prototype the transparent bindings first
-//    YCPValue evaluate( const YCPValue & val );
-
-    /**
      * Try to import a given namespace. This method is used
      * for transparent handling of namespaces (YCP modules)
      * through whole YaST.

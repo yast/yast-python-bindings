@@ -187,14 +187,11 @@ YPythonNamespace::YPythonNamespace (string name)
   //check each symbol and try to find function names
   for (int i = 0; i < num_fun_names; i++) {
     PyObject* pFunc;        //pionter for function from python
-    //y2milestone ("YPythonNamespace iteration %d from all %d", i, num_fun_names);
     item = PyList_GetItem(fun_names, i); /* Can’t fail */
-    //y2milestone ("YPythonNamespace item: %s", PyString_AsString(item));
     if (!PyStr_Check(item)){
       continue;
     }
     pFunc_name = PyStr_AsString(item);
-    //y2milestone ("item: %s", PyString_AsString(item));
     pFunc = PyDict_GetItemString(pMainDict, pFunc_name);
     //check if symbol is callable    
 
@@ -268,17 +265,14 @@ YCPValue YPythonNamespace::evaluate (bool cse)
 Y2Function* YPythonNamespace::createFunctionCall (const string name, constFunctionTypePtr required_type)
 {
     y2debug ("Python creating function call for %s", name.c_str ());
-    //TableEntry *func_te = table ()->find (name.c_str (), SymbolEntry::c_function);
     TableEntry *func_te = table ()->find (name.c_str ());
 
     if (func_te)
     {
-        //cout << "namespace: " << m_name << " function: " << name << endl;
 	constTypePtr t = required_type ? required_type : (constFunctionTypePtr)func_te->sentry()->type ();
 	return new  Y2PythonFunctionCall(m_name, name, t);
     }
     
-    //cout << "namespace: " << m_name << " function: " << name << endl;
     y2error ("No such function %s", name.c_str ());
     return NULL;
 }
