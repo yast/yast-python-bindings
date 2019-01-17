@@ -11,6 +11,8 @@ class YPythonNamespace : public Y2Namespace
 {
 private:
     string m_name;		//! this namespace's name, eg. XML::Writer
+    void insertFuncSymbol(PyObject *pFunc, const char *pFunc_name, int& count);
+
 public:
 
     /**

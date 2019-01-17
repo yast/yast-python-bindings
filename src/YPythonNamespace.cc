@@ -119,30 +119,57 @@ public:
     virtual string name () const { return m_local_name; }
 };
 
+void YPythonNamespace::insertFuncSymbol(PyObject *pFunc, const char *pFunc_name, int& count)
+{
+   FunctionTypePtr sym_tp;
+   //Declarations (using YPCDelcarations python module)
+   YCPDeclarations *decl = YCPDeclarations::instance();
+   //code of function
+   PyObject * fun_code = PyFunction_GetCode(pFunc);
+   //number of function arguments
+   long num = ((PyCodeObject *) fun_code)->co_argcount;
+   if (decl->exists((PyFunctionObject *)pFunc)
+      && decl->numParams((PyFunctionObject *)pFunc) == num){
+
+      sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)pFunc));
+      std::vector<constTypePtr> list_of_types =
+         decl->params((PyFunctionObject *)pFunc);
+      int tmp = list_of_types.size();
+      for (int i=0; i < tmp; i++){
+         sym_tp->concat(list_of_types[i]);
+      }
+   } else {
+      sym_tp = new FunctionType(Type::Any);
+      //add types and number of arguments into SymbolEntry table
+      for (long j = 0; j < num; j++) {
+         sym_tp->concat(Type::Any);
+      }
+   }
+   // symbol entry for the function
+   SymbolEntry *fun_se = new SymbolEntry (this,
+                // position. arbitrary numbering. must stay consistent when?
+                count++,
+                // passed to Ustring, no need to strdup
+		pFunc_name,
+		SymbolEntry::c_function,
+		sym_tp);
+   fun_se->setGlobal (true);
+
+   // enter it to the symbol table
+   enterSymbol (fun_se, 0);
+}
+
 YPythonNamespace::YPythonNamespace (string name)
     : m_name (name)
 {
-
   //Objects for Python API
   PyObject* pMainDict;    //global dictionary of imported module
-  PyObject* pFunc;        //pionter for function from python
   const char* pFunc_name;
   PyObject* item;         //item from dictionary
   PyObject * fun_names;   //list of keys from dictionary (YPython::yPython()->pMain())
-  PyObject * fun_code;    //code of function
-
-  //Declarations (using YPCDelcarations python module)
-  YCPDeclarations *decl = YCPDeclarations::instance();
-  //YCPDeclarations *decl = new YCPDeclarations();
-  
-  FunctionTypePtr sym_tp;
-  std::vector<constTypePtr> list_of_types;
-  int tmp;
-
 
   int num_fun_names = 0; //number of keys from dictionary
   int count = 0;         // position. arbitrary numbering
-  long num = 0;          //number of function arguments
 
   //obtain main dictionary of globals variables
   pMainDict = PyDict_GetItemString(YPython::yPython().pMainDicts(),name.c_str());
@@ -158,6 +185,7 @@ YPythonNamespace::YPythonNamespace (string name)
   num_fun_names = PyList_Size(fun_names);
   //check each symbol and try to find function names
   for (int i = 0; i < num_fun_names; i++) {
+    PyObject* pFunc;        //pionter for function from python
     //y2milestone ("YPythonNamespace iteration %d from all %d", i, num_fun_names);
     item = PyList_GetItem(fun_names, i); /* Can’t fail */
     //y2milestone ("YPythonNamespace item: %s", PyString_AsString(item));
@@ -170,103 +198,24 @@ YPythonNamespace::YPythonNamespace (string name)
     //check if symbol is callable    
 
     if (PyFunction_Check(pFunc)) {
-       fun_code = PyFunction_GetCode(pFunc);
-       num = ((PyCodeObject *) fun_code)->co_argcount;
-
-         
-       if (decl->exists((PyFunctionObject *)pFunc) 
-           && decl->numParams((PyFunctionObject *)pFunc) == num){
-
-           sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)pFunc));
-
-           list_of_types = decl->params((PyFunctionObject *)pFunc);
-           tmp = list_of_types.size();
-           for (int i=0; i < tmp; i++){
-               sym_tp->concat(list_of_types[i]);
-           }
-       }else{
-           sym_tp = new FunctionType(Type::Any);
-           //y2milestone ("Number of parameters: %d", num);
-           //add types and number of arguments into SymbolEntry table
-           for (long j = 0; j < num; j++) {
-               sym_tp->concat(Type::Any);    
-           }
-       }
-       //y2milestone ("Callable function %s", PyString_AsString(item));
-       // symbol entry for the function
-       SymbolEntry *fun_se = new SymbolEntry (
-		this,
-		count++,	         // position. arbitrary numbering. must stay consistent when?
-		pFunc_name,              // passed to Ustring, no need to strdup
-		SymbolEntry::c_function, 
-		sym_tp);
-       fun_se->setGlobal (true);
-
-       // enter it to the symbol table
-       enterSymbol (fun_se, 0);
+        insertFuncSymbol(pFunc, pFunc_name, count);
     }
   } // end of for (int i = 0; i < num_fun_names; i++)
 
   y2milestone ("YPythonNamespace finish");
-  
+
 }
 
 
 YPythonNamespace::YPythonNamespace (string name, PyObject* function)
       : m_name (name)
 {
-
-
-  PyObject * fun_code;    //code of function
-
-  //Declarations (using YPCDelcarations python module)
-  YCPDeclarations *decl = YCPDeclarations::instance();
-  //YCPDeclarations *decl = new YCPDeclarations();
-  
-  FunctionTypePtr sym_tp;
-  std::vector<constTypePtr> list_of_types;
-  int tmp;
-
   int count = 0;         // position. arbitrary numbering
-  long num = 0;          //number of function arguments
 
-
-  fun_code = PyFunction_GetCode(function);
-  num = ((PyCodeObject *) fun_code)->co_argcount;
-  string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
-         
-  if (decl->exists((PyFunctionObject *)function) 
-      && decl->numParams((PyFunctionObject *)function) == num){
-
-     sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)function));
-
-     list_of_types = decl->params((PyFunctionObject *)function);
-     tmp = list_of_types.size();
-     for (int i=0; i < tmp; i++){
-         sym_tp->concat(list_of_types[i]);
-     }
-  } else {
-     sym_tp = new FunctionType(Type::Any);
-     //y2milestone ("Number of parameters: %d", num);
-     //add types and number of arguments into SymbolEntry table
-     for (long j = 0; j < num; j++) {
-         sym_tp->concat(Type::Any);    
-     }
-  }
-  //y2milestone ("Callable function %s", PyString_AsString(item));
-  // symbol entry for the function
-  SymbolEntry *fun_se = new SymbolEntry (
-	this,
-	count++,	         // position. arbitrary numbering. must stay consistent when?
-	fun_name.c_str(), // passed to Ustring, no need to strdup
-	SymbolEntry::c_function, 
-	sym_tp);
-  fun_se->setGlobal (true);
-
-  // enter it to the symbol table
-  enterSymbol (fun_se, 0);
-
-
+  PyObject * fun_code = PyFunction_GetCode(function);
+  const char* pFunc_name;
+  pFunc_name = PyStr_AsString(((PyCodeObject *) fun_code)->co_name);
+  insertFuncSymbol(fun_code, pFunc_name, count);
   y2milestone ("(special) YPythonNamespace finish");
 
 }
