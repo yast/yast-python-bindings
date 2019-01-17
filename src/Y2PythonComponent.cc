@@ -55,10 +55,9 @@ Y2Namespace *Y2PythonComponent::import (const char* name)
     // must be the same in Y2CCPython and Y2PythonComponent
 
     string module = YCPPathSearch::find (YCPPathSearch::Module, string (name) + ".py");
-    if (module.empty ())
-    {
-	y2internal ("Couldn't find %s after Y2CCPython pointed to us", name);
-	return NULL;
+    if (module.empty ()) {
+        y2internal ("Couldn't find %s after Y2CCPython pointed to us", name);
+        return NULL;
     }
 
     //import module and add his dictionary to YPython::_pMainDicts

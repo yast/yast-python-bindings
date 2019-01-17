@@ -30,9 +30,10 @@ YCPDeclarations *YCPDeclarations::instance()
 bool YCPDeclarations::_isInCache(PyFunctionObject *func) const
 {
     int len = _cache.size();
-    for (int i=0; i < len; i++){
-        if (_cache[i]->function == func)
+    for (int i=0; i < len; i++) {
+        if (_cache[i]->function == func) {
             return true;
+        }
     }
 
     return false;
@@ -47,27 +48,28 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
     cache_function_t *function;
     Py_ssize_t tuple_size;
 
-    if (!_init())
+    if (!_init()) {
         return;
+    }
 
-    if (_isInCache(func)){
+    if (_isInCache(func)) {
         y2debug("function (%ld, %s) is already in cache.", (long)func, PyStr_AsString(func->func_name));
         return;
     }
 
     item = _getItemFromFunctionMap((PyObject *)func);
-    if (item == NULL || !PyDict_Check(item)){
+    if (item == NULL || !PyDict_Check(item)) {
         y2debug("function (%ld, %s) is not declared using YCPDeclare", (long)func, PyStr_AsString(func->func_name));
         return;
     }
 
     return_type = PyDict_GetItemString(item, "return_type");
-    if (return_type == NULL || !PyUnicode_Check(return_type)){
+    if (return_type == NULL || !PyUnicode_Check(return_type)) {
         y2debug("Invalid return type of function (%ld, %s)", (long)func, PyStr_AsString(func->func_name));
         return;
     }
     params = PyDict_GetItemString(item, "parameters");
-    if (params == NULL || !PyTuple_Check(params)){
+    if (params == NULL || !PyTuple_Check(params)) {
         y2debug("Invalid parameters of function (%ld, %s)", (long)func, PyStr_AsString(func->func_name));
         return;
     }
@@ -83,7 +85,7 @@ void YCPDeclarations::_cacheFunction(PyFunctionObject *func)
 
     //parameters:
     tuple_size = PyTuple_Size(params);
-    for (Py_ssize_t i=0; i < tuple_size; i++){
+    for (Py_ssize_t i=0; i < tuple_size; i++) {
         tmp = PyTuple_GetItem(params, i);
         function->parameters.push_back(_interpretType(PyStr_AsString(tmp)));
     }
@@ -99,15 +101,15 @@ const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyF
     int len = _cache.size();
 
     y2debug("Searching for function (%ld, %s)...", (long)func, PyStr_AsString(func->func_name));
-    for (int i=0; i < len; i++){
-        if (_cache[i]->function == func){
+    for (int i=0; i < len; i++) {
+        if (_cache[i]->function == func) {
             y2debug("    ==> Function found on position %d", i);
             ret = _cache[i];
             break;
         }
     }
 
-    if (ret == NULL){
+    if (ret == NULL) {
         y2debug("    ==> Function not found");
     }
 
@@ -117,16 +119,18 @@ const YCPDeclarations::cache_function_t *YCPDeclarations::_getCachedFunction(PyF
 
 PyObject *YCPDeclarations::_getItemFromFunctionMap(PyObject *key)
 {
-    if (!_init())
+    if (!_init()) {
         return NULL;
+    }
 
-    if (_py_self == NULL)
+    if (_py_self == NULL) {
         return NULL;
+    }
 
     PyObject *dict = PyModule_GetDict(_py_self);
     PyObject *func_map = PyDict_GetItemString(dict, "_function_map");
 
-    if (!PyDict_Check(func_map)){
+    if (!PyDict_Check(func_map)) {
         y2error("Map _function_map not found in python module YCPDeclarations");
         return NULL;
     }
@@ -139,26 +143,36 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
 {
     string type(c_type);
 
-    if (type == "void")
+    if (type == "void") {
         return Type::Void;
-    if (type == "boolean")
+    }
+    if (type == "boolean") {
         return Type::Boolean;
-    if (type == "float")
+    }
+    if (type == "float") {
         return Type::Float;
-    if (type == "integer")
+    }
+    if (type == "integer") {
         return Type::Integer;
-    if (type == "path")
+    }
+    if (type == "path") {
         return Type::Path;
-    if (type == "string")
+    }
+    if (type == "string") {
         return Type::String;
-    if (type == "symbol")
+    }
+    if (type == "symbol") {
         return Type::Symbol;
-    if (type == "term")
+    }
+    if (type == "term") {
         return Type::Term;
-    if (type == "map")
+    }
+    if (type == "map") {
         return Type::Map;
-    if (type == "list")
+    }
+    if (type == "list") {
         return Type::List;
+    }
 
     // default:
     return Type::Any;
@@ -167,16 +181,17 @@ constTypePtr YCPDeclarations::_interpretType(const char *c_type) const
 
 bool YCPDeclarations::_init()
 {
-    if (_py_self != NULL)
+    if (_py_self != NULL) {
         return true;
+    }
 
-    if (!Py_IsInitialized()){
+    if (!Py_IsInitialized()) {
         y2error("Python interpret is not initialized!");
         return false;
     }
 
     _py_self = PyImport_ImportModule("YCPDeclarations");
-    if (_py_self == NULL){
+    if (_py_self == NULL) {
         y2error("Failed to import YCPDeclarations module!");
         return false;
     }
@@ -199,7 +214,7 @@ YCPDeclarations::YCPDeclarations() : _py_self(NULL)
 YCPDeclarations::~YCPDeclarations()
 {
     int cache_len = _cache.size();
-    for (int i=0; i < cache_len; i++){
+    for (int i=0; i < cache_len; i++) {
         delete _cache[i];
     }
 
@@ -212,8 +227,9 @@ int YCPDeclarations::numParams(PyFunctionObject *func)
     _cacheFunction(func);
 
     const cache_function_t *function = _getCachedFunction(func);
-    if (function == NULL)
+    if (function == NULL) {
         return -1;
+    }
 
     y2debug("Number of parameters of function (%ld, %s) is %d",
             (long)func, PyStr_AsString(func->func_name), (int)function->parameters.size());
@@ -232,7 +248,7 @@ vector<constTypePtr> YCPDeclarations::params(PyFunctionObject *func)
     _cacheFunction(func);
 
     const cache_function_t *function = _getCachedFunction(func);
-    if (function == NULL){
+    if (function == NULL) {
         return vector<constTypePtr>();
     }
 
@@ -244,7 +260,7 @@ constTypePtr YCPDeclarations::returnType(PyFunctionObject *func)
     _cacheFunction(func);
 
     const cache_function_t *function = _getCachedFunction(func);
-    if (function == NULL){
+    if (function == NULL) {
         return _interpretType("any");
     }
 

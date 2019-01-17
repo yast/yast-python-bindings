@@ -43,7 +43,10 @@ public:
     /**
      * The name of this component.
      */
-    string name() const { return "python"; }
+    string name() const
+    {
+        return "python";
+    }
 
     /**
      * Is called by the generic frontend when the session is finished.

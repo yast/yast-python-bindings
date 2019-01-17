@@ -40,7 +40,10 @@ public:
     virtual ~YPythonNamespace ();
 
     //! what namespace do we implement
-    virtual const string name () const { return m_name; }
+    virtual const string name () const
+    {
+        return m_name;
+    }
     //! used for error reporting
     virtual const string filename () const;
 

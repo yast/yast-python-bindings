@@ -27,12 +27,13 @@
  *      ...
  *
  */
-class YCPDeclarations {
-  private:
+class YCPDeclarations
+{
+private:
     /**
      * structure where can be stored cached function.
      */
-    typedef struct{
+    typedef struct {
         PyFunctionObject *function;
         constTypePtr return_type;
         std::vector<constTypePtr> parameters;
@@ -92,7 +93,7 @@ class YCPDeclarations {
      */
     bool _init();
 
-  public:
+public:
     ~YCPDeclarations();
 
     /**
@@ -120,12 +121,12 @@ class YCPDeclarations {
      */
     bool init();
 
-  private:
+private:
     /**
      * Here is stored pointer to YCPDeclare object.
      */
     static YCPDeclarations _instance;
-  public:
+public:
     /**
      * Return pointer to instance of YCPDeclare object.
      */

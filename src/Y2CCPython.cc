@@ -31,28 +31,23 @@ Y2CCPython g_y2ccpython;
 Y2Component *Y2CCPython::provideNamespace (const char *name)
 {
     y2debug ("Y2CCPython::provideNamespace %s", name);
-    if (strcmp (name, "Python") == 0)
-    {
-	// low level functions
+    if (strcmp (name, "Python") == 0) {
+        // low level functions
 
-	// leave implementation to later
-	return 0;
-    }
-    else
-    {
-	// is there a python module?
-	// must be the same in Y2CCPython and Y2PythonComponent
-	string module = YCPPathSearch::find (YCPPathSearch::Module, string (name) + ".py");
-	if (!module.empty ())
-	{
-	    if (!cpython)
-	    {
-		cpython = new Y2PythonComponent ();
-	    }
-	    return cpython;
-	}
+        // leave implementation to later
+        return 0;
+    } else {
+        // is there a python module?
+        // must be the same in Y2CCPython and Y2PythonComponent
+        string module = YCPPathSearch::find (YCPPathSearch::Module, string (name) + ".py");
+        if (!module.empty ()) {
+            if (!cpython) {
+                cpython = new Y2PythonComponent ();
+            }
+            return cpython;
+        }
 
-	// let someone else try creating the namespace
-	return 0;
+        // let someone else try creating the namespace
+        return 0;
     }
 }

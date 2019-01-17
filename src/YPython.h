@@ -38,7 +38,7 @@ public:
      * import a Python module
      */
 
-     PyObject* importModule(string module);
+    PyObject* importModule(string module);
 
     /**
      * Load a Python YAST module
@@ -57,7 +57,7 @@ public:
 
     /**
      * Access the static _pMainDicts
-     * 
+     *
      **/
 
     PyObject* pMainDicts();
@@ -75,13 +75,13 @@ public:
      * Generic Python call.
      **/
     YCPValue callInner (string module, string function, bool method,
-			YCPList argList);
+                        YCPList argList);
 
 
-   /**
-     * Handler for python errors, info will be saved into  yast logs
-     * FUnction saves info from void PyErr_Fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback)
-     **/
+    /**
+      * Handler for python errors, info will be saved into  yast logs
+      * FUnction saves info from void PyErr_Fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback)
+      **/
     string PyErrorHandler();
 
     /**
@@ -91,11 +91,11 @@ public:
 
 private:
 
-    
+
     static YPython * _yPython;
     /**
      * static _pMainDicts includes dictionaries of all imported python modules
-     * 
+     *
      **/
 
     PyObject* _pMainDicts;
@@ -109,11 +109,11 @@ private:
 
     int findModuleFuncInDict(string module, string function);
 
-   /**
-     * Adding module name and function into 
-     * global dictionary 
-     * (necessary for calling python function via reference)
-     **/
+    /**
+      * Adding module name and function into
+      * global dictionary
+      * (necessary for calling python function via reference)
+      **/
     bool addModuleAndFunction(string module, string fun_name, PyObject* function);
 
     /**

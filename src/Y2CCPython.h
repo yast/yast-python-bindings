@@ -38,26 +38,34 @@ public:
      * Creates a Python component creator
      */
     Y2CCPython() : Y2ComponentCreator( Y2ComponentBroker::BUILTIN ),
-	cpython (0) {};
+        cpython (0) {};
 
-    ~Y2CCPython () {
-	if (cpython)
-	    delete cpython;
+    ~Y2CCPython ()
+    {
+        if (cpython) {
+            delete cpython;
+        }
     }
 
     /**
      * Returns true, since the Python component is a YaST2 server.
      */
-    bool isServerCreator() const { return true; };
+    bool isServerCreator() const
+    {
+        return true;
+    };
 
     /**
      * Creates a new Python component.
      */
     Y2Component *create( const char * name ) const
     {
-	// create as many as requested, they all share the static YPython anyway
-	if ( ! strcmp( name, "python") ) return new Y2PythonComponent();
-	else return 0;
+        // create as many as requested, they all share the static YPython anyway
+        if ( ! strcmp( name, "python") ) {
+            return new Y2PythonComponent();
+        } else {
+            return 0;
+        }
     }
 
     /**
