@@ -82,36 +82,24 @@ and also Python scripts can use YaST agents, APIs and modules.
 
 %build
 make -f Makefile.cvs all
-
 %if %{with_python3}
-%configure --enable-python3
-make
-mkdir -p %{builddir}/python3
-%__cp -d src/*.py %{builddir}/python3
-%__cp -d src/.libs/*.so.0.0.0 %{builddir}/python3
-%__cp -d src/*.la %{builddir}/python3
-make clean
+mkdir py3 && pushd py3
+%__ln_s ../configure configure
+%{configure} --enable-python3
+%make_build
+popd
 %endif
-
-%configure
-make
+mkdir py2 && pushd py2
+%__ln_s ../configure configure
+%{configure}
+%make_build
+popd
 
 %install
-%yast_install
-rm %{buildroot}/%{python_sitelib}/*.pyc
-rm %{buildroot}/%{python_sitelib}/*.pyo
-rm %{buildroot}/%{yast_plugindir}/*.la
-%__mkdir_p %{buildroot}/%{python_sitearch}/
-%__ln_s %{yast_plugindir}/libpy2lang_python.so %{buildroot}/%{python_sitearch}/_ycp.so
 %if %{with_python3}
-%__mkdir_p %{buildroot}/%{python3_sitelib}/
-%__install -m 0644 %{builddir}/python3/*.py %{buildroot}/%{python3_sitelib}/
-%__mkdir_p %{buildroot}/%{python3_sitearch}/
-%__install -m 0755 %{builddir}/python3/libpy2lang_python.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0.0.0
-%__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so
-%__ln_s %{yast_plugindir}/libpy2lang_python3.so.0.0.0 %{buildroot}/%{yast_plugindir}/libpy2lang_python3.so.0
-%__ln_s %{yast_plugindir}/libpy2lang_python3.so %{buildroot}/%{python3_sitearch}/_ycp.so
+%make_install -C py3
 %endif
+%make_install -C py2
 
 %if %{with_python3}
 %files -n yast2-python3-bindings
@@ -121,6 +109,10 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %{python3_sitearch}/_ycp.so
 %{yast_plugindir}/libpy2lang_python3.so.*
 %{yast_plugindir}/libpy2lang_python3.so
+%exclude %dir %{python3_sitelib}/__pycache__
+%exclude %{python3_sitelib}/__pycache__/*.pyc
+%exclude %{python3_sitelib}/__pycache__/*.pyo
+%exclude %{yast_plugindir}/libpy2lang_python3.la
 %endif
 
 %files -n yast2-python-bindings
@@ -131,5 +123,8 @@ rm %{buildroot}/%{yast_plugindir}/*.la
 %{yast_plugindir}/libpy2lang_python.so.*
 %{yast_plugindir}/libpy2lang_python.so
 %license COPYING
+%exclude %{python_sitelib}/*.pyc
+%exclude %{python_sitelib}/*.pyo
+%exclude %{yast_plugindir}/libpy2lang_python.la
 
 %changelog
