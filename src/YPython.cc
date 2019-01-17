@@ -106,7 +106,7 @@ public:
 
 YPython * YPython::_yPython = 0;
 
-YPython::YPython():_pMainDicts(NULL){}
+YPython::YPython():_pMainDicts(PyDict_New()){}
 
 
 YPython::~YPython(){}
@@ -168,9 +168,6 @@ YPython::importModule(string modulePath){
        Py_Initialize();
     }
 
-    if (!YPython::_pMainDicts)
-       YPython::_pMainDicts = PyDict_New();
-
     // put module path in os.path for loading
     append_to_sys_path(module.path().c_str());
 
@@ -194,8 +191,6 @@ YPython::loadModule(string modulePath)
     PyObject* pMain = NULL;
     ModuleFilePath module(modulePath);
 
-    if (!YPython::_pMainDicts)
-       YPython::_pMainDicts = PyDict_New();
     //create python string for name of module
 
     pModuleName = PyString_FromString(module.name().c_str());
@@ -314,8 +309,6 @@ YPython::callInner (string module, string function, bool method,
 int YPython::findModuleFuncInDict(string module, string function) {
 
     PyObject * pModuleName = PyString_FromString(module.c_str());
-    if (_pMainDicts==NULL)
-       return -1;
     if (PyDict_Contains(_pMainDicts, pModuleName)) {
 
        PyObject * pMainDict = PyDict_GetItemString(_pMainDicts, module.c_str());
@@ -341,10 +334,6 @@ bool YPython::addModuleAndFunction(string module, string fun_name, PyObject* fun
   
     PyObject * pModuleName = PyString_FromString(module.c_str());
     //check if dictionary contain "dictionary" for module
-
-    if (_pMainDicts==NULL) {
-       _pMainDicts = PyDict_New();
-    }
 
     if (PyDict_Contains(_pMainDicts, pModuleName)) {       
        PyObject * pMainDict = PyDict_GetItemString(_pMainDicts, module.c_str());
