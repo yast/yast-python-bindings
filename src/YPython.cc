@@ -62,7 +62,7 @@
     std::cerr << __FILE__ << ": " << __LINE__ << ": " << str << std::endl; \
     std::cerr.flush()
 
-static bool append_to_sys_path(string& path) {
+static bool append_to_sys_path(const string& path) {
     Py_ssize_t num_paths = 0;
     bool found = false;
     PyObject* pPaths = PySys_GetObject("path");
@@ -84,6 +84,25 @@ static bool append_to_sys_path(string& path) {
     }
     return true;
 }
+
+class ModuleFilePath
+{
+private:
+    string file_path;
+    string module_name;
+public:
+    ModuleFilePath(const string& fullModuleNamePath) {
+        size_t found = fullModuleNamePath.find_last_of("/");
+        if (found != string::npos) {
+            module_name = fullModuleNamePath.substr(found+1);
+            file_path = fullModuleNamePath.substr(0,found+1);
+            module_name.erase(module_name.size() - strlen(".py"));
+        }
+    }
+
+    const string& path() { return file_path; }
+    const string& name() { return module_name; }
+};
 
 YPython * YPython::_yPython = 0;
 
@@ -140,22 +159,10 @@ YPython::destroy()
  * import a module.
  **/
 PyObject *
-YPython::importModule(string module){
-    string path;
-    string module_name;
+YPython::importModule(string modulePath){
     PyObject* pModuleName = NULL;
-    size_t found;
     PyObject* pMain = NULL;
-
-    //found last "/" in path
-    found = module.find_last_of("/");
-    //extract directory from path module
-    path = module.substr(0,found+1);
-    //extract module name from path
-    module_name = module.substr(found+1);
-    //delete last 3 chars from module name ".py"
-    module_name.erase(module_name.size()-3); //delete ".py"
-
+    ModuleFilePath module(modulePath);
     //initialize python
     if (!Py_IsInitialized()) {
        Py_Initialize();
@@ -165,13 +172,13 @@ YPython::importModule(string module){
        YPython::_pMainDicts = PyDict_New();
 
     // put module path in os.path for loading
-    append_to_sys_path(path);
+    append_to_sys_path(module.path().c_str());
 
-    //create python string for name of module 
-    pModuleName = PyString_FromString(module_name.c_str());
+    //create python string for name of module
+    pModuleName = PyString_FromString(module.name().c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       pMain = PyImport_ImportModule(module_name.c_str());
+       pMain = PyImport_ImportModule(module.name().c_str());
     }
     return pMain;
 }
@@ -180,30 +187,23 @@ YPython::importModule(string module){
  * Loads a module.
  **/
 YCPValue
-YPython::loadModule(string module)
+YPython::loadModule(string modulePath)
 {
     string module_name;
     PyObject* pModuleName = NULL;
-    size_t found = 0;
     PyObject* pMain = NULL;
-
-    //found last "/" in path
-    found = module.find_last_of("/");
-    //extract module name from path
-    module_name = module.substr(found+1);
-    //delete last 3 chars from module name ".py"
-    module_name.erase(module_name.size()-3); //delete ".py"
+    ModuleFilePath module(modulePath);
 
     if (!YPython::_pMainDicts)
        YPython::_pMainDicts = PyDict_New();
-    //create python string for name of module 
+    //create python string for name of module
 
-    pModuleName = PyString_FromString(module_name.c_str());
+    pModuleName = PyString_FromString(module.name().c_str());
     //check if dictionary contain "dictionary" for module
     if (PyDict_Contains(YPython::_pMainDicts, pModuleName) == 0) {
-       pMain = YPython::yPython().importModule(module);
+       pMain = YPython::yPython().importModule(modulePath);
        if (pMain == NULL){
-           y2error("Can't import module %s", module_name.c_str());
+           y2error("Can't import module %s", module.name().c_str());
 
            if (PyErr_Occurred() != NULL){
               y2error("Python error: %s", PyErrorHandler().c_str());
@@ -218,7 +218,7 @@ YPython::loadModule(string module)
         * it works.
         */
        //int ret = PyDict_SetItem(YPython::_pMainDicts, pModuleName, PyModule_GetDict(pMain));
-       int ret = PyDict_SetItemString(YPython::_pMainDicts, module_name.c_str(), PyModule_GetDict(pMain));
+       int ret = PyDict_SetItemString(YPython::_pMainDicts, module.name().c_str(), PyModule_GetDict(pMain));
        if (ret != 0)
           return YCPError("The module was not imported");
     } else {
