@@ -119,7 +119,7 @@ public:
     virtual string name () const { return m_local_name; }
 };
 
-void YPythonNamespace::insertFuncSymbol(PyObject *pFunc, const char *pFunc_name, int& count)
+SymbolEntry * YPythonNamespace::insertFuncSymbol(PyObject *pFunc, const char *pFunc_name, int& count)
 {
    FunctionTypePtr sym_tp;
    //Declarations (using YPCDelcarations python module)
@@ -157,6 +157,7 @@ void YPythonNamespace::insertFuncSymbol(PyObject *pFunc, const char *pFunc_name,
 
    // enter it to the symbol table
    enterSymbol (fun_se, 0);
+   return fun_se;
 }
 
 YPythonNamespace::YPythonNamespace (string name)
@@ -222,46 +223,11 @@ YPythonNamespace::YPythonNamespace (string name, PyObject* function)
 
 SymbolEntry * YPythonNamespace::AddFunction (PyObject* function) {
 
-  //Declarations (using YPCDelcarations python module)
-  YCPDeclarations *decl = YCPDeclarations::instance();
-  int tmp;
-  std::vector<constTypePtr> list_of_types;
-  FunctionTypePtr sym_tp;
   PyObject *fun_code = PyFunction_GetCode(function);
-  int num = ((PyCodeObject *) fun_code)->co_argcount;
-  string fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
-         
-  if (decl->exists((PyFunctionObject *)function) 
-      && decl->numParams((PyFunctionObject *)function) == num){
+  const char * fun_name = PyString_AsString(((PyCodeObject *) fun_code)->co_name);
+  int count = 0;
 
-     sym_tp = new FunctionType(decl->returnType((PyFunctionObject *)function));
-
-     list_of_types = decl->params((PyFunctionObject *)function);
-     tmp = list_of_types.size();
-     for (int i=0; i < tmp; i++){
-         sym_tp->concat(list_of_types[i]);
-     }
-  } else {
-     sym_tp = new FunctionType(Type::Any);
-     //y2milestone ("Number of parameters: %d", num);
-     //add types and number of arguments into SymbolEntry table
-     for (long j = 0; j < num; j++) {
-         sym_tp->concat(Type::Any);    
-     }
-  }
-  // symbol entry for the function
-  SymbolEntry *fun_se = new SymbolEntry (
-	this,
-	0,	        // position. arbitrary numbering. must stay consistent when?
-	fun_name.c_str(),       // passed to Ustring, no need to strdup
-	SymbolEntry::c_function, 
-	sym_tp);
-
-  fun_se->setGlobal (true);
-
-  enterSymbol (fun_se, 0);
-
-  return fun_se;
+  return insertFuncSymbol(function, fun_name, count);
 }
 
 
