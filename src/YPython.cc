@@ -518,7 +518,29 @@ string YPython::PyErrorHandler()
             (pystring = PyObject_Str(errtraceback)) != NULL &&
             (PyString_Check(pystring))
        ) {
-        result += PyString_AsString(pystring);
+        PyObject *mod = PyImport_ImportModule("traceback");
+        if (mod) {
+            PyObject *traceStr = NULL;
+            PyObject *newline = PyUnicode_FromString("\n");
+            PyObject * meth_result =
+                PyObject_CallMethod(mod,
+                                    "format_exception",
+                                    "(OOO)",
+                                    errobj,
+                                    errdata,
+                                    errtraceback);
+            if (meth_result) {
+                traceStr = PyUnicode_Join(newline, meth_result);
+            }
+            if (traceStr) {
+                result += PyString_AsString(traceStr);
+            }
+            Py_XDECREF(meth_result);
+            Py_XDECREF(traceStr);
+            Py_XDECREF(newline);
+        } else {
+            result += PyString_AsString(pystring);
+        }
     } else {
         result += "<unknown exception traceback>";
     }
