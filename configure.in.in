@@ -11,6 +11,7 @@
 
 AC_ARG_ENABLE([python3], AS_HELP_STRING([--enable-python3], [Enable python3 build]))
 
+AM_CONDITIONAL([HAVE_PY3], [test "x$enable_python3" = "xyes"])
 if test "x$enable_python3" = "xyes"; then
     AM_PATH_PYTHON([3.4])
 else

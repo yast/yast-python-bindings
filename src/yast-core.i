@@ -13,6 +13,7 @@ using namespace std;
 
 %{
 #include "yast.h"
+#include "YPython.h"
 #include "YPythonCode.h"
 #include <ycp/YCPByteblock.h>
 %}

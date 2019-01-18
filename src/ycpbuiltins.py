@@ -1,13 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from ycp import List, String, Integer, Boolean, Float, Value
-from ycp import Term as YCPTerm
-
-import time, inspect, os
-from random import randint as pyrand_range
-import re
 
 # returns the caller n frames back
 def get_caller_loginfo(frames):
+    import inspect
     frame = inspect.currentframe()
     for i in range(0, frames):
         frame = frame.f_back
@@ -55,11 +50,11 @@ def foreach(listOrMap):
 
 # add - Add a key/value pair to a map or list
 def add(listOrMap, key, value=None):
-    from ycp import pyval_to_ycp
+    from ycp import pyval_to_ycp, List, Term
 
     if isinstance(listOrMap, dict):
         listOrMap[key] = value
-    elif isinstance(listOrMap, List) or isinstance(listOrMap, YCPTerm):
+    elif isinstance(listOrMap, List) or isinstance(listOrMap, Term):
          ycpvalue = pyval_to_ycp(key)
          listOrMap.add(ycpvalue)
     else: # assume list
@@ -68,13 +63,14 @@ def add(listOrMap, key, value=None):
     return listOrMap
 
 def size(listMapOrTerm):
-    if isinstance(listMapOrTerm, YCPTerm):
+    from ycp import Term
+    if isinstance(listMapOrTerm, Term):
         return listMapOrTerm.size()
     # assume list or map 
     return len(listMapOrTerm)
 
 def sleep(millisecs):
-    
+    import time
     time.sleep(float(millisecs)/1000)
 
 def tostring(val):
@@ -122,6 +118,7 @@ def merge(list1, list2):
     return list1 + list2
 
 def random(maxint):
+    from random import randint as pyrand_range
     return pyrand_range(0, maxint)
 
 def mergestring(listofstrings, glue):
@@ -143,5 +140,7 @@ def substring(s, start, num_chars=None):
     return result
 
 def regexpmatch(searchtext, pattern):
+    import re
     return re.search(pattern, searchtext) is not None
 
+del absolute_import, division, print_function, unicode_literals

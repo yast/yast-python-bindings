@@ -36,4 +36,4 @@ PyObject* import_module(const string & ns_name);
 
 bool widget_names();
 YCPValue _SCR_Run(char *function, YCPList args);
-
+Y2Namespace * getNs(const char * ns_name);
