@@ -9,7 +9,7 @@ yast.py: yast.py.in
 YCPMap.h:
 	sed 's/__attribute__ ((deprecated)) //g' /usr/include/YaST2/ycp/YCPMap.h > YCPMap.h
 
-python_PYTHON = ycp.py yast.py ycpbuiltins.py YCPDeclarations.py
+python_PYTHON = ycp.py yast.py yast_help.py ycpbuiltins.py YCPDeclarations.py
 
 noinst_HEADERS = PythonLogger.h y2log.h yast.h YPythonCode.h ytypes.h Y2CCPythonClient.h Y2PythonClientComponent.h YCPDeclarations.h YPython.h Y2CCPython.h Y2PythonComponent.h YCPMap.h YPythonNamespace.h
 
