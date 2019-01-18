@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Wed Jan  9 18:37:13 UTC 2019 - dmulder@suse.com
+Fri Jan 18 17:39:23 UTC 2019 - dmulder@suse.com, nopower@suse.com
 
-- Forward port python import capability.
+- Forward port python import capability, with improvements and code
+  cleanup.
+- Add pydocs to yast python
+- Improve building/packaging of python2/3
 
 -------------------------------------------------------------------
 Wed Jan  9 14:52:04 UTC 2019 - dmulder@suse.com
