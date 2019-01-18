@@ -17,7 +17,7 @@ def import_module(module):
     if m:
         globals()[module] = m
 
-def SCR_Run(func, *args):
+def __SCR_Run(func, *args):
     from ycp import _SCR_Run, pyval_to_ycp
     l = List()
     for item in args:
@@ -42,7 +42,7 @@ class SCR:
 
 def scr_meta_func_creator(func):
     from six import PY2
-    func_ptr = (lambda *args : SCR_Run(func, *args))
+    func_ptr = (lambda *args : __SCR_Run(func, *args))
     func_ptr.__name__ = func.encode() if PY2 else func
     if func in __scr_docs.keys():
         func_ptr.__doc__ = __scr_docs[func]
@@ -51,7 +51,7 @@ def scr_meta_func_creator(func):
 for func in scr_meta_funcs:
     setattr(SCR, func, scr_meta_func_creator(func))
 
-def run(func, *args):
+def __run(func, *args):
     from ycp import pyval_to_ycp
     from ycp import Term as YCPTerm
     l = List()
@@ -61,7 +61,7 @@ def run(func, *args):
 
 def meta_func_creator(func, lowercase):
     from six import PY2
-    func_ptr = (lambda *args : run(func.lower() if lowercase else func, *args))
+    func_ptr = (lambda *args : __run(func.lower() if lowercase else func, *args))
     func_ptr.__name__ = func.encode() if PY2 else func
     if func in __docs.keys():
         func_ptr.__doc__ = __docs[func]
@@ -191,3 +191,4 @@ def Id(arg, dont_force_sym = False):
         l.add(pyval_to_ycp(arg))
     return YCPTerm("id", l)
 
+del absolute_import, division, print_function, unicode_literals
