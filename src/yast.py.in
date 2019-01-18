@@ -130,7 +130,6 @@ meta_funcs = {
         'ColoredLabel': False,
         'Dummy': False,
         'DummySpecialWidget': False,
-        'HVStretch': False,
         'IconButton': False,
         'PkgSpecial': False,
         'Wizard': False,
