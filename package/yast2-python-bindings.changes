@@ -2,7 +2,7 @@
 Fri Jan 18 17:39:23 UTC 2019 - dmulder@suse.com, nopower@suse.com
 
 - Forward port python import capability, with improvements and code
-  cleanup.
+  cleanup; (bsc#1122532).
 - Add pydocs to yast python
 - Improve building/packaging of python2/3
 
