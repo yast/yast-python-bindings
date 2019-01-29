@@ -84,13 +84,13 @@ and also Python scripts can use YaST agents, APIs and modules.
 make -f Makefile.cvs all
 %if %{with_python3}
 mkdir py3 && pushd py3
-%__ln_s ../configure configure
+ln -s ../configure configure
 %{configure} --enable-python3
 %make_build
 popd
 %endif
 mkdir py2 && pushd py2
-%__ln_s ../configure configure
+ln -s ../configure configure
 %{configure}
 %make_build
 popd
