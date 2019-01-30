@@ -10,7 +10,7 @@ txtdir = $(docdir)
 
 
 
-txt_DATA = python-bindings
+txt_DATA =
 
 
 
