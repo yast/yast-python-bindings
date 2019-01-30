@@ -41,9 +41,11 @@ BuildRequires:  libyui-devel
 BuildRequires:  make
 BuildRequires:  python
 BuildRequires:  python-devel
+BuildRequires:  python-six
 %if %{with_python3}
 BuildRequires:  python3
 BuildRequires:  python3-devel
+BuildRequires:  python3-six
 %endif
 BuildRequires:  python-rpm-macros
 BuildRequires:  swig

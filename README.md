@@ -132,7 +132,7 @@ content = ButtonBox(
 
 ### Further Information
 
-More information about YaST can be found on its [homepage](http://yast.opensuse.org).
+More information about YaST can be found on its [homepage](http://yast.opensuse.org). More information about python bindings can be found in the generated documentation.
 
 ## Packager information
 

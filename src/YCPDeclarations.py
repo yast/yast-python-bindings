@@ -1,18 +1,18 @@
 """
- This module defines class YCPDeclare which can be used for defining
- what return type and what types of arguments has function which will be
- exported to YCP. For usage see YCPDeclare.__doc__.
+ This module defines the class Declare, which can be used for defining
+ what return type and what types of arguments a function has which will
+ be exported by YaST.
 
 
  Internal:
- Important is variable _function_map which holds information about
- functions. Contents of _function_map can be accessed from C:
+ The variable _function_map holds important information about functions.
+ Contents of _function_map can be accessed from C:
 
     PyObject *import = PyImport_ImportModule("YCPDeclarations");
     PyObject *dict = PyModule_GetDict(import);
     PyObject *func_map = PyDict_GetItemString(dict, "_function_map");
     // now in func_map should be stored map describing functions declared by
-    // YCPDeclare
+    // Declare
 
  _function_map has form:
     _function_map = {
@@ -32,18 +32,18 @@ def _addToFunctionMap(func_pointer, return_type, params_types):
     _function_map[func_pointer] = {"return_type" : return_type,
                                    "parameters" : params_types}
 
-class YCPDeclare:
+class Declare:
     """
-     Functor for definig return type and types of parameters
+     Functor for defining return type and types of parameters
      of function which will be exported into YCP. Best usage
      is as decorator (see http://www.python.org/dev/peps/pep-0318).
 
      Example of usage:
-         form YCPDeclarations import YCPDeclare
+         from yast import Declare
 
-         @YCPDeclare("string", "int", "int")
+         @Declare("string", "int", "int")
          def function(i, ii):
-             \"\"\" Function which returns string a accept two
+             \"\"\" Function which returns a string and accepts two
                     integers as arguments. \"\"\"
              return str(i+ii)
     """
@@ -96,7 +96,7 @@ class YCPDeclare:
 
 
     def _checkNumParams(self, func, numTypes):
-        """ Check if number of parameters equals to number of defined types """
+        """ Check if the number of parameters equals the number of defined types """
 
         args = len(inspect.getargspec(func)[0])
         if args != numTypes:

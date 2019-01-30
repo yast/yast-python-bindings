@@ -1027,3 +1027,146 @@ scr_docs['Write'] = \
             if succeed
     """
 
+type_docs = {}
+
+type_docs['Symbol'] = """Data Type symbol
+A symbol is a literal constant.
+"""
+
+type_docs['List'] = """Data Type list
+A list is a finite sequence of values. These values need not necessarily have the same data type. List constants are denoted by square brackets. In contrast to C it is possible to use complex expressions as list members when defining a list constant. The empty list is denoted by [].
+
+Example 2.6. List constants
+
+[ ]
+[ 1, 2, true ]
+[ variable, 17 + 38, some_function(x, y) ]
+[ "list", "of", "strings" ]
+
+Accessing the list elements is done by means of the index operator as in my_list[1]:"error". The list elements are numbered starting with 0, so index 1 returns the second element. After the index operator there must be a colon denoting a following default value that is returned if the list access fails somehow. The default value should have the type that is expected for the current list access, in this case the string "error".
+
+Note 1: A list preserves order of its elements when iterating over them.
+
+Note 2: There is also another method for accessing lists, originating from the early days of YaST. The command select(my_list, 1, "error") also returns the second element of my_list. While this still works, it is deprecated by now and may be dropped in the future.
+"""
+
+type_docs['String'] = """Data Type string
+Represents a character string of almost arbitrary length (limited only by memory restrictions). String constants consist of UNICODE characters encoded in UTF8. They are enclosed in double quotes.
+
+The backslash in string can be used to mark special characters:
+
+Representation	Meaning
+\\n	Newline (ASCII 10)
+\\t	Tabulator
+\\r	Carriage Return (ASCII 13)
+\\b	Backspace
+\\f	Form Feed
+\\abc	ASCII character represented by the octal value abc. Note that unlike in C, there must be exactly 3 octal digits!
+\\X	The character X itself.
+A backslash followed by a newline makes both the backslash and the newline being ignored. Thus you can split a string constant over multiple lines in the YCP code.
+
+Example 2.4. String constants
+
+"This string ends with a newline character.\\n"
+"This is also a newline: \\012"
+"""
+
+type_docs['Integer'] = """Data Type integer
+This is a machine independent signed integer value that is represented internally by a 64 bit value. The valid range is from -2^63 through 2^63-1. Integer constants are written just as you would expect. You can write them either decimal or hexadecimal by prefixing them with 0x, or octal by prefixing them with 0 (just like in C/C++).
+
+Example 2.2. Integer constants
+
+1
+-17049349
+0x9fa0
+0xDEADBEEF
+0233
+"""
+
+type_docs['Boolean'] = """Data Type boolean
+In contrast to C/C++, a YCP boolean is a real data type with the dedicated values true and false. Comparison operations like < or == evaluate to a boolean value. The if (...) statement expects a boolean value as the result of the decision clause.
+"""
+
+type_docs['Float'] = """Data Type float
+Floating point numbers. Because they are represented via the C datatype double the valid range is machine dependent. Constants are written just as you would expect. The decimal point is mandatory only if no exponent follows. Then there must be at least one digit leading the decimal point. The exponent symbol may be e or E.
+
+Example 2.3. Float constants
+
+1.0
+-0.0035
+1e30
+-0.128e-17
+"""
+
+type_docs['Code'] = """
+"""
+
+type_docs['Map'] = """Data Type map
+A YCP-map is an associative array. It is a list of key-value-pairs with the keys being non-ambiguous, i.e. there are no two keys being exactly equal. While you can use values of any type for keys and values, you should restrict the keys to be of type string because from experience other types tend to complicate the code. Values of arbitrary type on the other hand make the map a very flexible data container. Maps are denoted with $[ key_0:value_0, key_1:value_1, ...]. The empty map is denoted by $[].
+
+Note: A map does not reserve order of its elements when iterating over them.
+
+Example 2.7. Map constants
+
+$[ ]
+$[ "/usr": 560, "/home" : 3200 ]
+$[ "first": true, "2": [ true, false ], "number" : 8+9 ]
+
+Accessing the map elements is done by means of the index operator as in my_map["os_type"]:"linux". This returns the value associated with the key "os_type". As with lists, a default value must be appended (after a colon) that is returned if the given key does not exist. Again it should have the type that is expected for the current access, in this case the string "linux".
+
+You may have noticed that the syntax for accessing maps kind of resembles that of accessing lists. This is due to the fact that lists are realized as maps internally with constant keys 0, 1, 2, and so on.
+"""
+
+type_docs['Byteblock'] = """Data Type byteblock
+A byteblock simply is a sequence of zero or more bytes. The ASCII syntax for a byteblock is #[hexstring]. The hexstring is a sequence of hexadecimal values, lower and upper case letters are both allowed. A byte block consisting of the three bytes 1, 17 and 254 can thus be written as #[0111fE].
+
+In most cases, however, you will not write a byteblock constant directly into the YCP code. You can use the SCR to read and write byteblocks.
+
+Example 2.5. Byteblock constants
+
+#[ ]
+#[42]
+#[0111fE]
+#[03A6f298B5]
+"""
+
+type_docs['Path'] = """Data Type path
+A path is something special to YCP and similar to paths in TCL. It is a sequence of path elements separated by dots. A path element can contain any characters except \\x00. If it contains something else than a-zA-Z0-9_- it must be enclosed in double quotes. The root path, i.e. the root of the tree is denoted by a single dot. Paths can be used for multiple purposes. One of their main tasks is the selection of data from complex data structures like the SCR-tree (see Chapter 2, SCR Tree).
+
+The backslash in paths can be used to mark a special characters:
+
+Representation	Meaning
+\\n	Newline (ASCII 10)
+\\t	Tabulator
+\\r	Carriage Return (ASCII 13)
+\\b	Backspace
+\\f	Form Feed
+\\xXX	ASCII character represented by the hexadecimal value XX.
+\\X	The character X itself.
+Example 2.8. Path constants
+
+.
+.17
+.etc.fstab
+."\\nHello !\\n".World
+
+."\\xff" == ."\\xFF"
+."\\x41" == ."A"
+."" != .
+"""
+
+type_docs['Void'] = """Data Type void (nil)
+This is the most simple data type. It has only one possible value: nil. Declaring variables of this type doesn't make much sense but it is very useful to declare functions that need not return any useful value. nil is often also returned as an error flag if functions fail in doing their job somehow.
+"""
+
+type_docs['Term'] = """Data Type term
+A term is something you won't find in C, Perl, Pascal or Lisp but you will find it in functional programming languages like Prolog for example. It is a list plus a symbol, with the list written between normal brackets. The term `alpha(17, true) denotes a symbol `alpha and the list [ 17, true ] as parameters for that symbol. This looks pretty much like a function call.
+
+You can also use the term as a parameter in another function call, for example to specify a user dialog.
+
+Example 2.9. Term constants
+
+`like_function_call(17, true)
+`HBox(`Pushbutton(`Id(`ok), \"OK\"), `TextEntry(`Id(`name), \"Name\"))
+"""
+

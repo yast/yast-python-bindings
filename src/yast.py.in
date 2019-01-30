@@ -1,8 +1,27 @@
+'''
+YaST Python Bindings
+
+The bindings allow YaST modules to be written using the Python language
+and also Python scripts can use YaST agents, APIs and modules.
+'''
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 import ycpbuiltins
-from ycp import Symbol, List, String, Integer, Boolean, Float, Code, Map, Byteblock, Path, Void
-from YCPDeclarations import YCPDeclare as Declare
-from yast_help import docs as __docs, scr_docs as __scr_docs
+from YCPDeclarations import Declare
+from yast_help import docs as __docs, scr_docs as __scr_docs, type_docs as __type_docs
+
+current_module = __import__(__name__)
+
+def ycp_meta_func_creator(func):
+    from six import PY2
+    cls_ptr = getattr(__import__('ycp' , fromlist=[func]), func)
+    func_ptr = (lambda *args : cls_ptr(*args))
+    func_ptr.__name__ = func.encode() if PY2 else func
+    if func in __type_docs.keys():
+        func_ptr.__doc__ = __type_docs[func]
+    return func_ptr
+for func in ['Symbol', 'List', 'String', 'Integer', 'Boolean', 'Float', 'Code', 'Map', 'Byteblock', 'Path', 'Void', 'Value']:
+    setattr(current_module, func, ycp_meta_func_creator(func))
 
 from gettext import gettext
 globals()['_'] = gettext
@@ -67,7 +86,6 @@ def meta_func_creator(func, lowercase):
         func_ptr.__doc__ = __docs[func]
     return func_ptr
 
-current_module = __import__(__name__)
 meta_funcs = {
         'BarGraph': False,
         'BusyIndicator': False,
@@ -165,8 +183,11 @@ def Term(*args):
     if l is not None:
         return YCPTerm(name, l)
     return YCPTerm(name)
+Term.__doc__ = __type_docs['Term']
 
 def Opt(*args):
+    '''
+    '''
     from ycp import Term as YCPTerm
     from six import binary_type, text_type, PY2
     l = List()
@@ -178,6 +199,8 @@ def Opt(*args):
 
 # Id can take argument other than string
 def Id(arg, dont_force_sym = False):
+    '''
+    '''
     from ycp import pyval_to_ycp
     from ycp import Term as YCPTerm
     from six import binary_type, string_types, PY2

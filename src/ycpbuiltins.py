@@ -203,11 +203,11 @@ def regexpmatch(searchtext, pattern):
     If string or pattern is None, or if pattern is an invalid regex, None is returned.
 
     Parameters:
-    string (String) — a string to search
-    pattern (String) — a regex in the C syntax
+    string (String) - a string to search
+    pattern (String) - a regex in the C syntax
 
     Returns:
-    (Boolean, None) — does string match pattern
+    (Boolean, None) - does string match pattern
     '''
     import re
     return re.search(pattern, searchtext) is not None
