@@ -491,9 +491,9 @@ string YPython::PyErrorHandler()
     pystring = NULL;
     if (errobj != NULL &&
             (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
-            (PyString_Check(pystring))
+            (PyStr_Check(pystring))
        ) {
-        result += PyString_AsString(pystring);
+        result += PyStr_AsString(pystring);
     } else {
         result += "<unknown exception type>";
     }
@@ -503,9 +503,9 @@ string YPython::PyErrorHandler()
     pystring = NULL;
     if (errdata != NULL &&
             (pystring = PyObject_Str(errdata)) != NULL &&
-            (PyString_Check(pystring))
+            (PyStr_Check(pystring))
        ) {
-        result += PyString_AsString(pystring);
+        result += PyStr_AsString(pystring);
     } else {
         result += "<unknown exception value>";
     }
@@ -514,9 +514,9 @@ string YPython::PyErrorHandler()
     result +="; error traceback: ";
 
     pystring = NULL;
-    if (errdata != NULL &&
+    if (errtraceback != NULL &&
             (pystring = PyObject_Str(errtraceback)) != NULL &&
-            (PyString_Check(pystring))
+            (PyStr_AsString(pystring))
        ) {
         PyObject *mod = PyImport_ImportModule("traceback");
         if (mod) {
@@ -533,13 +533,13 @@ string YPython::PyErrorHandler()
                 traceStr = PyUnicode_Join(newline, meth_result);
             }
             if (traceStr) {
-                result += PyString_AsString(traceStr);
+                result += PyStr_AsString(traceStr);
             }
             Py_XDECREF(meth_result);
             Py_XDECREF(traceStr);
             Py_XDECREF(newline);
         } else {
-            result += PyString_AsString(pystring);
+            result += PyStr_AsString(pystring);
         }
     } else {
         result += "<unknown exception traceback>";
