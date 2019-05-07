@@ -130,6 +130,30 @@ content = ButtonBox(
 )
 ```
 
+### Internationalization & Localization
+YaST python provides internationalization and localization using python's
+gettext library. Some helper functions are available via the python yast
+library.
+To bind to a text domain:
+```python
+from yast import textdomain
+textdomain('proj_name')
+```
+The textdomain function is a helper function which calls gettext.bindtextdomain
+and binds to /usr/share/YaST2/locale.
+You can also import the gettext function, or it's alias \_(), via the yast
+module to translate text.
+```python
+from yast import _
+_('Message to be translated.')
+```
+The \_() alias to gettext cannot be imported using `from yast import *`,
+because python automatically hides functions starting with an underscore. It
+must be imported explicitly.
+
+Translations for the text wrapped with gettext should be added to the
+yast2-trans package.
+
 ### Further Information
 
 More information about YaST can be found on its [homepage](http://yast.opensuse.org).
