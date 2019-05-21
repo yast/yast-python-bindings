@@ -3,32 +3,32 @@
 
 void swig_y2debug(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_DEBUG, "Python", file, line, func, msg);
+    y2_logger(LOG_DEBUG, "Python", file, line, func, "%s", msg);
 }
 
 void swig_y2milestone(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_MILESTONE, "Python", file, line, func, msg);
+    y2_logger(LOG_MILESTONE, "Python", file, line, func, "%s", msg);
 }
 
 void swig_y2warning(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_WARNING, "Python", file, line, func, msg);
+    y2_logger(LOG_WARNING, "Python", file, line, func, "%s", msg);
 }
 
 void swig_y2error(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_ERROR, "Python", file, line, func, msg);
+    y2_logger(LOG_ERROR, "Python", file, line, func, "%s", msg);
 }
 
 void swig_y2security(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_SECURITY, "Python", file, line, func, msg);
+    y2_logger(LOG_SECURITY, "Python", file, line, func, "%s", msg);
 }
 
 void swig_y2internal(const char *file, const int line, const char *func, const char *msg)
 {
-    y2_logger(LOG_INTERNAL, "Python", file, line, func, msg);
+    y2_logger(LOG_INTERNAL, "Python", file, line, func, "%s", msg);
 }
 %}
 
