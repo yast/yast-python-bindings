@@ -1,6 +1,6 @@
 BUILT_SOURCES = ycp.py yast.py
 ycp.py yast-core_wrap.cxx: yast-core.i ytypes.i ycp.i $(libpy2UI) YCPMap.h y2log.i
-	$(SWIG) $(AX_SWIG_PYTHON_OPT) -c++ -I/usr/include/YaST2 -o $@ $<
+	$(SWIG) $(AX_SWIG_PYTHON_OPT) -c++ -I/usr/include/YaST2 $(CPPFLAGS) -o $@ $<
 
 yast.py: yast.py.in
 	sed -e 's;[@]DATADIR[@];$(datadir);g' < $(srcdir)/yast.py.in > $(srcdir)/yast.py
@@ -25,22 +25,22 @@ uninstall-hook:
 	(cd $(DESTDIR)/${pyexecdir}; rm -f _ycp.so || echo)
 
 SOURCES = Y2PythonComponent.cc Y2CCPython.cc YPython.cc YPythonNamespace.cc YCPDeclarations.cc yast.cpp yast-core_wrap.cxx Y2PythonClientComponent.cc Y2CCPythonClient.cc YPythonCode.cc PythonLogger.cc
-LIBADD = -L$(py2langdir) -lpy2UI -lpy2wfm
-LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(pyexecdir)
-CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate -Wno-format-security -Wno-format-nonliteral
+LIB_LIBADD = -L$(py2langdir) -lpy2UI -lpy2wfm
+LIB_LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(pyexecdir)
+LIB_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate -Wno-format-security -Wno-format-nonliteral
 
 if HAVE_PY3
 py2lang_LTLIBRARIES = libpy2lang_python3.la
 libpy2lang_python3_la_SOURCES = $(SOURCES)
-libpy2lang_python3_la_LIBADD = $(LIBADD)
-libpy2lang_python3_la_LDFLAGS = $(LDFLAGS)
-libpy2lang_python3_la_CPPFLAGS = $(CPPFLAGS)
+libpy2lang_python3_la_LIBADD = $(LIB_LIBADD)
+libpy2lang_python3_la_LDFLAGS = $(LIB_LDFLAGS)
+libpy2lang_python3_la_CPPFLAGS = $(LIB_CPPFLAGS)
 else
 py2lang_LTLIBRARIES = libpy2lang_python.la
 libpy2lang_python_la_SOURCES = $(SOURCES)
-libpy2lang_python_la_LIBADD = $(LIBADD)
-libpy2lang_python_la_LDFLAGS = $(LDFLAGS)
-libpy2lang_python_la_CPPFLAGS = $(CPPFLAGS)
+libpy2lang_python_la_LIBADD = $(LIB_LIBADD)
+libpy2lang_python_la_LDFLAGS = $(LIB_LDFLAGS)
+libpy2lang_python_la_CPPFLAGS = $(LIB_CPPFLAGS)
 endif
 
 AM_CXXFLAGS = -DY2LOG=\"Python\"
