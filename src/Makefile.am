@@ -26,7 +26,7 @@ uninstall-hook:
 
 SOURCES = Y2PythonComponent.cc Y2CCPython.cc YPython.cc YPythonNamespace.cc YCPDeclarations.cc yast.cpp yast-core_wrap.cxx Y2PythonClientComponent.cc Y2CCPythonClient.cc YPythonCode.cc PythonLogger.cc
 LIB_LIBADD = -L$(py2langdir) -lpy2UI -lpy2wfm
-LIB_LDFLAGS = -module ${PYTHON_LDFLAGS} -Wl,-rpath=$(pyexecdir)
+LIB_LDFLAGS = -module ${PYTHON_LDFLAGS} ${PYTHON_LIBS} -Wl,-rpath=$(pyexecdir)
 LIB_CPPFLAGS = -std=c++11 -I/usr/include/YaST2 ${PYTHON_CPPFLAGS} -Wno-terminate -Wno-format-security -Wno-format-nonliteral
 
 if HAVE_PY3
