@@ -1,7 +1,9 @@
 # YaST - The Python Bindings #
 
-[![Travis Build](https://travis-ci.org/yast/yast-python-bindings.svg?branch=master)](https://travis-ci.org/yast/yast-python-bindings)
-[![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-yast-python-bindings-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-yast-python-bindings-master/)
+[![Workflow Status](https://github.com/yast/yast-python-bindings/workflows/CI/badge.svg?branch=master)](
+https://github.com/yast/yast-python-bindings/actions?query=branch%3Amaster)
+[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-python-bindings-master)](
+https://ci.opensuse.org/view/Yast/job/yast-yast-python-bindings-master/)
 
 The API documentation for the UI can be found [here][api]. For more details,
 check the [YaST documentation][doc].
