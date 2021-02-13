@@ -488,6 +488,9 @@ string YPython::PyErrorHandler()
     /* get latest python exception info */
     PyErr_Fetch(&errobj, &errdata, &errtraceback);
 
+    /* normalize the value to assure it is be an exception object */
+    PyErr_NormalizeException(&errobj, &errdata, &errtraceback);
+
     pystring = NULL;
     if (errobj != NULL &&
             (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
