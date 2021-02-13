@@ -544,6 +544,7 @@ string YPython::PyErrorHandler()
         } else {
             result += PyStr_AsString(pystring);
         }
+        Py_XDECREF(mod);
     } else {
         result += "<unknown exception traceback>";
     }
