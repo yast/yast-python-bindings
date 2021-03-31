@@ -487,7 +487,7 @@ string YPython::PyErrorHandler()
     string result = "error type: ";
     /* get latest python exception info */
     PyErr_Fetch(&errobj, &errdata, &errtraceback);
-
+    PyErr_NormalizeException(&errobj, &errdata, &errtraceback);
     pystring = NULL;
     if (errobj != NULL &&
             (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
