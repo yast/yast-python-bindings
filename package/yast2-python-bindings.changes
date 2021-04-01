@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sat Feb 13 18:53:41 UTC 2021 - Petr Pavlu <petr.pavlu@suse.com>
+
+- Fix backtrace formatting for Python exceptions (bsc#1181595).
+- 4.2.0
+
+-------------------------------------------------------------------
 Thu Mar 12 13:30:21 UTC 2020 - Noel Power <nopower@suse.com>
 
 - Fix build for python 3.8; (bsc#1166517)/
