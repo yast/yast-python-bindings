@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr  1 12:39:38 UTC 2021 - Petr Pavlu <petr.pavlu@suse.com>
+
+- Fix backtrace formatting for Python exceptions (bsc#1181595).
+- 4.2.0
+
+-------------------------------------------------------------------
 Tue Mar 30 19:03:16 UTC 2021 - Noel Power <nopower@suse.com>
 
 - Fix PyErrorHandler() function, normalise exception object;
