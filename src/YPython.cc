@@ -487,7 +487,10 @@ string YPython::PyErrorHandler()
     string result = "error type: ";
     /* get latest python exception info */
     PyErr_Fetch(&errobj, &errdata, &errtraceback);
+
+    /* normalize the value to assure it is be an exception object */
     PyErr_NormalizeException(&errobj, &errdata, &errtraceback);
+
     pystring = NULL;
     if (errobj != NULL &&
             (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
@@ -541,6 +544,7 @@ string YPython::PyErrorHandler()
         } else {
             result += PyStr_AsString(pystring);
         }
+        Py_XDECREF(mod);
     } else {
         result += "<unknown exception traceback>";
     }
