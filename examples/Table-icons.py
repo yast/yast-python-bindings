@@ -43,9 +43,9 @@ class TableIconsClient:
 
       test = Term("icon", "22x22/apps/" + "iconName")
       test = Term("cell",test)
-      print "working %s"%test.toString()
+      print ("working %s"%test.toString())
       test = Term("cell", Term("icon", "22x22/apps/" + "iconName"))
-      print "not working %s"%test.toString()
+      print ("not working %s"%test.toString())
 
 
       for iconName in ycpbuiltins.foreach(iconList):
@@ -90,7 +90,7 @@ def readIconDir(dir):
       
       
       filtered.sort()
-      print "returning %d items"%len(filtered)
+      print ("returning %d items"%len(filtered))
       return copy.deepcopy(filtered)
 
 TableIconsClient().main()
