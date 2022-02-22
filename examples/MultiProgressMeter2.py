@@ -110,7 +110,7 @@ class MultiProgressMeter2Client:
 
         if widgetClass == "RadioButton":
           currentUnitID = UI.QueryWidget("unit", "CurrentButton")
-          print "type %s"%type(currentUnitID)
+          print ("type %s"%type(currentUnitID))
           #if Ops.is_term?(currentUnitID):
           if isinstance (currentUnitID, YCPTerm):
             unit = currentUnitID.value(0)
