@@ -11,20 +11,13 @@ class Image1Client:
         VBox(
           Image(
             Id("image"),
-            "/usr/share/YaST2/theme/current/wallpapers/welcome.jpg",
+            "/usr/share/grub2/themes/openSUSE/logo.png",
             "fallback text"
           ),
           PushButton(Opt("default"), "&OK")
         )
       )
       UI.UserInput()
-      if UI.WidgetExists(Id("image")):
-        UI.ChangeWidget(Id("image"), "Enabled", False)
-        UI.UserInput()
-        UI.ChangeWidget(Id("image"), "Enabled", True)
-        UI.UserInput()
-      else:
-        ycpbuiltins.y2error("No such widget id")
       UI.CloseDialog()
 
 
