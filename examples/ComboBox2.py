@@ -56,7 +56,7 @@ class ComboBox2Client:
       UI.OpenDialog(
         VBox(
           Label("You will get a pizza with:"),
-          Label("toppings"),
+          Label(toppings),
           PushButton("&OK")
         )
       )
