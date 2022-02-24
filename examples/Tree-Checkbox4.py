@@ -12,35 +12,37 @@ class TreeCheckbox4Client:
 
 
       UI.OpenDialog(
-        VBox(
-          Heading("YaST2 Mini Control Center"),
-          Tree(
-            Id("mod"),
-            Opt("multiSelection", "notify", "immediate", "recursiveSelection"),
-            "Modules",
-            [
-              Item(Id("unselected"), "Unseleted"),
-              Item(
-                Id("country"),
-                "Localization",
-                True,
-                [
-                  Item(Id("keyboard"), "Keyboard"),
-                  Item(
-                    Id("timezone"),
-                    "Time zone",
-                    True,
-                    [Item(Id("europe"), "Europe"), Item(Id("asia"), "Asia")]
-                  )
-                ]
-              ),
-              Item(Id("mouse"), "Mouse"),
-              Item(Id("lan"), "Network"),
-              Item(Id("xmas"), "Merry X-Mas"),
-              Item(Id("newyear"), "Happy New Year")
-            ]
-          ),
-          PushButton(Id("ok"), Opt("default"), "&OK")
+        MinSize( 40, 15,
+          VBox(
+            Heading("YaST2 Mini Control Center"),
+            Tree(
+              Id("mod"),
+              Opt("multiSelection", "notify", "immediate", "recursiveSelection"),
+              "Modules",
+              [
+                Item(Id("unselected"), "Unseleted"),
+                Item(
+                  Id("country"),
+                  "Localization",
+                  True,
+                  [
+                    Item(Id("keyboard"), "Keyboard"),
+                    Item(
+                      Id("timezone"),
+                      "Time zone",
+                      True,
+                      [Item(Id("europe"), "Europe"), Item(Id("asia"), "Asia")]
+                    )
+                  ]
+                ),
+                Item(Id("mouse"), "Mouse"),
+                Item(Id("lan"), "Network"),
+                Item(Id("xmas"), "Merry X-Mas"),
+                Item(Id("newyear"), "Happy New Year")
+              ]
+            ),
+            PushButton(Id("ok"), Opt("default"), "&OK")
+          )
         )
       )
 
