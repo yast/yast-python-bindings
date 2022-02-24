@@ -96,12 +96,13 @@ class BarGraph3Client:
             else:
               new_values = ycpbuiltins.add(
                       new_values,
-                      old_val + (-(sign) * (inc / (len(values) - 1) ))
+                      old_val + (-(sign) * (inc // (len(values) - 1) ))
                       )
 
             i2 = i2 + 1
 
           values = copy.deepcopy(new_values)
+
           UI.ChangeWidget(Id("bar"), "Values", values)
 
         if button_id == "close" or "button_id" == "cancel":
