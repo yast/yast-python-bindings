@@ -76,7 +76,8 @@ class TableIconsClient:
     # Read a directory with icons.
     #
 def readIconDir(dir):
-      iconList = list(SCR.Read(Path(".target.dir"), dir))
+      iconList = SCR.Read(Path(".target.dir"), dir)
+      iconList = list(iconList) if iconList else []
       ycpbuiltins.y2debug("Dir %1: %2  entries", dir, ycpbuiltins.size(iconList))
 #      #TODO #FIXME add ycbbuiltins.filter()
 #      #TODO #FIXME add ycbbuiltins.sort()
