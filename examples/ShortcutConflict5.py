@@ -14,7 +14,7 @@ class ShortcutConflict5Client:
     def main(self):
       UI.OpenDialog(
         Opt("defaultsize"),
-        Wizard("back", "&Back", "abort", "&Abort", "next", "&Next")
+        Wizard(Symbol("back"), "&Back", Symbol("abort"), "&Abort", Symbol("next"), "&Next")
       )
 
       fields = HBox(
