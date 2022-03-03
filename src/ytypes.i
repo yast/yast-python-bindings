@@ -26,7 +26,7 @@ YCPValue pyval_to_ycp(PyObject *input)
 #if PY_MAJOR_VERSION >= 3
         return YCPString(_PyUnicode_AsString(input));
 #else
-        PyObject* encoded = PyUnicode_Encode(PyUnicode_AsUnicode(input), PyUnicode_GetSize(input), "ascii", NULL);
+        PyObject* encoded = PyUnicode_AsEncodedString(input, "utf8", NULL);
         return YCPString(PyBytes_AsString(encoded));
 #endif
     }
