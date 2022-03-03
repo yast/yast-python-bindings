@@ -10,7 +10,7 @@ class ShortcutConflict6Client:
 
       UI.OpenDialog(
         HBox(
-          PushButton("&\u00A7\u00A7"),
+          PushButton(u"&\u00A7\u00A7"),
           PushButton("&???"),
           PushButton("?&??"),
           PushButton("&!!!"),
