@@ -63,11 +63,11 @@ class SlideShowDemo2Client:
         Opt("defaultsize"),
         Wizard(
           Opt("stepsEnabled"),
-          Id("back"),
+          Symbol("back"),
           "&Back",
-          Id("abort"),
+          Symbol("abort"),
           "Ab&ort",
-          Id("next"),
+          Symbol("next"),
           "&Next"
         )
       )
