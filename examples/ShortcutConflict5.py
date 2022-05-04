@@ -40,7 +40,7 @@ class ShortcutConflict5Client:
 
         ycpbuiltins.y2milestone("Got event: %1", event)
 
-        if event["ID"] == "abort":
+        if "ID" in event and event["ID"] == "abort":
           break
 
       UI.CloseDialog()
