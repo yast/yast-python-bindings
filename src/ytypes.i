@@ -5,7 +5,7 @@ YCPValue pyval_to_ycp(PyObject *input)
     void *arg = 0;
 
     if (input == Py_None)
-        return YCPNull();
+        return YCPVoid();
     if (PyBool_Check(input)) {
 #if PY_MAJOR_VERSION >= 3
         if (PyObject_RichCompareBool(input, Py_True, Py_EQ) == 1)
