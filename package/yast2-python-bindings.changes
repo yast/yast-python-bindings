@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed Feb  8 16:03:16 UTC 2023 - Noel Power <nopower@suse.com>
+
+- Misc fixes to examples; (bsc#1199343).
+- Fix python2 utf8 handling (python2 code wasn't displaying unicode
+  strings); (bsc#1199348).
+- Change conversion of Py_None to YCP_Void instead of YCP_Null;
+  (bsc#1199344).
+- 4.2.1
+
+-------------------------------------------------------------------
 Sat Feb 13 18:53:41 UTC 2021 - Petr Pavlu <petr.pavlu@suse.com>
 
 - Fix backtrace formatting for Python exceptions (bsc#1181595).
