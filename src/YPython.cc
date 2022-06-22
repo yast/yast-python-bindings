@@ -114,7 +114,14 @@ public:
 
 YPython * YPython::_yPython = 0;
 
-YPython::YPython():_pMainDicts(PyDict_New()) {}
+YPython::YPython()
+{
+    //initialize python
+    if (!Py_IsInitialized()) {
+        Py_Initialize();
+    }
+    _pMainDicts = PyDict_New();
+}
 
 
 YPython::~YPython() {}
@@ -174,11 +181,6 @@ YPython::importModule(string modulePath)
     PyObject* pModuleName = NULL;
     PyObject* pMain = NULL;
     ModuleFilePath module(modulePath);
-    //initialize python
-    if (!Py_IsInitialized()) {
-        Py_Initialize();
-    }
-
     // put module path in os.path for loading
     append_to_sys_path(module.path().c_str());
 
