@@ -14,7 +14,7 @@ class ShortcutConflict5Client:
     def main(self):
       UI.OpenDialog(
         Opt("defaultsize"),
-        Wizard("back", "&Back", "abort", "&Abort", "next", "&Next")
+        Wizard(Symbol("back"), "&Back", Symbol("abort"), "&Abort", Symbol("next"), "&Next")
       )
 
       fields = HBox(
@@ -40,7 +40,7 @@ class ShortcutConflict5Client:
 
         ycpbuiltins.y2milestone("Got event: %1", event)
 
-        if Ops.get(event, "ID") == "abort":
+        if "ID" in event and event["ID"] == "abort":
           break
 
       UI.CloseDialog()
