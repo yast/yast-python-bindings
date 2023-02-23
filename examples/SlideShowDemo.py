@@ -63,11 +63,11 @@ class SlideShowDemoClient:
         Opt("defaultsize"),
         Wizard(
           Opt("stepsEnabled"),
-          Id("back"),
+          Symbol("back"),
           "&Back",
-          Id("abort"),
+          Symbol("abort"),
           "Ab&ort",
-          Id("next"),
+          Symbol("next"),
           "&Next"
         )
       )
@@ -303,8 +303,8 @@ class SlideShowDemoClient:
       return ycpbuiltins.sformat("0%1", n) if (n < 10) else ycpbuiltins.sformat("%1", n)
 
     def formatTime(self, seconds):
-      hours = (seconds / 3600)
-      minutes = (seconds / 60)
+      hours = (seconds // 3600)
+      minutes = (seconds // 60)
       seconds = (seconds % 60)
       return ycpbuiltins.sformat(
         "%1:%2:%3",
