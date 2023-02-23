@@ -7,44 +7,46 @@ from yast import *
 class TreeCheckbox2Client:
     def main(self):
       UI.OpenDialog(
-        VBox(
-          Heading("YaST2 Mini Control Center"),
-          Tree(
-            Id("mod"),
-            Opt("notify", "multiSelection", "immediate"),
-            "Modules",
-            [
-              Item(
-                Id("country"),
-                Term("icon", "yast-yast-language.png"),
-                "Localization",
-                False,
-                [
-                  Item(
-                    Id("keyboard"),
-                    Term("icon", "yast-keyboard.png"),
-                    "Keyboard"
-                  ),
-                  Item(
-                    Id("timezone"),
-                    Term("icon", "yast-timezone.png"),
-                    "Time zone"
-                  )
-                ]
-              ),
-              Item(Id("mouse"), Term("icon", "yast-mouse.png"), "Mouse"),
-              Item(Id("lan"), Term("icon", "yast-lan.png"), "Network"),
-              Item(Id("xmas"), Term("icon", "yast-software.png"), "Merry X-Mas"),
-              Item(
-                Id("newyear"),
-                Term("icon", "yast-software.png"),
-                "Happy New Year"
-              )
-            ]
-          ),
-          HBox(
-            PushButton(Id("ok"), Opt("default"), "&OK"),
-            PushButton(Id("deselect"), "&Log selected")
+        MinSize( 40, 15,
+          VBox(
+            Heading("YaST2 Mini Control Center"),
+            Tree(
+              Id("mod"),
+              Opt("notify", "multiSelection", "immediate"),
+              "Modules",
+              [
+                Item(
+                  Id("country"),
+                  Term("icon", "yast-yast-language.png"),
+                  "Localization",
+                  False,
+                  [
+                    Item(
+                      Id("keyboard"),
+                      Term("icon", "yast-keyboard.png"),
+                      "Keyboard"
+                    ),
+                    Item(
+                      Id("timezone"),
+                      Term("icon", "yast-timezone.png"),
+                      "Time zone"
+                    )
+                  ]
+                ),
+                Item(Id("mouse"), Term("icon", "yast-mouse.png"), "Mouse"),
+                Item(Id("lan"), Term("icon", "yast-lan.png"), "Network"),
+                Item(Id("xmas"), Term("icon", "yast-software.png"), "Merry X-Mas"),
+                Item(
+                  Id("newyear"),
+                  Term("icon", "yast-software.png"),
+                  "Happy New Year"
+                )
+              ]
+            ),
+            HBox(
+              PushButton(Id("ok"), Opt("default"), "&OK"),
+              PushButton(Id("deselect"), "&Log selected")
+            )
           )
         )
       )

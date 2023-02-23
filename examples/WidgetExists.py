@@ -59,7 +59,7 @@ def Summary():
         summary = summary + "\nBottom button exists" 
       else:
         summary = summary + "\nNo bottom button"
-      print "returning \n%s"%summary
+      print ("returning \n%s"%summary)
       return summary
 
     # Remove button with given id and update summary.

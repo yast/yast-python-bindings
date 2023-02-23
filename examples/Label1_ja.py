@@ -5,7 +5,7 @@ import_module('UI')
 from yast import *
 class Label1JaClient:
     def main(self):
-      UI.OpenDialog(VBox(Label("\u5B8C\u6642"), PushButton("&OK\u5B8C\u6642")))
+      UI.OpenDialog(VBox(Label(u"\u5B8C\u6642"), PushButton(u"&OK\u5B8C\u6642")))
       UI.UserInput()
       UI.CloseDialog()
 

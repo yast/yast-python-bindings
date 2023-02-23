@@ -43,9 +43,9 @@ class TableIconsClient:
 
       test = Term("icon", "22x22/apps/" + "iconName")
       test = Term("cell",test)
-      print "working %s"%test.toString()
+      print ("working %s"%test.toString())
       test = Term("cell", Term("icon", "22x22/apps/" + "iconName"))
-      print "not working %s"%test.toString()
+      print ("not working %s"%test.toString())
 
 
       for iconName in ycpbuiltins.foreach(iconList):
@@ -76,7 +76,8 @@ class TableIconsClient:
     # Read a directory with icons.
     #
 def readIconDir(dir):
-      iconList = list(SCR.Read(Path(".target.dir"), dir))
+      iconList = SCR.Read(Path(".target.dir"), dir)
+      iconList = list(iconList) if iconList else []
       ycpbuiltins.y2debug("Dir %1: %2  entries", dir, ycpbuiltins.size(iconList))
 #      #TODO #FIXME add ycbbuiltins.filter()
 #      #TODO #FIXME add ycbbuiltins.sort()
@@ -90,7 +91,7 @@ def readIconDir(dir):
       
       
       filtered.sort()
-      print "returning %d items"%len(filtered)
+      print ("returning %d items"%len(filtered))
       return copy.deepcopy(filtered)
 
 TableIconsClient().main()

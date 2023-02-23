@@ -22,8 +22,7 @@ class PatternSelectorWizardWithPackagesClient:
 
       UI.OpenDialog(
         Opt("defaultsize"),
-        #Wizard("back", "", "cancel", "&Cancel", "ok", "&OK")
-        Wizard(Opt("stepsEnabled"), Id("back"), "", Id("cancel"), "&Cancel", Id("ok"), "&OK")
+        Wizard(Symbol("back"), "", Symbol("cancel"), "&Cancel", Symbol("ok"), "&OK")
       )
 
 
