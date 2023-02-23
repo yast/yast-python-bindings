@@ -50086,7 +50086,7 @@ class TreeRecursiveLargeClient:
         current = UI.QueryWidget(Id("mod"), "CurrentItem")
         ycpbuiltins.y2milestone("Current item: %1", current)
         if id == "ok":
-	  break
+          break
       UI.CloseDialog()
 
 TreeRecursiveLargeClient().main()

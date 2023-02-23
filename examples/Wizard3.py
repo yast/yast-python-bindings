@@ -34,7 +34,6 @@ class Wizard3Client:
       ]
 
       self.steps = ycpbuiltins.flatten([base_installation_steps, config_steps])
-
       if not UI.HasSpecialWidget("Wizard"):
         ycpbuiltins.y2error(
           "This works only with UIs that provide the wizard widget!"
@@ -78,9 +77,10 @@ class Wizard3Client:
         UI.WizardCommand(
           Term(
             "AddStep",
-            step["label"]),
-            step["id"])
-
+            step["label"],
+            step["id"]
+          )
+        )
       UI.WizardCommand(Term("AddStepHeading", "Configuration"))
 
       for step in ycpbuiltins.foreach(config_steps):

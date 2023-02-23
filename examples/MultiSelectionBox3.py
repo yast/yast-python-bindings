@@ -26,7 +26,7 @@ class MultiSelectionBox3Client:
           PushButton(Opt("default"), "&OK")
         )
       )
-      UI.ChangeWidget("toppings", "SelectedItems", ["sausage", "onions"])
+      UI.ChangeWidget("toppings", "SelectedItems", [Symbol("sausage"), Symbol("onions")])
 
       UI.UserInput()
       selected_items = UI.QueryWidget(Id("toppings"), "SelectedItems")
