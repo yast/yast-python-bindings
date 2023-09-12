@@ -98,7 +98,7 @@ class YCPDeclare:
     def _checkNumParams(self, func, numTypes):
         """ Check if number of parameters equals to number of defined types """
 
-        args = len(inspect.getargspec(func)[0])
+        args = len(inspect.getfullargspec(func)[0])
         if args != numTypes:
             raise Exception("Number of declared types does not match number of arguments.")
         
