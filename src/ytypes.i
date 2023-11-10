@@ -64,7 +64,7 @@ YCPValue pyval_to_ycp(PyObject *input)
             l->add(pyval_to_ycp(PyTuple_GetItem(input, i)));
         return l;
     }
-    ret = SWIG_ConvertPtr(input, &arg, SWIGTYPE_p_YCPValue, SWIG_POINTER_DISOWN | 0);
+    ret = SWIG_ConvertPtr(input, &arg, SWIGTYPE_p_YCPValue, 0 | 0);
     if (SWIG_IsOK(ret))
         return *(reinterpret_cast<YCPValue*>(arg));
 
