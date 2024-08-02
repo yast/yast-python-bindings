@@ -2,8 +2,7 @@
 
 [![Workflow Status](https://github.com/yast/yast-python-bindings/workflows/CI/badge.svg?branch=master)](
 https://github.com/yast/yast-python-bindings/actions?query=branch%3Amaster)
-[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-python-bindings-master)](
-https://ci.opensuse.org/view/Yast/job/yast-yast-python-bindings-master/)
+[![OBS](https://github.com/yast/yast-python-bindings/actions/workflows/submit.yml/badge.svg)](https://github.com/yast/yast-python-bindings/actions/workflows/submit.yml)
 
 The API documentation for the UI can be found [here][api]. For more details,
 check the [YaST documentation][doc].
