@@ -1,4 +1,6 @@
 %{
+#include "compat.h"
+
 YCPValue pyval_to_ycp(PyObject *input)
 {
     int ret;
@@ -24,7 +26,7 @@ YCPValue pyval_to_ycp(PyObject *input)
         return YCPString(PyString_AsString(input));
     if (PyUnicode_Check(input)) {
 #if PY_MAJOR_VERSION >= 3
-        return YCPString(_PyUnicode_AsString(input));
+        return YCPString(PyUnicode_AsUTF8(input));
 #else
         PyObject* encoded = PyUnicode_AsEncodedString(input, "utf8", NULL);
         return YCPString(PyBytes_AsString(encoded));
