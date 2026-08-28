@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-python-bindings
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2025 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -77,23 +77,23 @@ The bindings allow YaST modules to be written using the Python language
 and also Python scripts can use YaST agents, APIs and modules.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-make %{?_smp_mflags} -f Makefile.cvs all
+%make_build -f Makefile.cvs all
 %if %{with python3}
-mkdir py3 && pushd py3
+mkdir py3 && cd py3
 ln -s ../configure configure
 %configure --enable-python3
 %make_build
-popd
+cd -
 %endif
 %if %{with python2}
-mkdir py2 && pushd py2
+mkdir py2 && cd py2
 ln -s ../configure configure
 %configure
 %make_build
-popd
+cd -
 %endif
 
 %install
